@@ -11,6 +11,8 @@
 ![Python](https://img.shields.io/badge/python-3.12-3776AB)
 ![Videos](https://img.shields.io/badge/output-Shorts%20%2B%20Long%20videos-FF0000)
 
+**[▶️ See videos made with it](#-videos-made-with-autotube-studio)**
+
 </div>
 
 ---
@@ -66,6 +68,73 @@ flowchart LR
 ```
 
 Or let the **schedule** do it: the month planner fills every day with titles, and each one goes through the same steps on its day.
+
+---
+
+## 🎬 Videos made with AutoTube Studio
+
+Every video below was researched, written, animated, voiced and uploaded by AutoTube Studio. **Click any thumbnail to watch it on YouTube.**
+
+### 🧮 Exam channel: *Elevate with Sanjeev [IITK]* (JEE / NEET, Hinglish)
+
+Solved concepts, exam rules, myths and strategy, with real-life physics, whiteboard working, quizzes and news-style explainers.
+
+<table>
+<tr>
+<td align="center" width="33%" valign="top"><a href="https://youtu.be/JfgFPWZd1Qs"><img src="https://img.youtube.com/vi/JfgFPWZd1Qs/hqdefault.jpg" width="260" alt=""/></a><br/><sub><b>📱 Short</b></sub><br/><a href="https://youtu.be/JfgFPWZd1Qs">Cricket Ka SIX: Ball Kis Angle Pe Sabse Door Jaati Hai? 🏏 · 45° Ka Sach</a></td>
+<td align="center" width="33%" valign="top"><a href="https://youtu.be/zdUVXpXpDjs"><img src="https://img.youtube.com/vi/zdUVXpXpDjs/hqdefault.jpg" width="260" alt=""/></a><br/><sub><b>📱 Short</b></sub><br/><a href="https://youtu.be/zdUVXpXpDjs">Phone Falls Off a Table: Only 0.4 Seconds! · Free Fall JEE NEET</a></td>
+<td align="center" width="33%" valign="top"><a href="https://youtu.be/iorbQgb3xNk"><img src="https://img.youtube.com/vi/iorbQgb3xNk/hqdefault.jpg" width="260" alt=""/></a><br/><sub><b>📱 Short</b></sub><br/><a href="https://youtu.be/iorbQgb3xNk">Lift Cable Snaps! What Does the Weighing Machine Show? · JEE NEET</a><br/><sub>🎨 cel-anime-80s · whiteboard</sub></td>
+</tr>
+<tr>
+<td align="center" width="33%" valign="top"><a href="https://youtu.be/JClBCTn9RcE"><img src="https://img.youtube.com/vi/JClBCTn9RcE/hqdefault.jpg" width="260" alt=""/></a><br/><sub><b>📱 Short</b></sub><br/><a href="https://youtu.be/JClBCTn9RcE">100W vs 60W Series Mein: Kaunsa Bulb Zyada Chamkega? 💡 · JEE NEET</a><br/><sub>🎨 cel-anime-80s · whiteboard</sub></td>
+<td align="center" width="33%" valign="top"><a href="https://youtu.be/B04kRfHW7l8"><img src="https://img.youtube.com/vi/B04kRfHW7l8/hqdefault.jpg" width="260" alt=""/></a><br/><sub><b>📱 Short</b></sub><br/><a href="https://youtu.be/B04kRfHW7l8">Numerical Mein Negative Marking Nahi? ❌ JEE Main Ka Sabse Bada Myth</a><br/><sub>🎨 cel-anime-80s · whiteboard</sub></td>
+<td align="center" width="33%" valign="top"><a href="https://youtu.be/0GqXpl27cKs"><img src="https://img.youtube.com/vi/0GqXpl27cKs/hqdefault.jpg" width="260" alt=""/></a><br/><sub><b>📱 Short</b></sub><br/><a href="https://youtu.be/0GqXpl27cKs">75 Sawal, 180 Minute: Har Sawal 2.4 Min Dena Galti Hai! · JEE Main</a><br/><sub>🎨 cel-anime-80s · whiteboard</sub></td>
+</tr>
+<tr>
+<td align="center" width="33%" valign="top"><a href="https://youtu.be/CbKJyIPkU8g"><img src="https://img.youtube.com/vi/CbKJyIPkU8g/hqdefault.jpg" width="260" alt=""/></a><br/><sub><b>📱 Short</b></sub><br/><a href="https://youtu.be/CbKJyIPkU8g">HC Verma Ya DC Pandey? Asli Jawab: Dono, Par Is Order Mein · JEE</a><br/><sub>🎨 cel-anime-80s · whiteboard</sub></td>
+<td align="center" width="33%" valign="top"><a href="https://youtu.be/sILoblbbO34"><img src="https://img.youtube.com/vi/sILoblbbO34/hqdefault.jpg" width="260" alt=""/></a><br/><sub><b>📱 Short</b></sub><br/><a href="https://youtu.be/sILoblbbO34">165 vs 196 Marks, Dono 99 Percentile! Tough Shift Ka Sach · JEE Main</a><br/><sub>🎨 cel-anime-80s · whiteboard</sub></td>
+<td align="center" width="33%" valign="top"><a href="https://youtu.be/UUO0AhdZSIQ"><img src="https://img.youtube.com/vi/UUO0AhdZSIQ/hqdefault.jpg" width="260" alt=""/></a><br/><sub><b>📱 Short</b></sub><br/><a href="https://youtu.be/UUO0AhdZSIQ">JEE Main Form Mein Galti? Naya Form Chalega, Par 2 ID = UFM! ⚠️</a><br/><sub>🎨 cel-anime-80s · news-package · whiteboard · halftone-dossier</sub></td>
+</tr>
+<tr>
+<td align="center" width="33%" valign="top"><a href="https://youtu.be/RjuOERTlvpc"><img src="https://img.youtube.com/vi/RjuOERTlvpc/hqdefault.jpg" width="260" alt=""/></a><br/><sub><b>📱 Short</b></sub><br/><a href="https://youtu.be/RjuOERTlvpc">Jan Mein JEE, Feb Mein Boards! 2027 Ka Calendar Kaise Sambhalein 📅</a><br/><sub>🎨 caption-news · transit-map · whiteboard · cel-anime-80s</sub></td>
+<td align="center" width="33%" valign="top"><a href="https://youtu.be/dlUeJwOSpSs"><img src="https://img.youtube.com/vi/dlUeJwOSpSs/hqdefault.jpg" width="260" alt=""/></a><br/><sub><b>📱 Short</b></sub><br/><a href="https://youtu.be/dlUeJwOSpSs">Sawal Chhoda, Phir Bhi +4 Mile! Dropped Question Ka Rule · JEE Main</a><br/><sub>🎨 visual-investigation · whiteboard · isometric-picture-book · pixel-rpg</sub></td>
+<td align="center" width="33%" valign="top"><a href="https://youtu.be/JAa6y09wzTE"><img src="https://img.youtube.com/vi/JAa6y09wzTE/hqdefault.jpg" width="260" alt=""/></a><br/><sub><b>📱 Short</b></sub><br/><a href="https://youtu.be/JAa6y09wzTE">Dropper Ho? JEE Advanced Ke Sirf 2 Attempts, Kaise Count Hote Hain?</a><br/><sub>🎨 news-package · whiteboard · chalkboard · countdown</sub></td>
+</tr>
+</table>
+
+➡️ **Watch more:** [Elevate with Sanjeev on YouTube](https://www.youtube.com/@elevatewithsanjeev)
+
+### 🏛️ History channel: *Little Big Histories*
+
+Documentaries and Shorts on the hidden stories behind everyday things, mixing maps, archive photos, newsreel, engravings and investigation boards.
+
+<table>
+<tr>
+<td align="center" width="33%" valign="top"><a href="https://youtu.be/J3PIKR7qxUY"><img src="https://img.youtube.com/vi/J3PIKR7qxUY/hqdefault.jpg" width="260" alt=""/></a><br/><sub><b>🎞️ Long</b></sub><br/><a href="https://youtu.be/J3PIKR7qxUY">Nobody on the Silk Road Ever Called It That: The Real Story</a></td>
+<td align="center" width="33%" valign="top"><a href="https://youtu.be/MZJ3LiF2aKw"><img src="https://img.youtube.com/vi/MZJ3LiF2aKw/hqdefault.jpg" width="260" alt=""/></a><br/><sub><b>🎞️ Long</b></sub><br/><a href="https://youtu.be/MZJ3LiF2aKw">How Sugar Went From Kings' Medicine to Your Kitchen</a><br/><sub>🎨 cel-anime-80s · shadow-puppet · transit-map · woodcut</sub></td>
+<td align="center" width="33%" valign="top"><a href="https://youtu.be/xypiZfAF_aI"><img src="https://img.youtube.com/vi/xypiZfAF_aI/hqdefault.jpg" width="260" alt=""/></a><br/><sub><b>🎞️ Long</b></sub><br/><a href="https://youtu.be/xypiZfAF_aI">akabar and maharanapratha wrestling</a></td>
+</tr>
+<tr>
+<td align="center" width="33%" valign="top"><a href="https://youtu.be/HQztMeiVU7M"><img src="https://img.youtube.com/vi/HQztMeiVU7M/hqdefault.jpg" width="260" alt=""/></a><br/><sub><b>📱 Short</b></sub><br/><a href="https://youtu.be/HQztMeiVU7M">This 4,500-Year-Old City Saved Every Drop of Rain</a></td>
+<td align="center" width="33%" valign="top"><a href="https://youtu.be/qjcdS4cWdfo"><img src="https://img.youtube.com/vi/qjcdS4cWdfo/hqdefault.jpg" width="260" alt=""/></a><br/><sub><b>📱 Short</b></sub><br/><a href="https://youtu.be/qjcdS4cWdfo">Shivaji's great escape from Agra</a></td>
+<td align="center" width="33%" valign="top"><a href="https://youtu.be/6DSHTEHONRA"><img src="https://img.youtube.com/vi/6DSHTEHONRA/hqdefault.jpg" width="260" alt=""/></a><br/><sub><b>📱 Short</b></sub><br/><a href="https://youtu.be/6DSHTEHONRA">Napoleon's Sugar Crisis: How a Beet Root Changed What We Eat</a><br/><sub>🎨 cel-anime-80s · engraving · watercolor</sub></td>
+</tr>
+<tr>
+<td align="center" width="33%" valign="top"><a href="https://youtu.be/Yep6Ahoq5jI"><img src="https://img.youtube.com/vi/Yep6Ahoq5jI/hqdefault.jpg" width="260" alt=""/></a><br/><sub><b>📱 Short</b></sub><br/><a href="https://youtu.be/Yep6Ahoq5jI">Why Americans Switch Their Fork: Is the Zig-Zag the Older Way?</a></td>
+<td align="center" width="33%" valign="top"><a href="https://youtu.be/iEPicLRGpbk"><img src="https://img.youtube.com/vi/iEPicLRGpbk/hqdefault.jpg" width="260" alt=""/></a><br/><sub><b>📱 Short</b></sub><br/><a href="https://youtu.be/iEPicLRGpbk">Why Is It Called Black Friday? Blame Philadelphia's Traffic Cops</a><br/><sub>🎨 cel-anime-80s · visual-investigation · newsreel · archive-lighttable</sub></td>
+<td align="center" width="33%" valign="top"><a href="https://youtu.be/hrrpvBOBqBU"><img src="https://img.youtube.com/vi/hrrpvBOBqBU/hqdefault.jpg" width="260" alt=""/></a><br/><sub><b>📱 Short</b></sub><br/><a href="https://youtu.be/hrrpvBOBqBU">Were the Hessians Drunk at Trenton? The 250-Year-Old Christmas Myth</a><br/><sub>🎨 cel-anime-80s · visual-investigation · woodcut · archive-lighttable</sub></td>
+</tr>
+<tr>
+<td align="center" width="33%" valign="top"><a href="https://youtu.be/3tsQfzgl_HE"><img src="https://img.youtube.com/vi/3tsQfzgl_HE/hqdefault.jpg" width="260" alt=""/></a><br/><sub><b>📱 Short</b></sub><br/><a href="https://youtu.be/3tsQfzgl_HE">The Year America Had Two Thanksgivings: FDR's 'Franksgiving'</a><br/><sub>🎨 cel-anime-80s · newsreel · silent-film · archive-lighttable</sub></td>
+<td align="center" width="33%" valign="top"><a href="https://youtu.be/HHpkYT3L1jA"><img src="https://img.youtube.com/vi/HHpkYT3L1jA/hqdefault.jpg" width="260" alt=""/></a><br/><sub><b>📱 Short</b></sub><br/><a href="https://youtu.be/HHpkYT3L1jA">What Was Really Eaten at the First Thanksgiving? Start With 5 Deer</a><br/><sub>🎨 cel-anime-80s · archive-lighttable · visual-investigation · watercolor</sub></td>
+<td align="center" width="33%" valign="top"><a href="https://youtu.be/lbvWCgN5-j8"><img src="https://img.youtube.com/vi/lbvWCgN5-j8/hqdefault.jpg" width="260" alt=""/></a><br/><sub><b>📱 Short</b></sub><br/><a href="https://youtu.be/lbvWCgN5-j8">Christmas Was Illegal in Boston: The 5-Shilling Fine (1659-1681)</a><br/><sub>🎨 cel-anime-80s · archive-lighttable · visual-investigation · engraving</sub></td>
+</tr>
+<tr>
+<td align="center" width="33%" valign="top"><a href="https://youtu.be/MMQ6GmwR4pc"><img src="https://img.youtube.com/vi/MMQ6GmwR4pc/hqdefault.jpg" width="260" alt=""/></a><br/><sub><b>📱 Short</b></sub><br/><a href="https://youtu.be/MMQ6GmwR4pc">The Famous Delaware Painting Gets the Flag and the Boat Wrong</a><br/><sub>🎨 cel-anime-80s · visual-investigation</sub></td>
+</tr>
+</table>
+
+➡️ **Watch more:** [Little Big Histories on YouTube](https://www.youtube.com/@LittleBigHistories)
 
 ---
 

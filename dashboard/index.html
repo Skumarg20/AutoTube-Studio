@@ -1,0 +1,1123 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AutoTube Studio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Geist:wght@400..700&family=Geist+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0b0c10; --bg2:#111319; --raise:#171a22; --glass:rgba(23,26,34,.72); --line:rgba(255,255,255,.08); --line2:rgba(255,255,255,.16);
+  --text:#f3f2ee; --dim:#a1a3ab; --mute:#6c6f79;
+  --tally:#ff3b30; --tally-soft:rgba(255,59,48,.16); --ok:#4fd18b; --ok-soft:rgba(79,209,139,.14); --work:#7aa7ff; --work-soft:rgba(122,167,255,.14); --warn:#ffa940; --warn-soft:rgba(255,169,64,.15);
+  --cta:#f3f2ee; --cta-text:#0b0c10; --shadow:0 30px 80px rgba(0,0,0,.55);
+  --display:"Bricolage Grotesque",system-ui,sans-serif; --ui:"Geist",system-ui,sans-serif; --mono:"Geist Mono",ui-monospace,monospace;
+  color-scheme:dark;
+}
+:root[data-theme="light"]{
+  --bg:#f1f0ec; --bg2:#e8e7e2; --raise:#ffffff; --glass:rgba(255,255,255,.78); --line:rgba(10,12,16,.09); --line2:rgba(10,12,16,.18);
+  --text:#121318; --dim:#555862; --mute:#8b8e97; --tally:#e5281d; --tally-soft:rgba(229,40,29,.1); --ok:#1f9a5a; --ok-soft:rgba(31,154,90,.12); --work:#2a62d6; --work-soft:rgba(42,98,214,.1); --warn:#b86200; --warn-soft:rgba(184,98,0,.12);
+  --cta:#121318; --cta-text:#fff; --shadow:0 24px 60px rgba(20,22,30,.16); color-scheme:light;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--text);font:15.5px/1.55 var(--ui);-webkit-font-smoothing:antialiased}
+body{min-height:100vh;overflow-x:hidden}
+a{color:var(--work)}
+::selection{background:var(--tally);color:#fff}
+:focus-visible{outline:2px solid var(--work);outline-offset:3px;border-radius:6px}
+button{font:inherit;color:inherit}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+code{font:13px var(--mono);background:var(--bg2);padding:2px 6px;border-radius:5px;border:1px solid var(--line)}
+::view-transition-old(root),::view-transition-new(root){animation-duration:.28s}
+
+/* ---------- top bar ---------- */
+.top{position:fixed;inset:0 0 auto 0;height:64px;display:flex;align-items:center;gap:18px;padding:0 28px;z-index:20;background:color-mix(in srgb,var(--bg) 94%,transparent);border-bottom:1px solid var(--line);pointer-events:none}
+.top>*{pointer-events:auto}
+.logo{white-space:nowrap;display:flex;align-items:center;gap:10px;font:700 18px var(--display);letter-spacing:-.01em;background:none;border:0;cursor:pointer;padding:0}
+.tallydot{width:11px;height:11px;border-radius:50%;background:var(--tally);box-shadow:0 0 0 4px var(--tally-soft)}
+.tallydot.live{animation:tally 1.6s ease-in-out infinite}
+@keyframes tally{50%{box-shadow:0 0 0 9px transparent}}
+.clock{font:500 13.5px var(--mono);color:var(--dim)}
+.top .sp{flex:1}
+.status{display:flex;align-items:center;gap:8px;font-size:13.5px;color:var(--dim);background:var(--glass);border:1px solid var(--line);padding:6px 12px;border-radius:99px;backdrop-filter:blur(14px)}
+.spin{width:12px;height:12px;border:2px solid var(--work-soft);border-top-color:var(--work);border-radius:50%;animation:spin .8s linear infinite;flex:none}
+@keyframes spin{to{transform:rotate(360deg)}}
+.kbtn{display:flex;align-items:center;gap:10px;font-size:13.5px;color:var(--dim);background:var(--glass);border:1px solid var(--line);padding:6px 8px 6px 12px;border-radius:99px;cursor:pointer;backdrop-filter:blur(14px)}
+.kbtn kbd{font:600 11.5px var(--mono);border:1px solid var(--line2);border-radius:5px;padding:1px 6px;color:var(--text)}
+.ibtn{width:36px;height:36px;display:grid;place-items:center;border-radius:50%;border:1px solid var(--line);background:var(--glass);cursor:pointer;backdrop-filter:blur(14px)}
+.ibtn svg{width:17px;height:17px}
+
+/* ---------- dock ---------- */
+.dock{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:20;display:flex;gap:4px;padding:6px;border-radius:20px;background:var(--glass);border:1px solid var(--line2);backdrop-filter:blur(22px) saturate(1.4);box-shadow:var(--shadow)}
+.dock button{position:relative;display:flex;flex-direction:column;align-items:center;gap:3px;min-width:74px;padding:8px 10px 6px;border:0;border-radius:14px;background:none;cursor:pointer;color:var(--dim);font-size:12px;font-weight:500;transition:background .15s,color .15s,transform .15s}
+.dock button svg{width:21px;height:21px}
+.dock button:hover{color:var(--text);transform:translateY(-2px)}
+.dock button.on{background:var(--text);color:var(--bg)}
+.dock .badge{position:absolute;top:3px;right:12px;min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:var(--tally);color:#fff;font:700 11px/18px var(--ui);text-align:center}
+@media(max-width:720px){.dock{left:8px;right:8px;transform:none;overflow-x:auto;justify-content:flex-start}.dock button{min-width:50px;padding:7px 6px 5px;font-size:10.5px}.dock .badge{right:4px}.top{padding:0 14px;gap:10px}.clock,.kbtn,.status{display:none}.logo{white-space:nowrap}}
+
+main{padding:84px 28px 130px;max-width:1500px;margin:0 auto}
+@media(max-width:720px){main{padding:76px 14px 120px}}
+.enter>*{animation:rise .55s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(var(--i,0) * 60ms)}
+@keyframes rise{from{opacity:0;transform:translateY(18px)}}
+
+/* ---------- type ---------- */
+.h1{font:800 clamp(44px,7vw,108px)/.9 var(--display);letter-spacing:-.035em;margin:0}
+.h2{font:700 clamp(24px,2.6vw,34px)/1 var(--display);letter-spacing:-.02em;margin:0}
+.h3{font:650 19px/1.2 var(--display);margin:0}
+.sub{color:var(--dim);font-size:17px;max-width:60ch;margin:14px 0 0}
+.note{color:var(--dim);font-size:14px;max-width:72ch}
+.err{color:var(--tally);font-size:14px}.warnt{color:var(--warn);font-size:14px}
+.pagehead{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;flex-wrap:wrap;margin:18px 0 34px}
+.sec{display:flex;align-items:baseline;gap:14px;margin:56px 0 18px;flex-wrap:wrap}
+.sec .count{font:500 13px var(--mono);color:var(--mute)}
+
+/* ---------- controls ---------- */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font:600 14.5px var(--ui);padding:11px 18px;border-radius:12px;border:1px solid var(--line2);background:var(--raise);color:var(--text);cursor:pointer;text-decoration:none;transition:transform .12s,background .15s,border-color .15s;white-space:nowrap}
+.btn:hover{border-color:var(--text)}
+.btn:active{transform:scale(.97)}
+.btn.cta{background:var(--cta);color:var(--cta-text);border-color:var(--cta)}
+.btn.ok{background:var(--ok);border-color:var(--ok);color:#06140c}
+.btn.ghost{background:transparent}
+.btn.danger{background:transparent;color:var(--tally);border-color:var(--tally-soft)}
+.btn.big{padding:15px 24px;font-size:16px;border-radius:14px}
+.btn:disabled{opacity:.5;cursor:wait}
+.btn svg{width:17px;height:17px}
+.acts{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+label.f{display:grid;gap:7px;font-weight:600;font-size:14px}
+label.f small{font-weight:400;color:var(--dim);font-size:13px}
+input,select,textarea{font:15px var(--ui);color:var(--text);background:var(--bg2);border:1px solid var(--line2);border-radius:11px;padding:11px 13px;width:100%;transition:border-color .15s,box-shadow .15s}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--work);box-shadow:0 0 0 4px var(--work-soft)}
+textarea{resize:vertical;line-height:1.55}
+.check{display:flex;gap:12px;align-items:center;cursor:pointer;font-size:14.5px}
+.sw{appearance:none;-webkit-appearance:none;width:42px;height:24px;border-radius:12px;background:var(--line2);position:relative;cursor:pointer;flex:none;padding:0;border:0;transition:background .2s;margin:0}
+.sw::after{content:"";position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:transform .2s cubic-bezier(.3,1.4,.5,1)}
+.sw:checked{background:var(--ok)}.sw:checked::after{transform:translateX(18px)}
+.sw:focus{box-shadow:0 0 0 4px var(--work-soft)}
+.panel{background:var(--raise);border:1px solid var(--line);border-radius:22px;padding:26px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:18px}
+.stack{display:grid;gap:16px;align-content:start}
+.chip{display:inline-flex;align-items:center;gap:7px;font:600 12.5px var(--ui);padding:5px 10px;border-radius:99px;background:var(--bg2);color:var(--dim);white-space:nowrap}
+.chip i{width:7px;height:7px;border-radius:50%;background:currentColor;flex:none}
+.chip.need{background:var(--tally-soft);color:var(--tally)}.chip.need i{animation:tally2 1.4s infinite}
+@keyframes tally2{50%{opacity:.25}}
+.chip.work{background:var(--work-soft);color:var(--work)}.chip.done{background:var(--ok-soft);color:var(--ok)}.chip.bad{background:var(--warn-soft);color:var(--warn)}
+.seg{display:inline-flex;padding:4px;border-radius:13px;background:var(--bg2);border:1px solid var(--line);gap:2px;flex-wrap:wrap}
+.seg button{border:0;background:none;padding:8px 14px;border-radius:10px;cursor:pointer;font-weight:600;font-size:13.5px;color:var(--dim)}
+.seg button.on{background:var(--raise);color:var(--text);box-shadow:0 2px 8px rgba(0,0,0,.2)}
+details summary{cursor:pointer;font-weight:600;color:var(--dim);list-style:none;display:flex;align-items:center;gap:10px}
+details summary::-webkit-details-marker{display:none}
+details summary::before{content:"";width:7px;height:7px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(-45deg);transition:transform .2s}
+details[open] summary::before{transform:rotate(45deg)}
+pre.log{font:12.5px/1.65 var(--mono);white-space:pre-wrap;max-height:340px;overflow:auto;background:var(--bg2);border:1px solid var(--line);padding:16px 18px;border-radius:14px;color:var(--dim);margin:12px 0 0}
+
+/* ---------- hero (on deck) ---------- */
+.hero{position:relative;min-height:min(68vh,640px);border-radius:30px;overflow:hidden;display:flex;align-items:flex-end;isolation:isolate;background:#000;box-shadow:var(--shadow)}
+.hero .bg{position:absolute;inset:0;z-index:-2;overflow:hidden}
+.hero .bg img,.hero .bg video{width:100%;height:100%;object-fit:cover;animation:kb 26s ease-in-out infinite alternate}
+.hero .bg.blur img{filter:blur(40px) saturate(1.3) brightness(.7);transform:scale(1.2);animation:none}
+@keyframes kb{to{transform:scale(1.09) translate(-1.5%,-1%)}}
+.hero::before{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,rgba(0,0,0,.05) 0%,rgba(0,0,0,.15) 40%,rgba(0,0,0,.88) 100%),radial-gradient(600px circle at var(--mx,70%) var(--my,30%),rgba(255,255,255,.08),transparent 60%)}
+.hero .vert{position:absolute;right:6%;top:50%;transform:translateY(-50%);height:84%;aspect-ratio:9/16;border-radius:20px;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.6);border:1px solid rgba(255,255,255,.15);z-index:-1}
+.hero .vert video,.hero .vert img{width:100%;height:100%;object-fit:cover}
+.hero .in{padding:clamp(24px,4vw,54px);color:#fff;max-width:min(900px,100%)}
+.hero .kick{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:18px}
+.hero .kick .chip{background:rgba(0,0,0,.45);color:#fff;backdrop-filter:blur(10px)}
+.hero .kick .chip.need{background:var(--tally);color:#fff}
+.hero h1{font:800 clamp(38px,6.2vw,96px)/.92 var(--display);letter-spacing:-.035em;margin:0;text-wrap:balance;text-shadow:0 4px 40px rgba(0,0,0,.4)}
+.hero .meta{font:500 14px var(--mono);color:rgba(255,255,255,.72);margin:18px 0 26px}
+.hero .btn{border-color:rgba(255,255,255,.3);background:rgba(255,255,255,.1);color:#fff;backdrop-filter:blur(12px)}
+.hero .btn.cta{background:#fff;color:#000;border-color:#fff}
+.hero .pager{position:absolute;top:22px;right:22px;display:flex;gap:8px;align-items:center;color:#fff;font:600 13px var(--mono)}
+.hero .pager button{width:38px;height:38px;border-radius:50%;border:1px solid rgba(255,255,255,.3);background:rgba(0,0,0,.35);color:#fff;cursor:pointer;backdrop-filter:blur(10px);display:grid;place-items:center}
+.hero .pager svg{width:16px;height:16px}
+.hero.clear{min-height:320px;background:radial-gradient(900px 400px at 80% 0%,var(--ok-soft),transparent),var(--raise);box-shadow:none;border:1px solid var(--line)}
+.hero.clear::before{display:none}.hero.clear .in{color:var(--text)}
+@media(max-width:800px){.hero .vert{display:none}}
+
+/* ---------- run sheet timeline ---------- */
+.runsheet{background:var(--raise);border:1px solid var(--line);border-radius:22px;padding:22px 24px 18px;overflow-x:auto}
+.rs-in{min-width:760px;position:relative}
+.rs-hours{display:grid;grid-template-columns:150px 1fr;font:500 11.5px var(--mono);color:var(--mute);margin-bottom:8px}
+.rs-hours div:last-child{display:flex;justify-content:space-between}
+.rs-row{display:grid;grid-template-columns:150px 1fr;align-items:center;height:50px;border-top:1px solid var(--line)}
+.rs-row b{font:600 14px var(--ui);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding-right:12px}
+.rs-track{position:relative;height:100%}
+.rs-make{position:absolute;top:13px;height:24px;border-radius:8px;background:repeating-linear-gradient(-45deg,var(--work-soft) 0 8px,transparent 8px 14px),var(--work-soft);border:1px solid var(--work);display:flex;align-items:center;padding:0 9px;font:600 11.5px var(--ui);color:var(--work);white-space:nowrap;overflow:hidden}
+.rs-ready{position:absolute;top:8px;bottom:8px;width:2px;background:var(--ok)}
+.rs-ready span{position:absolute;top:-1px;left:6px;font:600 11px var(--mono);color:var(--ok);white-space:nowrap}
+.rs-pub{position:absolute;top:50%;width:12px;height:12px;margin:-6px 0 0 -6px;border-radius:50%;background:var(--text);border:2px solid var(--raise)}
+.rs-pub.short{width:9px;height:9px;margin:-4.5px 0 0 -4.5px;background:var(--dim)}
+.rs-now{position:absolute;top:24px;bottom:0;width:2px;background:var(--tally);z-index:2;pointer-events:none;transition:left 1s}
+.rs-now::before{content:attr(data-t);position:absolute;top:-22px;left:50%;transform:translateX(-50%);font:700 11px var(--mono);color:#fff;background:var(--tally);padding:1px 6px;border-radius:5px}
+.rs-off b{color:var(--mute)}
+.legend{display:flex;gap:18px;flex-wrap:wrap;font-size:12.5px;color:var(--dim);margin-top:14px}
+.legend span{display:inline-flex;align-items:center;gap:7px}
+.legend i{display:inline-block}
+
+/* ---------- reels ---------- */
+.reel{display:flex;gap:16px;overflow-x:auto;padding:6px 2px 18px;scroll-snap-type:x proximity;scrollbar-width:thin}
+.card{flex:none;scroll-snap-align:start;position:relative;height:250px;border-radius:20px;overflow:hidden;cursor:pointer;background:var(--bg2);border:1px solid var(--line);padding:0;text-align:left;transition:transform .25s cubic-bezier(.2,.8,.2,1),box-shadow .25s;isolation:isolate;color:#fff}
+.card.long{width:444px}.card.short{width:170px}
+.card:hover{transform:translateY(-4px) scale(1.015);box-shadow:var(--shadow)}
+.card img,.card video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:-2}
+.card video{opacity:0;transition:opacity .3s}.card.playing video{opacity:1}
+.card::after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,rgba(0,0,0,0) 35%,rgba(0,0,0,.85))}
+.card .ph{position:absolute;inset:0;z-index:-2;display:grid;place-items:center;font:800 28px var(--display);color:var(--mute);background:repeating-linear-gradient(45deg,var(--bg2) 0 16px,var(--raise) 16px 32px)}
+.card .top-l{position:absolute;top:12px;left:12px;right:12px;display:flex;justify-content:space-between;gap:6px;flex-wrap:wrap}
+.card .top-l .chip{background:rgba(0,0,0,.55);color:#fff;backdrop-filter:blur(8px)}
+.card .top-l .chip.need{background:var(--tally)}
+.card .top-l .chip.work{background:rgba(30,60,140,.75)}.card .top-l .chip.done{background:rgba(20,110,60,.8)}.card .top-l .chip.bad{background:rgba(150,80,0,.85)}
+.card.short .top-l .chip{font-size:11px;padding:4px 8px}
+.card .bot{position:absolute;left:14px;right:14px;bottom:13px}
+.card .bot b{font:650 17px/1.2 var(--display);letter-spacing:-.01em;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.card.short .bot b{font-size:14.5px}
+.card .bot span{display:block;font:500 12px var(--mono);color:rgba(255,255,255,.7);margin-top:6px}
+.card.need{box-shadow:0 0 0 2px var(--tally)}
+.card.empty{width:100%;height:120px;display:grid;place-items:center;color:var(--mute);cursor:default;background:transparent;border-style:dashed}
+.card.empty::after{display:none}
+.card.empty:hover{transform:none;box-shadow:none}
+.wall{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+.wall .card{width:auto}
+
+/* ---------- list (all videos) ---------- */
+.toolbar{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-bottom:18px}
+.toolbar input{max-width:320px}
+.rows{display:grid;gap:8px}
+.row{display:grid;grid-template-columns:120px minmax(0,1fr) 120px 170px 96px 190px;gap:18px;align-items:center;padding:10px 16px 10px 10px;border-radius:16px;background:var(--raise);border:1px solid var(--line);cursor:pointer;transition:border-color .15s,transform .15s;text-align:left;width:100%}
+.row:hover{border-color:var(--line2);transform:translateX(3px)}
+.row .th{width:120px;aspect-ratio:16/9;border-radius:10px;overflow:hidden;background:var(--bg2)}
+.row .th img{width:100%;height:100%;object-fit:cover;display:block}
+.row b{font:600 15.5px var(--ui);display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.row small{color:var(--dim);font-size:13px}
+.row .mono{font:500 13px var(--mono);color:var(--dim)}
+.row select.act{font:500 13.5px var(--ui);padding:8px 10px;border-radius:10px;width:100%}
+@media(max-width:900px){.row{grid-template-columns:96px 1fr}.row>:nth-child(n+3){display:none}.row>select.act{display:block;grid-column:1/-1}.row .th{width:96px}}
+
+/* ---------- job / theater ---------- */
+.backdrop{position:fixed;inset:0;z-index:-1;overflow:hidden;pointer-events:none}
+.backdrop img{width:100%;height:100%;object-fit:cover;filter:blur(70px) saturate(1.4);opacity:.32;transform:scale(1.2)}
+:root[data-theme="light"] .backdrop img{opacity:.2}
+.backbtn{display:inline-flex;align-items:center;gap:8px;background:var(--glass);border:1px solid var(--line);padding:8px 14px 8px 10px;border-radius:99px;cursor:pointer;font-weight:600;font-size:14px;backdrop-filter:blur(12px)}
+.backbtn svg{width:16px;height:16px}
+.theater{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(320px,1fr);gap:22px;align-items:start;margin-top:8px}
+@media(max-width:1050px){.theater{grid-template-columns:1fr}}
+.screen{border-radius:24px;overflow:hidden;background:#000;box-shadow:var(--shadow);display:grid;place-items:center}
+.screen video{width:100%;max-height:76vh;display:block;background:#000}
+.screen.v video{width:auto;max-width:100%;height:76vh}
+.facts{display:flex;gap:22px;flex-wrap:wrap;margin-top:14px;font:500 13px var(--mono);color:var(--dim)}
+.facts b{color:var(--text);font-weight:600}
+.glass{background:var(--glass);border:1px solid var(--line2);border-radius:24px;padding:24px;backdrop-filter:blur(24px) saturate(1.3)}
+.thumbimg{width:100%;max-height:360px;object-fit:contain;border-radius:14px;display:block;background:#000;margin:14px 0 12px}
+
+/* plan editor */
+.chap{margin-top:30px;border-radius:24px;background:var(--raise);border:1px solid var(--line);overflow:hidden}
+.chap-h{display:flex;gap:12px;align-items:center;flex-wrap:wrap;padding:18px 22px;border-bottom:1px solid var(--line);background:linear-gradient(90deg,var(--bg2),transparent)}
+.chap-h .no{font:600 12px var(--mono);color:var(--tally);letter-spacing:.04em}
+.chap-h .h3{margin-right:auto}
+.chap-h select,.chap-h input{width:auto;padding:7px 10px;font-size:13.5px;border-radius:9px}
+.chap-h input{min-width:240px}
+.ln{display:grid;grid-template-columns:40px minmax(0,1.2fr) minmax(240px,1fr) 32px;gap:16px;padding:14px 22px;border-top:1px solid var(--line);align-items:start}
+.chap-h+.ln{border-top:0}
+.ln .k{font:500 12px var(--mono);color:var(--mute);padding-top:7px}
+.ln textarea{border:1px solid transparent;background:transparent;font:16px/1.6 var(--ui);padding:5px 10px;margin:-5px -10px;resize:none;field-sizing:content;min-height:40px;width:calc(100% + 20px)}
+.ln textarea:hover{border-color:var(--line)}
+.ln textarea:focus{background:var(--bg2)}
+.shots{display:flex;flex-wrap:wrap;gap:6px}
+.shot{display:inline-flex;gap:6px;align-items:baseline;font-size:12.5px;padding:5px 10px;border-radius:9px;background:var(--bg2);border:1px solid var(--line);color:var(--dim);max-width:100%}
+.shot b{color:var(--text);font-weight:600;white-space:nowrap}
+.shot em{font-style:normal;color:var(--work);font-family:var(--mono);font-size:11.5px;white-space:nowrap}
+.x{border:0;background:none;color:var(--mute);cursor:pointer;width:30px;height:30px;border-radius:8px;display:grid;place-items:center;padding:0}.x:hover{background:var(--tally-soft);color:var(--tally)}
+.x svg{width:15px;height:15px}
+@media(max-width:900px){.ln{grid-template-columns:1fr 30px}.ln .k{display:none}.shots{grid-column:1}}
+.actionbar{position:sticky;bottom:100px;z-index:5;margin-top:24px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;padding:12px;border-radius:20px;background:var(--glass);border:1px solid var(--line2);backdrop-filter:blur(22px);box-shadow:var(--shadow)}
+.photos{display:grid;grid-template-columns:60px 1fr 1fr;gap:10px;align-items:center;margin-top:10px}
+.photos span{font:600 13px var(--mono);color:var(--dim)}
+@media(max-width:700px){.photos{grid-template-columns:1fr}}
+
+/* ---------- make ---------- */
+.modes{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:14px}
+.mode{position:relative;text-align:left;padding:26px 24px 24px;border-radius:24px;border:1px solid var(--line);background:var(--raise);cursor:pointer;transition:border-color .2s,transform .2s,background .2s}
+.mode:hover{transform:translateY(-3px);border-color:var(--line2)}
+.mode .n{font:800 64px/1 var(--display);color:var(--line2);letter-spacing:-.04em}
+.mode b{display:block;font:700 22px/1.15 var(--display);margin:18px 0 8px;letter-spacing:-.015em}
+.mode span{color:var(--dim);font-size:14px}
+.mode.on{border-color:var(--text);background:var(--text);color:var(--bg)}
+.mode.on span{color:var(--bg);opacity:.72}.mode.on .n{color:var(--tally)}
+
+/* ---------- channels ---------- */
+.chan{position:relative;border-radius:26px;background:var(--raise);border:1px solid var(--line);padding:28px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:18px 28px}
+.chan+.chan{margin-top:16px}
+.chan .name{font:800 clamp(30px,3.6vw,48px)/.95 var(--display);letter-spacing:-.03em;margin:0}
+.chan .niche{color:var(--dim);margin:10px 0 0;max-width:70ch}
+.chan .nums{display:flex;gap:30px;flex-wrap:wrap;margin-top:22px}
+.chan .nums div{font:500 12.5px var(--ui);color:var(--dim)}
+.chan .nums strong{display:block;font:700 30px/1 var(--display);color:var(--text);margin-bottom:5px}
+.chan .side{display:grid;gap:16px;justify-items:end;align-content:space-between}
+.week{display:flex;gap:5px}
+.week span{width:32px;height:32px;display:grid;place-items:center;font:600 12px var(--ui);border-radius:9px;background:var(--bg2);color:var(--mute);transition:background .15s}
+.week span.on{background:var(--text);color:var(--bg)}
+.chan.off .name,.chan.off .nums{opacity:.55}
+@media(max-width:800px){.chan{grid-template-columns:1fr}.chan .side{justify-items:start}}
+.appr{display:grid;gap:8px}
+.appr label{display:grid;grid-template-columns:20px 1fr;gap:12px;padding:14px 16px;border-radius:14px;border:1px solid var(--line);cursor:pointer;background:var(--bg2)}
+.appr label:has(input:checked){border-color:var(--text)}
+.appr input{width:18px;height:18px;accent-color:var(--tally);margin:2px 0 0;padding:0}
+.appr b{font-size:15px}
+
+/* ---------- looks ---------- */
+.gal{columns:4 260px;column-gap:16px}
+.gal button{break-inside:avoid;display:block;width:100%;margin:0 0 16px;padding:0;background:var(--raise);border-radius:18px;overflow:hidden;cursor:pointer;text-align:left;position:relative;border:1px solid var(--line);transition:transform .2s}
+.gal button:hover{transform:translateY(-3px)}
+.gal .m{position:relative;aspect-ratio:16/9;background:var(--bg2)}
+.gal img,.gal video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.gal video{opacity:0;transition:opacity .3s}.gal button.playing video{opacity:1}
+.gal .t{padding:12px 14px 14px}.gal .t b{font:650 16px var(--display)}.gal .t span{display:block;color:var(--dim);font-size:12.5px}
+
+/* ---------- overlays ---------- */
+.modal{position:fixed;inset:0;z-index:50;background:rgba(5,6,8,.7);backdrop-filter:blur(10px);display:grid;place-items:start center;padding:12vh 16px 20px;animation:fade .18s;overflow:auto}
+@keyframes fade{from{opacity:0}}
+.modal .box{width:min(980px,100%);background:var(--raise);border:1px solid var(--line2);border-radius:24px;box-shadow:var(--shadow);overflow:hidden;animation:pop .22s cubic-bezier(.2,.9,.3,1.2)}
+@keyframes pop{from{transform:scale(.96) translateY(8px);opacity:0}}
+.pal{width:min(640px,100%)!important}
+.pal input{border:0;border-radius:0;border-bottom:1px solid var(--line);background:transparent;font-size:18px;padding:20px 22px}
+.pal input:focus{box-shadow:none}
+.pal ul{list-style:none;margin:0;padding:8px;max-height:52vh;overflow:auto}
+.pal li{display:flex;justify-content:space-between;gap:12px;padding:11px 14px;border-radius:12px;cursor:pointer;font-size:15px}
+.pal li small{color:var(--mute);font:500 12px var(--mono);white-space:nowrap}
+.pal li.on{background:var(--bg2)}
+.toast{position:fixed;left:50%;bottom:104px;transform:translate(-50%,16px);background:var(--text);color:var(--bg);padding:12px 18px;border-radius:14px;font-weight:600;opacity:0;transition:.25s cubic-bezier(.2,.9,.3,1.2);z-index:60;pointer-events:none;box-shadow:var(--shadow)}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+.empty-note{padding:40px;text-align:center;color:var(--dim);border:1px dashed var(--line2);border-radius:22px}
+.cstats{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,170px),1fr));gap:10px;margin-bottom:18px}
+.cstat{background:var(--raise);border:1px solid var(--line);border-radius:14px;padding:12px 16px;display:grid}
+.cstat b{font:800 28px var(--display);font-variant-numeric:tabular-nums}.cstat span{color:var(--dim);font-size:13px}
+.cstat.ok b{color:var(--ok)}.cstat.need b{color:var(--tally)}.cstat.work b{color:var(--work)}
+.cfilter{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
+.cfilter button{display:inline-flex;align-items:center;gap:8px;font:600 13.5px var(--ui);padding:7px 14px;border-radius:99px;border:1px solid var(--line);background:var(--raise);color:var(--text);cursor:pointer}
+.cfilter button.on{background:var(--text);color:var(--bg);border-color:var(--text)}.cfilter i{width:9px;height:9px;border-radius:50%}
+.cgrid-wrap{overflow-x:auto;padding-bottom:6px}
+.cgrid{display:grid;grid-template-columns:repeat(7,minmax(150px,1fr));gap:6px;min-width:1080px}
+.cwd{font:600 11px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--dim);padding:0 6px 4px}
+.cc{background:var(--raise);border:1px solid var(--line);border-radius:12px;padding:8px;min-height:120px;display:grid;gap:6px;align-content:start;min-width:0}
+.cc.past{opacity:.78}.cc.today{border-color:var(--cta);box-shadow:inset 0 0 0 1px var(--cta)}
+.cd{display:flex;align-items:baseline;gap:6px}.cd span{font:600 10.5px var(--mono);text-transform:uppercase;color:var(--dim);display:none}.cd b{font:800 17px var(--display)}.cd small{font:600 11px var(--mono);color:var(--dim);text-transform:uppercase}.cd em{margin-left:auto;font:600 10.5px var(--mono);text-transform:uppercase;color:var(--cta);font-style:normal}
+.cc ul{list-style:none;margin:0;padding:0;display:grid;gap:5px}
+.ce{border-left:3px solid var(--cc);background:var(--bg2);border-radius:7px;padding:5px 7px;display:grid;gap:2px;min-width:0}
+.ce.long{background:color-mix(in srgb,var(--cc) 16%,var(--bg2))}
+.ce.plan{background:transparent;border:1px dashed color-mix(in srgb,var(--cc) 60%,var(--line));border-left:3px solid var(--cc)}
+.ce.go{cursor:pointer}.ce.go:hover,.ce.go:focus-visible{outline:2px solid var(--cc);outline-offset:1px}
+.ce .cm{font:600 10px var(--mono);letter-spacing:.03em;color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.ce .cm em{font-style:normal;color:var(--text);margin-right:5px}
+.ce b{font-size:12px;font-weight:600;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.ce .cs{display:inline-flex;align-items:center;gap:5px;font:600 10.5px var(--ui);color:var(--dim)}.ce .cs i{width:6px;height:6px;border-radius:50%;background:currentColor}
+.ce .cs.need{color:var(--tally)}.ce .cs.work{color:var(--work)}.ce .cs.done{color:var(--ok)}.ce .cs.bad{color:var(--warn)}
+.ce .cu{display:flex;gap:8px;font-size:11px}.ce .cu a{color:var(--cc)}
+@media (max-width:760px){.cgrid{grid-template-columns:1fr;min-width:0}.cwd{display:none}.cd span{display:inline}.cc{min-height:0}.cc:not(:has(ul)){display:none}}
+.cweek{display:grid;gap:12px;margin-bottom:28px}
+.cdays{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,220px),1fr));gap:10px}
+.cday{background:var(--raise);border:1px solid var(--line);border-radius:16px;padding:12px;display:grid;gap:9px;align-content:start;min-width:0}
+.cday.today{border-color:var(--cta)}
+.cday h4{margin:0;font:700 15px var(--display)}.cday h4 span{font:600 11px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--dim);margin-right:4px}.cday h4 em{font:600 11px var(--mono);color:var(--cta);font-style:normal;text-transform:uppercase;margin-left:4px}
+.cday ul{list-style:none;margin:0;padding:0;display:grid;gap:7px}
+.ci{display:grid;gap:3px;border-radius:11px;padding:8px 10px;background:var(--bg2);min-width:0}
+.ci.long{background:color-mix(in srgb,var(--cta) 16%,var(--bg2));border:1px solid color-mix(in srgb,var(--cta) 40%,transparent)}
+.ci.go{cursor:pointer}.ci.go:hover{outline:2px solid var(--cta)}
+.ci .cl{font:600 10.5px var(--mono);letter-spacing:.05em;text-transform:uppercase;color:var(--dim)}
+.ci .ct{justify-self:start;font:600 10.5px var(--mono);text-transform:uppercase;letter-spacing:.04em;padding:1px 7px;border-radius:99px;border:1px solid var(--line);color:var(--text)}
+.ci b{font-size:13.5px;font-weight:600;line-height:1.35;overflow-wrap:anywhere}.ci small{font-size:12px;color:var(--dim)}
+.ci.none{color:var(--dim);font-size:13px}
+.accts{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,380px),1fr));gap:16px}
+.acct{background:var(--bg2);border:1px solid var(--line);border-radius:18px;padding:20px;display:flex;flex-direction:column;gap:12px}
+.acct .hd{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.acct .hd b{font:700 17px var(--display);flex:1}
+.acct ol{margin:0;padding-left:20px;color:var(--dim);font-size:14px;line-height:1.55}.acct ol li{margin-bottom:3px}
+.acct code{font:12.5px var(--mono);background:var(--raise);padding:2px 6px;border-radius:6px;word-break:break-all}
+.acct .arow{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.acct .arow input{flex:1;min-width:150px}
+.acct .res{font-size:14px;padding:10px 12px;border-radius:12px;background:var(--raise)}
+</style></head>
+<body>
+<header class="top">
+  <button class="logo" onclick="go('desk')"><span class="tallydot" id="tdot"></span>AutoTube Studio</button>
+  <span class="clock" id="clock"></span>
+  <span class="sp"></span>
+  <span class="status" id="status"></span>
+  <button class="kbtn" onclick="palette()"><span>Jump to anything</span><kbd>Ctrl K</kbd></button>
+  <button class="ibtn" onclick="toggleTheme()" title="Light or dark" aria-label="Switch light or dark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg></button>
+</header>
+<main id="main"></main>
+<nav class="dock" id="dock" aria-label="Sections"></nav>
+<div class="toast" id="toast" role="status"></div>
+<div id="overlay"></div>
+<script>
+// ================= helpers =================
+const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const api = async (p, b) => { const r = await fetch(p, b === undefined ? {} : { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(b) }); const j = await r.json().catch(() => ({})); if (!r.ok) throw new Error(j.error || ('Request failed (' + r.status + ')')); return j; };
+let S = null, tab = 'desk', openId = null, openJob = null, flowEdit = null, logFilter = 'all', logQ = '', createMode = 'auto', STY = [], gal = null, heroK = 0, lastSig = '', lastView = '';
+const toast = m => { const t = $('#toast'); t.textContent = m; t.classList.add('on'); clearTimeout(window._t); window._t = setTimeout(() => t.classList.remove('on'), 2600); };
+const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const swap = fn => (document.startViewTransition && !RM) ? document.startViewTransition(fn) : fn();
+function toggleTheme() { const r = document.documentElement; r.dataset.theme = r.dataset.theme === 'light' ? 'dark' : 'light'; try { localStorage.setItem('hs-theme2', r.dataset.theme); } catch {} }
+try { const t = localStorage.getItem('hs-theme2'); if (t) document.documentElement.dataset.theme = t; } catch {}
+const I = {
+  desk: '<path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/>', review: '<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3.5" fill="currentColor"/>',
+  make: '<path d="M12 5v14M5 12h14"/>', ideas: '<path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z"/>', calendar: '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4M8 14h2M14 14h2M8 17h2"/>', log: '<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M8 4v16"/>', channels: '<path d="M4 9a11 11 0 0 1 16 0M7 12.5a6.5 6.5 0 0 1 10 0"/><circle cx="12" cy="17" r="2"/>',
+  looks: '<rect x="3" y="3" width="8" height="8" rx="2"/><rect x="13" y="3" width="8" height="5" rx="2"/><rect x="13" y="10" width="8" height="11" rx="2"/><rect x="3" y="13" width="8" height="8" rx="2"/>',
+  settings: '<path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/>',
+  play: '<path d="M7 4l13 8-13 8z" fill="currentColor"/>', back: '<path d="M15 5l-7 7 7 7"/>', next: '<path d="M9 5l7 7-7 7"/>', x: '<path d="M6 6l12 12M18 6L6 18"/>', doc: '<path d="M6 3h9l4 4v14H6z"/><path d="M9 12h7M9 16h7"/>',
+};
+const ic = k => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${I[k]}</svg>`;
+
+const STATUS = { draft: ['Add your material', 'need'], writing: ['Writing the plan', 'work'], script_review: ['Plan ready for you', 'need'], queued_render: ['Waiting to be made', 'work'], on_hold: ['On hold', 'need'], rendering: ['Being made', 'work'], video_review: ['Video ready for you', 'need'], approved: ['Approved', 'done'], uploading: ['Uploading', 'work'], published: ['Published', 'done'], failed: ['Something went wrong', 'bad'], upload_failed: ['Upload failed', 'bad'], rejected: ['Rejected', 'bad'] };
+const st = j => STATUS[j.status] || [j.status, ''];
+const chip = j => { const [l, k] = st(j); return `<span class="chip ${k}">${k === 'work' ? '<span class="spin" style="width:10px;height:10px"></span>' : '<i></i>'}${l}</span>`; };
+const needsYou = j => ['script_review', 'video_review', 'draft'].includes(j.status);
+const flowName = id => ((S.flows || []).find(f => f.id === id) || {}).name;
+const dur = s => s ? Math.floor(s / 60) + ':' + String(Math.round(s % 60)).padStart(2, '0') : '';
+const fmtWhen = ms => new Date(ms).toLocaleString(undefined, { weekday: 'short', hour: '2-digit', minute: '2-digit' });
+const hm = s => { const [h, m] = String(s || '0:0').split(':').map(Number); return (h || 0) * 60 + (m || 0); };
+const VOICES = ['bf_emma', 'bf_isabella', 'bf_alice', 'bf_lily', 'af_heart', 'af_bella', 'af_nicole', 'bm_george', 'bm_lewis', 'bm_fable', 'am_michael', 'hf_alpha', 'hf_beta', 'hm_omega'];
+// narrator menu: the user's own ElevenLabs voices first, then the free built-in Kokoro voices
+function voiceOpts(sel) {
+  const el = (S && S.elevenVoices) || [];
+  return (el.length ? `<optgroup label="Your voices (ElevenLabs)">${el.map(v => `<option value="${esc(v.value)}" ${v.value === sel ? 'selected' : ''}>${esc(v.label)}</option>`).join('')}</optgroup>` : '') +
+    `<optgroup label="Built-in voices (free)">${VOICES.map(v => `<option value="${v}" ${v === sel ? 'selected' : ''}>${v}</option>`).join('')}</optgroup>`;
+}
+const thumb = j => j.files?.thumb ? `/${j.files.thumb}?${j.updatedAt}` : '';
+
+// ================= chrome =================
+const TABS = [['desk', 'Today'], ['ideas', 'Ideas'], ['log', 'Videos'], ['calendar', 'Calendar'], ['channels', 'Channels'], ['looks', 'Looks'], ['settings', 'Settings']];
+function chrome() {
+  const n = S ? S.jobs.filter(needsYou).length : 0, ni = S ? (S.ideaRuns || []).flatMap(r => r.ideas).filter(i => i.status === 'new').length : 0;
+  $('#dock').innerHTML = TABS.map(([k, l]) => `<button class="${tab === k && !openId ? 'on' : ''}" onclick="go('${k}')" ${tab === k && !openId ? 'aria-current="page"' : ''}>${ic(k)}${l}${k === 'log' && n ? `<span class="badge">${n}</span>` : ''}${k === 'ideas' && ni ? `<span class="badge">${ni}</span>` : ''}</button>`).join('');
+  if (!S) return;
+  const q = S.queues, busy = q.writing + q.rendering;
+  $('#status').innerHTML = busy ? `<span class="spin"></span>${[q.rendering && `Making ${q.rendering}`, q.writing && `writing ${q.writing}`].filter(Boolean).join(', ')}` : `<i style="width:8px;height:8px;border-radius:50%;background:var(--ok);display:inline-block"></i>Studio idle`;
+  $('#tdot').classList.toggle('live', n > 0 || busy > 0);
+}
+function tickClock() { $('#clock').textContent = new Date().toLocaleString(undefined, { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }); const nw = $('.rs-now'); if (nw) placeNow(nw); }
+function go(t) { swap(() => { tab = t; openId = null; flowEdit = null; calFlow = null; closeOv(); render(true); scrollTo(0, 0); }); }
+async function openJ(id) { const j = await api('/api/jobs/' + id); swap(() => { openId = id; openJob = j; render(true); scrollTo(0, 0); }); }
+async function reloadJob() { openJob = await api('/api/jobs/' + openId); render(true); }
+function pagehead(title, sub, right = '') { return `<div class="pagehead" style="--i:0"><div><h1 class="h1">${title}</h1>${sub ? `<p class="sub">${sub}</p>` : ''}</div>${right}</div>`; }
+
+// ================= cards =================
+function card(j, i = 0) {
+  const v = j.format === 'short', t = thumb(j);
+  const media = t ? `<img src="${t}" alt="" loading="lazy">${j.files?.video ? `<video muted loop playsinline preload="none" data-src="/${j.files.video}?${j.updatedAt}"></video>` : ''}` : `<div class="ph">${v ? 'Short' : 'Long'}</div>`;
+  return `<button class="card ${v ? 'short' : 'long'} ${needsYou(j) ? 'need' : ''}" onclick="openJ('${j.id}')" onmouseenter="hoverPlay(this,1)" onmouseleave="hoverPlay(this,0)">${media}
+   <div class="top-l">${chip(j)}${!v && j.files?.duration ? `<span class="chip">${dur(j.files.duration)}</span>` : ''}</div>
+   <div class="bot"><b>${esc(j.title || j.topic)}</b><span>${esc(j.slot || (v ? 'Short' : 'Long'))}${j.publishAt ? ' / out ' + esc(j.publishAt) : ''}</span></div></button>`;
+}
+function hoverPlay(el, on) { const v = el.querySelector('video'); if (!v || RM) return; if (on) { if (!v.src) v.src = v.dataset.src; v.play().then(() => el.classList.add('playing')).catch(() => {}); } else { v.pause(); el.classList.remove('playing'); } }
+const reel = list => `<div class="reel">${list.length ? list.map(card).join('') : `<div class="card empty">Nothing here yet today.</div>`}</div>`;
+
+// ================= Today =================
+function hero(need) {
+  if (!need.length) return `<section class="hero clear" style="--i:0"><div class="in"><div class="kick"><span class="chip done"><i></i>All clear</span></div><h1 style="text-shadow:none">Nothing needs you right now.</h1><p class="meta" style="color:var(--dim)">New plans and videos land here the moment they're ready.</p><div class="acts"><button class="btn cta big" onclick="go('ideas')">${ic('make')}Make a video</button><button class="btn big" onclick="go('channels')">See channels</button></div></div></section>`;
+  heroK = ((heroK % need.length) + need.length) % need.length; const j = need[heroK], v = j.format === 'short', t = thumb(j), vid = j.files?.video ? `/${j.files.video}?${j.updatedAt}` : '';
+  const media = vid && !RM ? `<video autoplay muted loop playsinline poster="${t}" src="${vid}"></video>` : t ? `<img src="${t}" alt="">` : '';
+  const bg = v ? `<div class="bg blur">${t ? `<img src="${t}" alt="">` : ''}</div><div class="vert">${media}</div>` : `<div class="bg">${media}</div>`;
+  const act = j.status === 'video_review' ? `${ic('play')}Watch and approve` : j.status === 'script_review' ? `${ic('doc')}Read the plan` : 'Add your material';
+  return `<section class="hero" style="--i:0" onmousemove="const r=this.getBoundingClientRect();this.style.setProperty('--mx',(event.clientX-r.left)+'px');this.style.setProperty('--my',(event.clientY-r.top)+'px')">${bg}
+   ${need.length > 1 ? `<div class="pager"><button onclick="heroK--;render(true)" aria-label="Previous">${ic('back')}</button><span>${heroK + 1} / ${need.length}</span><button onclick="heroK++;render(true)" aria-label="Next">${ic('next')}</button></div>` : ''}
+   <div class="in"><div class="kick">${chip(j)}<span class="chip">${v ? 'Short and Reel' : 'Long video'}</span>${flowName(j.flowId) ? `<span class="chip">${esc(flowName(j.flowId))}</span>` : ''}</div>
+   <h1>${esc(j.title || j.topic)}</h1>
+   <p class="meta">${[j.files?.duration && dur(j.files.duration), j.files?.shots && j.files.shots + ' shots', j.publishAt && 'goes out ' + j.publishAt, j.date].filter(Boolean).join('   /   ')}</p>
+   <div class="acts"><button class="btn cta big" onclick="openJ('${j.id}')">${act}</button>${need.length > 1 ? `<button class="btn big" onclick="logFilter='need';go('log')">All ${need.length} waiting</button>` : ''}</div></div></section>`;
+}
+function placeNow(el) { const d = new Date(), m = d.getHours() * 60 + d.getMinutes(); el.style.left = `calc(150px + (100% - 150px) * ${m / 1440})`; el.dataset.t = d.toTimeString().slice(0, 5); }
+function runsheet() {
+  const F = S.flows || []; if (!F.length) return '';
+  const pct = m => (Math.max(0, Math.min(1440, m)) / 1440 * 100) + '%', dow = new Date().getDay();
+  const rows = F.map(f => {
+    const s = f.schedule, on = f.enabled && s.days.includes(dow), ready = hm(s.readyBy), start = ready - (+s.leadHours || 8) * 60;
+    const make = `<div class="rs-make" style="left:${pct(start)};width:calc(${pct(ready)} - ${pct(start)})">${start < 0 ? 'from last night, ' : ''}making ${s.longs} + ${s.shorts}</div>`;
+    const pubs = [...s.publishLong.map(t => `<span class="rs-pub" style="left:${pct(hm(t))}" title="Long video out at ${t}"></span>`), ...s.publishShort.map(t => `<span class="rs-pub short" style="left:${pct(hm(t))}" title="Short out at ${t}"></span>`)].join('');
+    return `<div class="rs-row ${on ? '' : 'rs-off'}"><b title="${esc(f.name)}">${esc(f.name)}${on ? '' : ' <small style="font-weight:400">(off)</small>'}</b><div class="rs-track" style="${on ? '' : 'opacity:.35'}">${make}<div class="rs-ready" style="left:${pct(ready)}"><span>ready ${s.readyBy}</span></div>${pubs}</div></div>`;
+  }).join('');
+  return `<section style="--i:1"><div class="sec"><h2 class="h2">Today's run sheet</h2><span class="count">24 hours, every channel</span></div><div class="runsheet"><div class="rs-in"><div class="rs-hours"><div></div><div>${[0, 3, 6, 9, 12, 15, 18, 21, 24].map(h => `<span>${String(h).padStart(2, '0')}:00</span>`).join('')}</div></div>${rows}<div class="rs-now"></div></div>
+   <div class="legend"><span><i style="width:22px;height:10px;border-radius:3px;border:1px solid var(--work);background:var(--work-soft)"></i>Research, writing and making</span><span><i style="width:2px;height:14px;background:var(--ok)"></i>Ready for you</span><span><i style="width:11px;height:11px;border-radius:50%;background:var(--text)"></i>Long video goes out</span><span><i style="width:8px;height:8px;border-radius:50%;background:var(--dim)"></i>Short goes out</span><span><i style="width:2px;height:14px;background:var(--tally)"></i>Now</span></div></div></section>`;
+}
+// fresh install: no channel yet -> one clear first step
+// one line under "Channel type" in the channel form, for the type that is picked
+const DOM_NOTE = {
+  general: 'Any subject. Claude researches each topic and gives every part of the video the animation theme that fits it best.',
+  history: 'Documentaries about the past, told in period-style animation themes and archive photos, each part in the theme that fits it best.',
+  exam: 'Concepts, common mistakes, solved questions, quizzes, formula revision and strategy. Formulas, quizzes and solutions are written on the whiteboard; every other part gets the theme that fits it best.',
+};
+function firstRun() {
+  if ((S.flows || []).length) return '';
+  const su = S.setup || {}, step = (ok, t, d) => `<li style="margin:6px 0"><b style="color:${ok ? 'var(--ok)' : 'var(--warn)'}">${ok ? '✓' : '•'}</b> ${t}${d ? ` <span class="note">${d}</span>` : ''}</li>`;
+  const checks = `<ul style="list-style:none;padding:0;margin:0">${step(su.claude, 'Claude is connected', su.claude ? '' : `<a href="#" onclick="go('settings');return false">Connect it in Settings &gt; Claude</a> (sign in with your Claude account, or add an API key). Videos cannot be planned until then.`)}${step(su.library, 'Animation library found', su.library ? '' : 'Set its folder in Settings (libraryPath).')}${step(su.youtube, 'YouTube uploads', su.youtube ? 'set up' : 'optional: without it you download each finished video from Videos. Settings &gt; Connections shows how.')}${step(su.eleven, 'ElevenLabs voice', su.eleven ? 'set up' : 'optional: free English voices are built in; add a key in Settings &gt; Voice for Hindi, Hinglish or your own voice.')}</ul>`;
+  return `<div class="panel stack" style="--i:1;max-width:900px;border:1px solid var(--line, #333)">
+    <h2 class="h2" style="margin:0">Welcome to AutoTube Studio</h2>
+    ${checks}
+    <p style="margin:0">Nothing is made until you create your first channel. A channel tells Claude what the videos are about, who watches, the language, the narrator voice, how many long videos and Shorts to make, and which YouTube account to upload to.</p>
+    <ol class="note" style="margin:0;padding-left:20px;line-height:1.7"><li>Add a channel and describe it.</li><li>Connect its YouTube account (Channels &gt; the channel &gt; Connections).</li><li>Go to Ideas, give a prompt, and approve the titles you like. Or switch the channel on and it plans videos on its schedule.</li></ol>
+    <div class="acts"><button class="btn cta big" onclick="tab='channels';openId=null;flowEdit='new';render(true);scrollTo(0,0)">Add your first channel</button></div></div>`;
+}
+function viewDesk() {
+  if (!(S.flows || []).length) return pagehead('Today', 'Your studio at a glance.') + firstRun();
+  const today = S.jobs.filter(j => j.date === S.today), need = S.jobs.filter(needsYou).reverse();
+  let out = hero(need) + runsheet(), i = 2;
+  for (const f of S.flows || []) {
+    const tj = today.filter(j => j.flowId === f.id).sort((a, b) => String(a.slot).localeCompare(String(b.slot)));
+    const js = tj.length ? tj : S.jobs.filter(j => j.flowId === f.id).reverse().slice(0, 12);
+    out += `<section style="--i:${i++}"><div class="sec"><h2 class="h2">${esc(f.name)}</h2><span class="count">${tj.length ? tj.length + ' today' : js.length ? 'latest ' + js.length : 'nothing yet'}${f.enabled ? (f.next ? `, next batch ${fmtWhen(f.next.start)}` : '') : ', paused'}</span></div>${reel(js)}</section>`;
+  }
+  const loose = S.jobs.filter(j => !j.flowId).reverse().slice(0, 12);
+  if (loose.length) out += `<section style="--i:${i++}"><div class="sec"><h2 class="h2">Made by hand</h2><span class="count">${loose.length} latest</span></div>${reel(loose)}</section>`;
+  out += `<section style="--i:${i}"><div class="sec"><h2 class="h2">Studio log</h2></div><details><summary>Show what the studio did recently</summary><pre class="log">${(S.activity || []).length ? esc(S.activity.slice(0, 40).join('\n')) : 'Nothing yet.'}</pre></details></section>`;
+  return out;
+}
+function viewReview() {
+  const groups = [['Videos to watch', j => j.status === 'video_review'], ['Plans to read', j => j.status === 'script_review'], ['Drafts that need your material', j => j.status === 'draft'], ['Problems', j => ['failed', 'upload_failed'].includes(j.status)]];
+  let out = pagehead('Needs you', 'Read the plan, watch the video, approve. Everything else runs by itself.'), any = false, i = 1;
+  for (const [t, fn] of groups) { const l = S.jobs.filter(fn).reverse(); if (!l.length) continue; any = true; out += `<section style="--i:${i++}"><div class="sec"><h2 class="h2">${t}</h2><span class="count">${l.length}</span></div><div class="wall">${l.map(card).join('')}</div></section>`; }
+  return any ? out : out + `<div class="empty-note" style="--i:1">You're all caught up.</div>`;
+}
+
+// ================= All videos =================
+function viewLog() {
+  const F = { all: () => true, need: needsYou, work: j => ['writing', 'queued_render', 'rendering', 'uploading', 'on_hold'].includes(j.status), done: j => ['approved', 'published'].includes(j.status), bad: j => ['failed', 'upload_failed', 'rejected'].includes(j.status) };
+  const q = logQ.toLowerCase(), rows = S.jobs.slice().reverse().filter(F[logFilter]).filter(j => !q || String(j.title || j.topic).toLowerCase().includes(q));
+  const seg = [['all', 'All'], ['need', 'Needs you'], ['work', 'In progress'], ['done', 'Done'], ['bad', 'Problems']].map(([k, l]) => `<button class="${logFilter === k ? 'on' : ''}" onclick="logFilter='${k}';render(true)">${l}</button>`).join('');
+  return pagehead('Videos', `${S.jobs.length} made so far.`) + `<div class="toolbar" style="--i:1"><div class="seg">${seg}</div><input id="logq" type="search" placeholder="Search titles" value="${esc(logQ)}" oninput="logQ=this.value;clearTimeout(window._lq);window._lq=setTimeout(()=>{render(true);const e=$('#logq');e.focus();e.setSelectionRange(e.value.length,e.value.length)},200)" aria-label="Search titles"></div>
+  <div class="rows" style="--i:2">${rows.map(j => `<div class="row" role="button" tabindex="0" onclick="openJ('${j.id}')" onkeydown="if(event.key==='Enter'&&event.target===this)openJ('${j.id}')"><div class="th">${thumb(j) ? `<img src="${thumb(j)}" alt="" loading="lazy" style="${j.format === 'short' ? 'object-fit:contain;background:#000' : ''}">` : ''}</div><div style="min-width:0"><b>${esc(j.title || j.topic)}</b><small>${esc(flowName(j.flowId) || 'Made by hand')}</small></div><span class="mono">${j.format === 'long' ? 'Long' : 'Short'}${j.files?.duration ? ', ' + dur(j.files.duration) : ''}</span><span>${chip(j)}</span><span class="mono">${esc(j.date)}</span>${rowMenu(j)}</div>`).join('') || `<div class="empty-note">Nothing matches.</div>`}</div>`;
+}
+
+// what can be done with a video from the Videos list, by its status
+function rowActs(j) {
+  const yt = Object.values(j.uploads || {}).find(r => r.ok && r.url), A = [];
+  if (j.status === 'script_review') A.push(['approve-plan', 'Approve the plan (make the video)'], ['rewrite', 'Rewrite the plan']);
+  if (j.status === 'video_review') A.push(['approve', 'Approve' + (j.publishAt ? ' for ' + j.publishAt : '')], ['publish-now', 'Approve and publish now'], ['rerender', 'Make it again'], ['reject', 'Reject']);
+  if (['queued_render', 'rendering'].includes(j.status)) A.push(['hold', 'Hold (stop making it for now)']);
+  if (j.status === 'on_hold') A.push(['resume', 'Resume (make it)']);
+  if (j.status === 'approved') A.push(['publish-now', 'Publish now']);
+  if (j.status === 'upload_failed') A.push(['retry-upload', 'Try the upload again']);
+  if (['failed', 'rejected'].includes(j.status)) A.push(...(j.styles ? [['rerender', 'Make it again']] : []), ['rewrite', 'Rewrite the plan']);
+  if (yt) A.push(['watch', 'See it on YouTube']);
+  A.push(['open', 'Open']);
+  if (!['rendering', 'uploading'].includes(j.status)) A.push(['delete', 'Delete']);
+  return A;
+}
+const rowMenu = j => `<select class="act" aria-label="What to do with this video" onclick="event.stopPropagation()" onkeydown="event.stopPropagation()" onchange="rowDo('${j.id}',this)"><option value="">Choose an action</option>${rowActs(j).map(([v, l]) => `<option value="${v}">${esc(l)}</option>`).join('')}</select>`;
+async function rowDo(id, sel) {
+  const a = sel.value, j = S.jobs.find(x => x.id === id); sel.value = ''; if (!a || !j) return;
+  const v = j.format === 'short', fb = !!(S.flows || []).find(x => x.id === j.flowId)?.upload?.facebook;
+  const go2 = async (path, body, msg) => { try { await api(`/api/jobs/${id}/${path}`, body); toast(msg); } catch (e) { alert(e.message); } await refresh(true); };
+  if (a === 'open') return openJ(id);
+  if (a === 'watch') return window.open(Object.values(j.uploads || {}).find(r => r.ok && r.url).url, '_blank', 'noopener');
+  if (a === 'delete') return delJob(j);
+  if (a === 'approve-plan') return go2('approve-script', {}, 'Approved. The video is being made.');
+  if (a === 'rewrite') { const n = prompt('What should Claude change in the plan? (optional)'); if (n === null) return; return go2('regenerate', { notes: n }, 'Claude is rewriting the plan.'); }
+  if (a === 'rerender') return go2('rerender', {}, 'The video is being made again.');
+  if (a === 'hold') return go2('hold', {}, 'On hold. Press Resume when you want it made.');
+  if (a === 'resume') return go2('resume', {}, 'Back in the queue.');
+  if (a === 'retry-upload') return go2('retry-upload', {}, 'Uploading again.');
+  if (a === 'reject') { const r = prompt('Why are you rejecting it? (optional)'); if (r === null) return; return go2('reject', { reason: r }, 'Rejected'); }
+  if (a === 'approve' || a === 'publish-now') {
+    const now = a === 'publish-now';
+    if (now && !confirm('Publish "' + (j.title || j.topic) + '" now?')) return;
+    if (j.status === 'approved') return go2('approve-video', { ...(j.targets || { youtube: true, instagram: v, facebook: fb }), now: true }, 'Publishing now.');
+    return go2('approve-video', { youtube: true, instagram: v, facebook: fb, now }, now ? 'Approved. Publishing now.' : 'Approved');
+  }
+}
+
+// ================= one video =================
+function viewJob() {
+  const j = openJob, sc = j.script, v2 = j.engine === 'v2', t = thumb(j);
+  let out = `${t ? `<div class="backdrop"><img src="${t}" alt=""></div>` : ''}<button class="backbtn" onclick="swap(()=>{openId=null;render(true)})">${ic('back')}Back</button>
+   <div class="pagehead" style="margin-top:22px"><div><div class="acts" style="margin-bottom:16px">${chip(j)}<span class="chip">${j.format === 'long' ? 'Long video' : 'Short and Reel'}</span>${flowName(j.flowId) ? `<span class="chip">${esc(flowName(j.flowId))}</span>` : ''}${j.publishAt ? `<span class="chip">Goes out ${esc(j.publishAt)}</span>` : ''}</div><h1 class="h1" style="font-size:clamp(36px,5vw,76px);max-width:22ch;text-wrap:balance">${esc((sc && sc.title) || j.title || j.topic)}</h1></div></div>`;
+  if (j.status === 'draft') out += viewDraft(j);
+  if (j.files && j.files.video) out += viewRelease(j);
+  if (sc && v2 && j.status !== 'draft') out += j.files && j.files.video ? `<details style="margin-top:40px"><summary>The plan this video was made from</summary>${viewPlan(j, true)}</details>` : viewPlan(j);
+  else if (sc && !v2) out += `<div class="panel" style="margin-top:20px"><h2 class="h2">Script</h2>${(sc.scenes || []).map(s => `<p style="max-width:70ch">${esc(s.narration)}</p>`).join('')}</div>`;
+  else if (j.status === 'writing') out += `<div class="panel" style="display:flex;gap:16px;align-items:center"><span class="spin" style="width:22px;height:22px;border-width:3px"></span><div><h3 class="h3">Claude is writing the plan</h3><p class="note" style="margin:4px 0 0">This takes a few minutes. The page updates by itself.</p></div></div>`;
+  if (j.status === 'failed') out += `<div class="panel" style="margin-top:20px;border-color:var(--warn)"><h3 class="h3">This one failed</h3><p class="err">${esc((j.log || []).slice(-1)[0] || '')}</p><div class="acts">${sc ? `<button class="btn cta" onclick="jact('rerender')">Make it again</button>` : ''}<button class="btn" onclick="jact('regenerate')">Rewrite the plan</button></div></div>`;
+  if (!['rendering', 'uploading'].includes(j.status)) out += `<div class="panel" style="margin-top:34px;display:flex;gap:14px;align-items:center;justify-content:space-between;flex-wrap:wrap"><div><h3 class="h3" style="margin:0">Delete this video</h3><p class="note" style="margin:4px 0 0">Removes it from AutoTube Studio for good (its files too).${j.status === 'published' ? ' The copy already on YouTube stays there.' : ''}</p></div><button class="btn danger" onclick="delJob()">Delete</button></div>`;
+  out += `<div style="margin-top:34px"><details><summary>Production log</summary><pre class="log">${esc((j.log || []).slice(-150).join('\n'))}</pre></details></div>`;
+  return out;
+}
+function viewRelease(j) {
+  const F = j.files, sc = j.script || {}, v = j.format === 'short';
+  return `<div class="theater"><div><div class="screen ${v ? 'v' : ''}"><video controls preload="metadata" poster="${thumb(j)}" src="/${F.video}?${j.updatedAt}"></video></div>
+    <div class="facts"><span><b>${dur(F.duration)}</b> long</span>${F.shots ? `<span><b>${F.shots}</b> shots</span><span>new picture every <b>${F.avgShot} s</b></span>` : ''}${F.photos ? `<span><b>${F.photos}</b> archive photos</span>` : ''}${F.srt ? `<a href="/${F.srt}" target="_blank">Subtitles</a>` : ''}</div></div>
+   <div class="glass"><h2 class="h2">Release</h2><p class="note">Watch it all the way through. Check names, dates and spellings on screen, and that names are said correctly.</p>
+    ${F.thumb ? `<img class="thumbimg" src="${thumb(j)}" alt="Thumbnail"><div class="acts" style="margin-bottom:20px"><input id="thText" aria-label="Thumbnail headline" placeholder="Thumbnail headline, 2 to 4 words" value="${esc(sc.thumbText || '')}" style="flex:1;min-width:170px"><button class="btn" onclick="remakeThumb(this)">Redo thumbnail</button></div>` : ''}
+    ${j.status === 'video_review' ? `<div class="stack" style="gap:12px;margin-bottom:20px"><label class="check"><input type="checkbox" class="sw" id="toYT" checked> YouTube${v ? ' Short' : ''}</label>${v ? `<label class="check"><input type="checkbox" class="sw" id="toIG" checked> Instagram Reel</label>` : '<input type="checkbox" id="toIG" hidden>'}<label class="check"><input type="checkbox" class="sw" id="toFB" ${(S.flows || []).find(x => x.id === j.flowId)?.upload?.facebook ? 'checked' : ''}> Facebook Page</label></div>
+      <div class="stack" style="gap:10px"><button class="btn ok big" onclick="apV(false)">Approve${j.publishAt ? ' for ' + esc(j.publishAt) : ''}</button><button class="btn big" onclick="apV(true)">Approve and publish now</button><div class="acts" style="margin-top:4px"><button class="btn ghost" onclick="jact('rerender')">Make it again</button><button class="btn danger" onclick="rej()">Reject</button></div></div>` : ''}
+    ${j.status === 'upload_failed' ? `<p class="err">${Object.entries(j.uploads || {}).filter(([, r]) => !r.ok).map(([k, r]) => k + ': ' + esc(r.error)).join('<br>')}</p><button class="btn cta" onclick="jact('retry-upload')">Try the upload again</button>` : ''}
+    ${Object.entries(j.uploads || {}).filter(([, r]) => r.ok && r.url).map(([k, r]) => `<p><a href="${esc(r.url)}" target="_blank">See it on ${{ youtube: 'YouTube', instagram: 'Instagram', facebook: 'Facebook' }[k] || k}</a></p>`).join('')}
+   </div></div>`;
+}
+const SHOT = { headline: 'Headline', punch: 'Slam card', photo: 'Photo', text: 'Card', quote: 'Quote', stat: 'Counter', list: 'List', split: 'Side by side', black: 'Silent beat', map: 'Map', board: 'Evidence board', num: 'Number', countintro: 'Countdown', tease: 'Teaser', end: 'End card', spin: 'Newspaper spin', globe: 'World map', draw: 'Drawn scene', clip: 'Your clip' };
+function shotChip(s) {
+  const t = s.head ? [].concat(s.head).join(' / ') : s.text || (s.lines || []).join(' / ') || s.quote || s.big || (s.value ? (s.prefix || '') + s.value + (s.suffix || '') + ' ' + (s.label || '') : '') || s.label || (s.items || []).map(x => x[0] || x).join(', ') || (s.els ? s.els.map(e => e.costume || e.icon || e.text).filter(Boolean).slice(0, 4).join(', ') : '');
+  return `<span class="shot" title="${esc(t)}">${s.at ? `<em>"${esc(s.at)}"</em>` : ''}<b>${SHOT[s.type] || esc(s.type)}</b>${t ? `<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:24ch">${esc(String(t).toLowerCase())}</span>` : ''}${s.gfx && s.gfx.length ? `<em>+${esc(s.gfx.map(g => g.k).join(', '))}</em>` : ''}</span>`;
+}
+const LIBNAMES = { whiteboard: 'Whiteboard Explainer', 'cel-anime-80s': '80s Cel Anime', chalkboard: 'Chalkboard' };
+function viewPlan(j, inside) {
+  const sc = j.script, v = j.validation || {}, ST = S.v2styles || {}, MOODS = ['tense', 'curious', 'suspense', 'march', 'drama', 'rise', 'outro', 'bouncy'];
+  let n = 0;
+  const chapters = sc.chapters.map((ch, ci) => `<section class="chap"><div class="chap-h"><span class="no">${ch.title ? 'CH ' + String(ci).padStart(2, '0') : 'OPEN'}</span><h3 class="h3">${ch.title ? esc(ch.title.join(': ')) : 'Cold open'}</h3>
+      ${sc.look === 'lib' ? `<span class="note" style="margin:0" title="${esc(ch.why || '')}"><b>Theme: ${esc((LIBNAMES[ch.style] || ch.style))}</b> <small>(Lemo Opuscar library)</small>${ch.why ? ` · ${esc(ch.why)}` : ''}</span>` : `<select data-ci="${ci}" data-cf="style" aria-label="Look">${Object.entries(ST).map(([k, x]) => `<option value="${k}" ${k === ch.style ? 'selected' : ''}>${esc(x.name)}</option>`).join('')}</select>`}
+      <select data-ci="${ci}" data-cf="mood" aria-label="Music">${MOODS.map(m => `<option value="${m}" ${m === ch.mood ? 'selected' : ''}>${m} music</option>`).join('')}</select>
+      ${j.format === 'long' ? `<input data-ci="${ci}" data-cf="title" value="${esc((ch.title || []).join(' | '))}" placeholder="Chapter title, empty for none" aria-label="Chapter title">` : ''}</div>
+    ${ch.lines.map((l, li) => `<div class="ln"><span class="k">${String(++n).padStart(2, '0')}</span><textarea data-ci="${ci}" data-li="${li}" rows="1" aria-label="Narration line ${n}">${esc(l.say)}</textarea><div class="shots">${(l.shots || []).map(shotChip).join('')}</div><button class="x" title="Remove this line" aria-label="Remove line ${n}" onclick="delLine(${ci},${li})">${ic('x')}</button></div>`).join('')}</section>`).join('');
+  return `<div class="grid2" style="align-items:start;margin-top:${inside ? 20 : 8}px">
+    <div class="panel stack"><h2 class="h2">The plan</h2><p class="note" style="margin:0">About <b>${Math.max(1, Math.round((v.estSeconds || 0) / 60))} min</b>, ${v.lines || 0} lines, ${sc.chapters.length} chapters${sc.era ? `, set around ${esc(sc.era)}` : ''}. Each line is what the voice reads. The chips beside it are the shots Claude planned.</p>
+      ${(v.errs || []).map(e => `<p class="err" style="margin:0">${esc(e)}</p>`).join('')}${(v.warns || []).slice(0, 6).map(e => `<p class="warnt" style="margin:0">${esc(e)}</p>`).join('')}
+      <label class="f">YouTube title<input id="sTitle" value="${esc(sc.title)}" maxlength="100"></label>
+      <label class="f">Description<textarea id="sDesc" rows="4">${esc(sc.description)}</textarea></label>
+      <div class="grid2" style="gap:12px"><label class="f">Tags <small>Comma separated</small><input id="sTags" value="${esc((sc.tags || []).join(', '))}"></label><label class="f">Thumbnail headline<input id="sThumb" value="${esc(sc.thumbText || '')}"></label></div>
+      <label class="f">Next-episode teaser<input id="sNext" value="${esc(sc.next || '')}"></label></div>
+    <div class="panel stack"><h2 class="h2">Voice</h2><p class="note" style="margin:0">${j.voiceFile ? `Using your recording, <b>${esc(j.voiceFile)}</b>.` : `Using the AI voice <b>${esc(j.voice || S.settings.voice)}</b>. For a real human voice, read the script into your phone in one go and upload it. The app finds every sentence by itself.`}</p>
+      <div class="acts"><a class="btn" href="/api/jobs/${j.id}/narration.txt">Download the script</a><label class="btn cta" style="cursor:pointer">Upload my recording<input type="file" accept="audio/*,video/*" hidden onchange="voiceUpload(this)"></label>${j.voiceFile ? `<button class="btn danger" onclick="voiceRemove()">Use the AI voice</button>` : ''}</div><span class="note" id="vup"></span>
+      </div>
+   </div>${chapters}
+   <details class="panel" style="margin-top:24px"><summary>Archive photos to find (${(sc.images || []).length}) and the raw plan</summary><div class="stack" style="margin-top:16px"><p class="note" style="margin:0">Free-licence photos from Wikimedia Commons. Edit what to look for if a search needs help.</p>
+      <div>${(sc.images || []).map((im, ii) => `<div class="photos"><span>${esc(im.id)}</span><input data-ii="${ii}" data-if="want" value="${esc(im.want)}" aria-label="What ${esc(im.id)} shows"><input data-ii="${ii}" data-if="queries" value="${esc((im.queries || []).join(' | '))}" aria-label="Search words for ${esc(im.id)}"></div>`).join('') || '<p class="note">No photos requested.</p>'}</div>
+      <details><summary>Edit the whole plan as JSON</summary><textarea id="rawPlan" rows="14" style="font:12.5px var(--mono);margin-top:10px">${esc(JSON.stringify(sc, null, 1))}</textarea><div class="acts" style="margin-top:10px"><button class="btn" onclick="applyRaw()">Use this JSON</button></div></details></div></details>
+   <div class="actionbar" ${inside ? 'style="position:static"' : ''}>${j.status === 'script_review' ? `<button class="btn ok big" onclick="apS(this)">Approve and make the video</button>` : ''}<button class="btn big" onclick="saveScript()">Save</button>
+    ${['script_review', 'failed', 'rejected'].includes(j.status) ? `<input id="notes" aria-label="What should Claude change" placeholder="Tell Claude what to change" style="flex:1;min-width:200px"><button class="btn big" onclick="jact('regenerate',{notes:$('#notes').value})">Rewrite</button>` : ''}
+    <button class="btn danger big" onclick="delJob()">Delete</button></div>`;
+}
+function collectPlan() {
+  const sc = openJob.script; sc.title = $('#sTitle').value; sc.description = $('#sDesc').value; sc.tags = $('#sTags').value.split(',').map(x => x.trim()).filter(Boolean); sc.thumbText = $('#sThumb').value.trim(); sc.next = $('#sNext').value;
+  $$('[data-cf]').forEach(e => { const ch = sc.chapters[+e.dataset.ci], f = e.dataset.cf; ch[f] = f === 'title' ? (e.value.trim() ? e.value.split('|').map(x => x.trim()) : null) : e.value; });
+  $$('textarea[data-li]').forEach(e => { sc.chapters[+e.dataset.ci].lines[+e.dataset.li].say = e.value; });
+  $$('[data-if]').forEach(e => { const im = sc.images[+e.dataset.ii]; if (e.dataset.if === 'queries') im.queries = e.value.split('|').map(x => x.trim()).filter(Boolean); else im.want = e.value; });
+  return sc;
+}
+async function saveScript() { try { openJob = await api(`/api/jobs/${openJob.id}/script`, { script: collectPlan() }); toast('Saved'); render(true); } catch (e) { alert(e.message); } }
+async function apS(btn) { btn.disabled = true; try { await api(`/api/jobs/${openJob.id}/script`, { script: collectPlan() }); await api(`/api/jobs/${openJob.id}/approve-script`, {}); toast('Approved. The video is being made.'); openId = null; await refresh(true); } catch (e) { alert(e.message); btn.disabled = false; } }
+function delLine(ci, li) { collectPlan(); openJob.script.chapters[ci].lines.splice(li, 1); render(true); }
+async function applyRaw() { try { openJob = await api(`/api/jobs/${openJob.id}/script`, { script: JSON.parse($('#rawPlan').value) }); toast('Plan updated'); render(true); } catch (e) { alert('That JSON has a problem: ' + e.message); } }
+async function apV(now) { try { await api(`/api/jobs/${openJob.id}/approve-video`, { youtube: $('#toYT').checked, instagram: $('#toIG').checked, facebook: $('#toFB').checked, now }); toast(now ? 'Approved. Publishing now.' : 'Approved'); openId = null; await refresh(true); } catch (e) { alert(e.message); } }
+async function rej() { const r = prompt('Why are you rejecting it? (optional)'); if (r === null) return; await jact('reject', { reason: r }); }
+async function jact(a, b = {}, leave = false) { try { await api(`/api/jobs/${openJob.id}/${a}`, b); } catch (e) { alert(e.message); } if (leave) { openId = null; tab = 'log'; await refresh(true); return; } await reloadJob(); refresh(); }
+async function remakeThumb(btn) { btn.disabled = true; btn.textContent = 'Making it'; try { await api('/api/jobs/' + openJob.id + '/thumbnail', { text: $('#thText').value.trim() }); toast('Thumbnail updated'); await reloadJob(); } catch (e) { alert(e.message); btn.disabled = false; btn.textContent = 'Redo thumbnail'; } }
+async function voiceUpload(inp) { const f = inp.files[0]; if (!f) return; $('#vup').textContent = 'Uploading ' + (f.size / 1048576).toFixed(1) + ' MB'; try { const r = await fetch('/api/jobs/' + openJob.id + '/voice', { method: 'POST', headers: { 'x-filename': encodeURIComponent(f.name) }, body: f }); if (!r.ok) throw new Error((await r.json()).error); toast('Your recording will be used'); await reloadJob(); } catch (e) { alert('Upload failed: ' + e.message); $('#vup').textContent = ''; } }
+async function voiceRemove() { await api('/api/jobs/' + openJob.id + '/voice-remove', {}); await reloadJob(); }
+function viewDraft(j) {
+  const M = j.media || [];
+  return `<div class="panel stack"><h2 class="h2">Your material</h2><p class="note" style="margin:0">Add photos and clips with a line about what each shows, plus your narration if you recorded one. Claude plans the video around them.</p>
+   <div class="acts"><label class="btn cta" style="cursor:pointer">Add photos or clips<input type="file" multiple accept="image/*,video/*" hidden onchange="mediaUpload(this)"></label><label class="btn" style="cursor:pointer">${j.voiceFile ? 'Replace' : 'Add'} my narration<input type="file" accept="audio/*,video/*" hidden onchange="voiceUpload(this)"></label><span class="note" id="vup"></span></div>
+   ${M.length ? `<div class="rows">${M.map(m => `<div class="row" style="cursor:default;grid-template-columns:90px minmax(0,1fr) 36px"><span class="mono" style="padding-left:8px">${esc(m.id)}</span><div style="min-width:0"><b>${esc(m.desc)}</b><small>${m.kind === 'image' ? 'Photo' : 'Clip, ' + (+m.dur || 0).toFixed(1) + ' s'}, ${esc(m.name)}</small></div><button class="x" aria-label="Remove ${esc(m.id)}" onclick="mediaRemove('${m.id}')">${ic('x')}</button></div>`).join('')}</div>` : ''}
+   ${j.voiceFile ? `<p class="note" style="margin:0">Narration: <b>${esc(j.voiceFile)}</b>. ${j.voiceFirst ? 'The video will follow it word for word.' : 'It will be matched to the script Claude writes.'}</p>` : ''}
+   <div><button class="btn ok big" onclick="jact('start')">Plan the video from my material</button></div></div>`;
+}
+async function mediaUpload(inp) {
+  for (const f of inp.files) { const d = prompt(`What does "${f.name}" show? One line helps Claude place it.`, '') ?? ''; $('#vup').textContent = 'Uploading ' + f.name; const r = await fetch('/api/jobs/' + openJob.id + '/media', { method: 'POST', headers: { 'x-filename': encodeURIComponent(f.name), 'x-desc': encodeURIComponent(d || f.name) }, body: f }); if (!r.ok) { alert((await r.json().catch(() => ({}))).error || 'Upload failed'); break; } }
+  await reloadJob();
+}
+async function mediaRemove(id) { await api('/api/jobs/' + openJob.id + '/media-remove', { id }); await reloadJob(); }
+
+// ================= Ideas =================
+// prompt -> Claude researches -> titles (Short or Long) -> you approve one -> Claude researches it and writes the plan -> you approve the plan -> video -> you approve -> upload
+let ideaFmt = 'any';
+const IDEA_STEP = { writing: 'Claude is researching and writing the plan', script_review: 'Plan ready: check it', queued_render: 'Plan approved: waiting to be made', on_hold: 'On hold', rendering: 'Video being made', video_review: 'Video ready: check it', approved: 'Approved: will upload', uploading: 'Uploading', published: 'Published', failed: 'Something went wrong', upload_failed: 'Upload failed', rejected: 'Rejected' };
+function viewIdeas() {
+  const F = S.flows || [], R = (S.ideaRuns || []).slice().reverse();
+  if (!F.length) return pagehead('Ideas', 'Give a prompt. Claude researches and suggests titles for a channel.') + firstRun();
+  const opt = (v, l) => `<option value="${v}" ${ideaFmt === v ? 'selected' : ''}>${l}</option>`;
+  const form = `<div class="panel stack" style="--i:1;max-width:900px">
+    <h2 class="h2">What kind of videos do you want?</h2>
+    <p class="note" style="margin:0">Describe it in your own words. Claude researches on the web (what people search, what is new, what others already made) and comes back with titles. You pick the ones to make.</p>
+    <div class="grid2" style="gap:14px">${F.length ? `<label class="f">Channel<select id="iFlow">${F.map(f => `<option value="${f.id}">${esc(f.name)}</option>`).join('')}</select></label>` : ''}
+      <label class="f">Format<select id="iFmt">${opt('any', 'Let Claude choose (Shorts and long)')}${opt('short', 'Only Shorts')}${opt('long', 'Only long videos')}</select></label></div>
+    <label class="f">Your prompt<textarea id="iPrompt" rows="4" placeholder="e.g. Physics topics JEE students get wrong in the last 2 months before the exam, or: strange stories about food in Indian history"></textarea></label>
+    <div class="grid2" style="gap:14px"><label class="f">How many titles<select id="iN"><option>6</option><option selected>10</option><option>15</option><option>20</option></select></label><div style="align-self:end"><button class="btn cta big" onclick="ideasGo(this)">Research titles</button></div></div></div>`;
+  const when = at => new Date(at).toLocaleString(undefined, { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+  const card = (r, i, k) => {
+    const done = i.status === 'approved', rej = i.status === 'rejected', other = i.format === 'long' ? 'short' : 'long';
+    const state = done ? `<span class="chip ${i.jobStatus === 'published' ? 'done' : /failed/.test(i.jobStatus || '') ? 'bad' : ['script_review', 'video_review'].includes(i.jobStatus) ? 'need' : 'work'}"><i></i>${esc(IDEA_STEP[i.jobStatus] || 'Approved')}</span>` : rej ? '<span class="chip">Not now</span>' : '';
+    const acts = done ? `<button class="btn" onclick="openJ('${i.jobId}')">Open the video</button>`
+      : rej ? `<button class="btn ghost" onclick="ideaAct('approve','${r.id}','${i.id}','${i.format}')">Make it anyway</button>`
+      : `<button class="btn ok" onclick="ideaAct('approve','${r.id}','${i.id}','${i.format}')">Approve as ${i.format === 'long' ? 'long video' : 'Short'}</button><button class="btn" onclick="ideaAct('approve','${r.id}','${i.id}','${other}')">Make it ${other === 'short' ? 'a Short' : 'long'} instead</button><button class="btn ghost" onclick="ideaAct('reject','${r.id}','${i.id}')">Not now</button>`;
+    const src = i.sources.length ? `<p class="note" style="margin:0">Sources: ${i.sources.map(u => `<a href="${esc(u)}" target="_blank" rel="noopener">${esc((u.split('/')[2] || 'link').replace(/^www\./, ''))}</a>`).join(' · ')}</p>` : '';
+    return `<div class="panel stack" style="padding:16px;${rej ? 'opacity:.45' : ''}">
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><span class="mono">${k + 1}</span><span class="chip ${i.format === 'long' ? 'work' : 'need'}">${i.format === 'long' ? 'Long video' : 'Short'}</span>${state}</div>
+      <h3 class="h3" style="margin:0">${esc(i.title)}</h3>
+      ${i.hook ? `<p class="note" style="margin:0"><b>Hook:</b> ${esc(i.hook)}</p>` : ''}${i.angle ? `<p style="margin:0">${esc(i.angle)}</p>` : ''}${i.why ? `<p class="note" style="margin:0"><b>Why now:</b> ${esc(i.why)}</p>` : ''}
+      ${src}<div class="acts">${acts}<button class="btn ghost" onclick="ideaRemove('${r.id}','${i.id}',${done && i.jobId ? 1 : 0})">Delete</button></div></div>`;
+  };
+  const run = r => {
+    const status = r.status === 'researching' ? `<span class="chip work"><span class="spin"></span>Claude is researching (a few minutes)</span>`
+      : r.status === 'failed' ? `<span class="chip bad"><i></i>Research failed</span><button class="btn" onclick="ideaAct('retry','${r.id}')">Try again</button>`
+      : `<span class="chip done"><i></i>${r.ideas.length} titles</span>`;
+    const head = `<div style="display:flex;gap:12px;align-items:flex-start;justify-content:space-between;flex-wrap:wrap"><div style="min-width:0"><b>${esc(r.prompt)}</b><div class="note" style="margin:4px 0 0">${esc(r.channel || '')} · ${r.format === 'any' ? 'Shorts and long' : r.format === 'short' ? 'Shorts' : 'Long videos'} · ${when(r.at)}</div></div>
+      <div class="acts">${status}<button class="btn ghost" onclick="if(confirm('Remove this list of ideas?'))ideaAct('delete','${r.id}')">Remove</button></div></div>`;
+    return `<div class="panel stack" style="max-width:900px">${head}${r.status === 'failed' ? `<p class="err">${esc(r.error || '')}</p>` : ''}${r.ideas.length ? `<div class="stack">${r.ideas.map((i, k) => card(r, i, k)).join('')}</div>` : ''}</div>`;
+  };
+  return pagehead('Ideas', 'Give a prompt. Claude researches and suggests titles. Approve a title and Claude researches it and writes the plan; you approve the plan, then the finished video, then it is uploaded.') + form + (R.length ? `<div class="stack" style="--i:2;margin-top:18px">${R.map(run).join('')}</div>` : '');
+}
+async function delJob(j = openJob) { if (!confirm('Delete this video for good?' + (j.status === 'published' ? ' (The copy on YouTube stays there.)' : ''))) return;
+  const idea = j.fromIdea && confirm('Also delete the idea it was made from?\n\nOK = delete the idea too\nCancel = keep the idea, so you can make it again');
+  try { await api(`/api/jobs/${j.id}/delete`, { idea }); } catch (e) { return alert(e.message); }
+  openId = null; tab = 'log'; toast('Video deleted'); await refresh(true);
+}
+async function ideaRemove(run, id, hasVideo) {
+  if (!confirm('Delete this idea?')) return;
+  const video = hasVideo ? confirm('Also delete the video made from it?\n\nOK = delete the video too\nCancel = keep the video in Videos') : false;
+  try { await api('/api/ideas/remove', { run, id, video }); toast(video ? 'Idea and video deleted' : 'Idea deleted'); await refresh(true); } catch (e) { alert(e.message); }
+}
+async function ideasGo(btn) {
+  const b = { prompt: $('#iPrompt').value.trim(), flowId: $('#iFlow') ? $('#iFlow').value : null, format: $('#iFmt').value, n: +$('#iN').value };
+  if (!b.prompt) return alert('Write what kind of videos you want first.');
+  ideaFmt = b.format; btn.disabled = true; btn.textContent = 'Starting';
+  try { await api('/api/ideas', b); toast('Claude is researching titles. They will show up here.'); $('#iPrompt').value = ''; if (document.activeElement) document.activeElement.blur(); await refresh(true); } catch (e) { alert(e.message); btn.disabled = false; btn.textContent = 'Research titles'; }
+}
+async function ideaAct(a, run, id, format) {
+  try { await api('/api/ideas/' + a, { run, id, format }); if (a === 'approve') toast('Approved. Claude is researching it and writing the plan. It will be in Needs you when ready.'); await refresh(true); } catch (e) { alert(e.message); }
+}
+
+// ================= Make =================
+function viewMake() {
+  const F = S.flows || [];
+  if (!F.length) return pagehead('Make', 'Make one video now.') + firstRun();
+  const form = createMode === 'auto' ? `<label class="f">Topic <small>Leave it empty and Claude takes the next researched topic for this channel.</small><input id="cTopic" placeholder="The fall of Vijayanagara"></label>`
+    : createMode === 'brief' ? `<label class="f">Title <small>Used exactly as written.</small><input id="cTitle" maxlength="100" placeholder="The day salt beat the British Empire"></label><label class="f">Brief <small>What to cover, the angle, people and facts to include, anything to avoid.</small><textarea id="cPrompt" rows="5"></textarea></label>`
+    : `<label class="f">Title or topic<input id="cTitle" placeholder="My trip to Hampi"></label><label class="f">What should it say? <small>Optional. Claude builds the story around your photos, clips and voice.</small><textarea id="cPrompt" rows="4"></textarea></label><label class="check"><input type="checkbox" class="sw" id="cVF"> I'll upload my own narration. Follow it word for word.</label>`;
+  const M = [['auto', '01', 'Claude does everything', 'Researches the topic, writes the title and script, plans every shot and finds the photos.'], ['brief', '02', 'My title, my brief', 'You set the direction. Claude researches and builds the video from it.'], ['own', '03', 'My own material', 'Your voice, photos or clips. Claude plans the video around them.']];
+  return pagehead('Make a video', 'One video outside the daily schedule.') + `<div class="modes" style="--i:1">${M.map(([k, n, t, d]) => `<button class="mode ${createMode === k ? 'on' : ''}" onclick="createMode='${k}';render(true)" aria-pressed="${createMode === k}"><div class="n">${n}</div><b>${t}</b><span>${d}</span></button>`).join('')}</div>
+  <div class="panel stack" style="--i:2;margin-top:16px;max-width:900px">
+    <div class="grid2" style="gap:14px">${F.length ? `<label class="f">Channel<select id="cFlow">${F.map(f => `<option value="${f.id}">${esc(f.name)}</option>`).join('')}</select></label>` : ''}<label class="f">Length<select id="cFmt"><option value="short">Short and Reel, about 45 seconds</option><option value="long">Long video</option></select></label></div>
+    ${form}<div><button class="btn cta big" onclick="createOne(this)">${createMode === 'own' ? 'Continue to my material' : 'Write the plan'}</button></div></div>`;
+}
+async function createOne(btn) {
+  const b = { mode: createMode, flowId: $('#cFlow') ? $('#cFlow').value : null, format: $('#cFmt').value };
+  if (createMode === 'auto') b.topic = $('#cTopic').value.trim();
+  else { b.title = $('#cTitle').value.trim(); b.prompt = $('#cPrompt').value.trim(); b.topic = b.title; if (!b.title) return alert('Give the video a title first.'); if (createMode === 'own') b.voiceFirst = $('#cVF').checked; }
+  btn.disabled = true; btn.textContent = createMode === 'auto' && !b.topic ? 'Picking a topic' : 'Starting';
+  try { const j = await api('/api/jobs', b); if (createMode === 'own') { await openJ(j.id); toast('Draft made. Add your material.'); } else { toast('Claude is writing the plan'); go('log'); } } catch (e) { alert(e.message); btn.disabled = false; }
+}
+
+// ================= Channels =================
+const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+const APPROVAL = { both: ['I check plans and videos', 'Claude researches and writes. You approve each plan, then each finished video.'], video: ['I only check finished videos', 'Plans are approved automatically. You approve each video.'], none: ['Autopilot', 'Made and published on schedule without you. Use it once you trust the channel.'] };
+function viewChannels() {
+  if (flowEdit) return viewChannelEdit();
+  if (calFlow) return viewCalendar();
+  const F = S.flows || [];
+  return pagehead('Channels', 'Each channel researches, writes, makes, thumbnails and uploads on its own schedule.', `<button class="btn cta big" onclick="flowEdit='new';render(true)">${ic('make')}Add a channel</button>`) +
+   (F.map((f, i) => { const s = f.schedule; return `<article class="chan ${f.enabled ? '' : 'off'}" style="--i:${i + 1}"><div><h2 class="name">${esc(f.name)}</h2><p class="niche">${esc(f.channel.niche)}</p>
+      <div class="nums"><div><strong>${s.longs} + ${s.shorts}</strong>long + Shorts a day</div><div><strong>${esc(s.readyBy)}</strong>ready for you</div><div><strong>${f.topics.length}</strong>topics queued</div><div><strong>${f.jobs}</strong>videos made</div></div>
+      <p class="note" style="margin:18px 0 0">${esc(APPROVAL[f.approvals][0])}. ${f.enabled ? (f.next ? `Next batch starts ${fmtWhen(f.next.start)}.` : '') : 'Paused.'}</p></div>
+      <div class="side"><label class="check"><span>${f.enabled ? 'Running' : 'Paused'}</span><input type="checkbox" class="sw" ${f.enabled ? 'checked' : ''} onchange="flowToggle('${f.id}',this.checked)" aria-label="Run ${esc(f.name)} on schedule"></label>
+      <div class="week" aria-label="Runs on ${s.days.map(i => DAYS[i]).join(', ')}">${DAYS.map((d, i) => `<span class="${s.days.includes(i) ? 'on' : ''}" title="${d}">${d[0]}</span>`).join('')}</div>
+      <div class="acts"><button class="btn" onclick="openCal('${f.id}')">Content calendar</button><button class="btn" onclick="flowRun('${f.id}',this)">Make today's videos now</button><button class="btn cta" onclick="flowEdit='${f.id}';render(true)">Edit</button></div></div></article>`; }).join('') || `<div class="empty-note">No channels yet. Add one for each YouTube and Instagram account.</div>`);
+}
+async function flowToggle(id, on) { try { await api('/api/flows', { id, enabled: on }); toast(on ? 'Channel running' : 'Channel paused'); } catch (e) { alert(e.message); } await refresh(true); }
+async function flowRun(id, btn) { btn.disabled = true; btn.textContent = 'Researching topics'; try { const r = await api(`/api/flows/${id}/run`, {}); toast(`${(r.jobs || []).length} videos started`); } catch (e) { alert(e.message); } await refresh(true); }
+function viewChannelEdit() {
+  const isNew = flowEdit === 'new', f = isNew ? { id: '', name: '', enabled: false, channel: { name: '', niche: '', audience: '', tone: 'warm, clear and friendly' }, domain: 'general', language: 'english', pack: 'auto', voice: S.settings.voice, longMinutes: 8, schedule: { days: [0, 1, 2, 3, 4, 5, 6], longs: 1, shorts: 2, readyBy: '09:00', leadHours: 8, publishLong: ['18:00'], publishShort: ['09:00', '15:00'] }, approvals: 'both', research: 'auto', topics: [], upload: { youtube: true, instagram: true, privacy: 'public' } } : (S.flows || []).find(x => x.id === flowEdit);
+  if (!f) { flowEdit = null; return viewChannels(); }
+  const s = f.schedule, root = 'channels\\' + (f.id || 'the-channel-id');
+  return `<button class="backbtn" onclick="flowEdit=null;render(true)">${ic('back')}Channels</button>` + pagehead(isNew ? 'New channel' : esc(f.name), 'Set it up once. It then runs on its own.') + `
+  <div class="grid2" style="grid-template-columns:repeat(auto-fit,minmax(min(100%,460px),1fr));align-items:start">
+   <div class="panel stack" style="--i:1"><h2 class="h2">The channel</h2>
+     <label class="f">Name in AutoTube Studio<input id="fName" value="${esc(f.name)}" placeholder="e.g. Kitchen Science"></label>
+     <label class="f">Name on thumbnails and end cards<input id="fCh" value="${esc(f.channel.name)}"></label>
+     <div class="grid2" style="gap:12px;grid-template-columns:1fr 1fr"><label class="f">Channel type<select id="fDomain" onchange="$('#fDomNote').textContent=DOM_NOTE[this.value]"><option value="general" ${f.domain === 'general' ? 'selected' : ''}>Any topic (explainers, stories, facts, how-to)</option><option value="history" ${!f.domain || f.domain === 'history' ? 'selected' : ''}>History documentaries</option><option value="exam" ${f.domain === 'exam' ? 'selected' : ''}>JEE / NEET preparation</option></select></label>
+     <label class="f">Narration language <small>Hinglish / Hindi need an ElevenLabs voice</small><select id="fLang">${[['hinglish', 'Hinglish'], ['english', 'English'], ['hindi', 'Hindi']].map(([v, l]) => `<option value="${v}" ${(f.language || 'english') === v ? 'selected' : ''}>${l}</option>`).join('')}</select></label></div>
+     <p class="note" id="fDomNote" style="margin:0">${DOM_NOTE[f.domain || 'history'] || DOM_NOTE.general}</p>
+     <label class="f">What it's about <small>Claude researches every topic from this, so be specific.</small><textarea id="fNiche" rows="3" placeholder="e.g. the science behind everyday cooking: why recipes work, kitchen myths, simple experiments">${esc(f.channel.niche)}</textarea></label>
+     <div class="grid2" style="gap:12px"><label class="f">Who watches<input id="fAud" value="${esc(f.channel.audience)}"></label><label class="f">Tone of voice<input id="fTone" value="${esc(f.channel.tone)}"></label></div>
+     <div class="grid2" style="gap:12px"><label class="f">Look<select id="fPack">${Object.entries(S.packs).map(([k, p]) => `<option value="${k}" ${f.pack === k ? 'selected' : ''}>${esc(p.name)}</option>`).join('')}</select></label><label class="f">Narrator<select id="fVoice">${voiceOpts(f.voice)}</select></label></div>
+     <label class="f">Long video length, minutes<input id="fMin" type="number" min="3" max="20" value="${f.longMinutes}" style="max-width:140px"></label>
+     <label class="f">Topics<select id="fRes"><option value="auto" ${f.research === 'auto' ? 'selected' : ''}>Claude researches new ones when the list runs low</option><option value="queue" ${f.research === 'queue' ? 'selected' : ''}>Only use my list</option></select></label>
+     <label class="f">${(f.shortTopics || []).length || f.shortsOwnTopics ? 'Long video topics' : 'Topic list'} <small>One per line. The top one is used next.</small><textarea id="fTopics" rows="7">${esc(f.topics.join('\n'))}</textarea></label>
+     ${(f.shortTopics || []).length || f.shortsOwnTopics ? `<label class="f">Short topics <small>One per line, in order. Two are used each day.</small><textarea id="fShortTopics" rows="7">${esc((f.shortTopics || []).join('\n'))}</textarea></label>` : ''}
+     ${isNew ? '' : `<div><button class="btn" onclick="flowResearch('${f.id}',this)">Research 12 topics now</button></div>`}
+   </div>
+   <div class="stack" style="gap:18px">
+    <div class="panel stack" style="--i:2"><h2 class="h2">Schedule</h2>
+     <fieldset style="border:0;padding:0;margin:0"><legend style="font-weight:600;margin-bottom:9px;font-size:14px;padding:0">Days</legend><div class="week">${DAYS.map((d, i) => `<label title="${d}" style="cursor:pointer;position:relative"><input type="checkbox" class="fDay" value="${i}" ${s.days.includes(i) ? 'checked' : ''} aria-label="${d}" style="position:absolute;opacity:0;width:1px;height:1px" onchange="this.nextElementSibling.classList.toggle('on',this.checked)"><span class="${s.days.includes(i) ? 'on' : ''}" style="width:40px;height:40px">${d.slice(0, 2)}</span></label>`).join('')}</div></fieldset>
+     <div class="grid2" style="gap:12px;grid-template-columns:1fr 1fr"><label class="f">Long videos a day<input id="fLongs" type="number" min="0" max="6" value="${s.longs}"></label><label class="f">Shorts a day<input id="fShorts" type="number" min="0" max="12" value="${s.shorts}"></label></div>
+     <div class="grid2" style="gap:12px;grid-template-columns:1fr 1fr"><label class="f">Ready for me by<input id="fReady" type="time" value="${s.readyBy}"></label><label class="f">Start hours earlier<input id="fLead" type="number" min="1" max="24" value="${s.leadHours}"></label></div>
+     <p class="note" style="margin:0">On this PC a long video takes about 40 minutes and a Short about 10, so leave enough hours.</p>
+     <div class="grid2" style="gap:12px;grid-template-columns:1fr 1fr"><label class="f">Long videos go out <small>Comma separated</small><input id="fPubL" value="${esc(s.publishLong.join(', '))}"></label><label class="f">Shorts go out <small>Comma separated</small><input id="fPubS" value="${esc(s.publishShort.join(', '))}"></label></div>
+    </div>
+    <div class="panel stack" style="--i:3"><h2 class="h2">Who checks what</h2><div class="appr">${Object.entries(APPROVAL).map(([k, [t, d]]) => `<label><input type="radio" name="fAppr" value="${k}" ${f.approvals === k ? 'checked' : ''}><span><b>${t}</b><br><span class="note">${d}</span></span></label>`).join('')}</div></div>
+    <div class="panel stack" style="--i:4"><h2 class="h2">Uploads</h2>
+     <label class="check"><input type="checkbox" class="sw" id="fYT" ${f.upload.youtube ? 'checked' : ''}> Upload to this channel's YouTube</label>
+     <label class="check"><input type="checkbox" class="sw" id="fIG" ${f.upload.instagram ? 'checked' : ''}> Post Shorts as Instagram Reels</label>
+     <label class="check"><input type="checkbox" class="sw" id="fFB" ${f.upload.facebook ? 'checked' : ''}> Post videos to the Facebook Page</label>
+     <label class="f">YouTube visibility<select id="fPriv" style="max-width:220px">${['public', 'unlisted', 'private'].map(v => `<option ${v === f.upload.privacy ? 'selected' : ''}>${v}</option>`).join('')}</select></label>
+     ${isNew ? '<p class="note" style="margin:0">Save the channel first, then connect its own accounts here. Until then it uses the accounts in Settings.</p>' : `<h3 class="h3" style="margin-top:8px">This channel's accounts</h3><p class="note" style="margin:0">Leave empty to use the accounts from Settings.</p>${connPanel(f.id, f.id)}`}
+    </div>
+   </div>
+  </div>
+  <div class="actionbar"><label class="check" style="font-weight:600"><input type="checkbox" class="sw" id="fOn" ${f.enabled ? 'checked' : ''}> Run on schedule</label><span style="flex:1"></span>
+    ${isNew ? '' : `<button class="btn danger" onclick="if(confirm('Delete this channel? Videos already made stay in Videos.'))flowDelete('${f.id}')">Delete</button>`}
+    <button class="btn cta big" onclick="flowSave('${f.id}')">Save channel</button></div>`;
+}
+const times = v => String(v).split(/[ ,]+/).map(x => x.trim()).filter(x => /^\d{1,2}:\d{2}$/.test(x));
+async function flowSave(id) {
+  const f = { name: $('#fName').value.trim() || $('#fCh').value.trim(), enabled: $('#fOn').checked,
+    channel: { name: $('#fCh').value.trim() || $('#fName').value.trim(), niche: $('#fNiche').value.trim(), audience: $('#fAud').value.trim(), tone: $('#fTone').value.trim(), language: 'English' },
+    pack: $('#fPack').value, voice: $('#fVoice').value, domain: $('#fDomain').value, language: $('#fLang').value, look: $('#fLook') ? $('#fLook').value : undefined, longMinutes: +$('#fMin').value || 8, research: $('#fRes').value, topics: $('#fTopics').value.split('\n').map(x => x.trim()).filter(Boolean), ...($('#fShortTopics') ? { shortTopics: $('#fShortTopics').value.split('\n').map(x => x.trim()).filter(Boolean) } : {}),
+    schedule: { days: $$('.fDay').filter(x => x.checked).map(x => +x.value), longs: +$('#fLongs').value || 0, shorts: +$('#fShorts').value || 0, readyBy: $('#fReady').value || '09:00', leadHours: +$('#fLead').value || 8, publishLong: times($('#fPubL').value), publishShort: times($('#fPubS').value) },
+    approvals: ($('input[name=fAppr]:checked') || {}).value || 'both', upload: { youtube: $('#fYT').checked, instagram: $('#fIG').checked, facebook: $('#fFB').checked, privacy: $('#fPriv').value } };
+  if (!f.name) return alert('Give the channel a name.'); if (!f.channel.niche) return alert('Describe what the channel is about. Claude researches topics from it.');
+  if (id) f.id = id;
+  try { await api('/api/flows', f); flowEdit = null; toast('Channel saved'); await refresh(true); } catch (e) { alert(e.message); }
+}
+async function flowDelete(id) { await api(`/api/flows/${id}/delete`, {}); flowEdit = null; toast('Channel deleted'); await refresh(true); }
+async function flowResearch(id, btn) { btn.disabled = true; btn.textContent = 'Claude is researching'; try { const r = await api(`/api/flows/${id}/research`, {}); toast(`${(r.topics || []).length} topics added`); } catch (e) { alert(e.message); } S = await api('/api/state'); render(true); }
+async function flowConn(id) { $('#fConn').textContent = 'Checking'; try { const r = await api(`/api/flows/${id}/connections`, {}); $('#fConn').textContent = `YouTube ${r.youtube.connected ? 'connected' + (r.youtube.channel ? ' (' + r.youtube.channel + ')' : '') : 'not connected'}. Instagram ${r.instagram.connected ? 'connected' : 'not connected'}.`; } catch (e) { $('#fConn').textContent = e.message; } }
+
+// ================= accounts: connect YouTube / Instagram / Facebook from here =================
+const CONN = {};
+function connPanel(scope, back) { setTimeout(() => loadConn(scope, back), 0); return `<div class="accts" id="acc-${scope}"><p class="note">Checking accounts</p></div>`; }
+async function loadConn(scope, back) {
+  const el = $('#acc-' + scope); if (!el) return;
+  try { CONN[scope] = await api('/api/connect?scope=' + encodeURIComponent(scope)); } catch (e) { el.innerHTML = `<p class="err">${esc(e.message)}</p>`; return; }
+  const r = CONN[scope]; el.dataset.back = back; el.innerHTML = acctYT(r, scope, back) + acctMeta(r, scope, back);
+  if (Object.values(r.tests || {}).some(t => t.running)) setTimeout(() => loadConn(scope, back), 4000);
+}
+const accChip = (s, label) => !s ? `<span class="chip">Not connected</span>` : s.connected ? `<span class="chip done"><i></i>${esc(label || 'Connected')}</span>` : `<span class="chip bad"><i></i>Login broken</span>`;
+function testLine(t) {
+  if (!t) return '';
+  if (t.running) return `<div class="res"><span class="spin" style="width:14px;height:14px;border-width:2px;vertical-align:-2px"></span> Uploading a test copy of "${esc(t.video || 'a Short')}". This takes 1 to 3 minutes.</div>`;
+  const x = t.result || {};
+  return x.ok ? `<div class="res" style="color:var(--ok)">Test upload worked. <a href="${esc(x.url)}" target="_blank" rel="noopener">Open it</a>${x.published === false ? ' (unpublished, only you can see it)' : ''}</div>` : `<div class="res err">Test failed: ${esc(x.error || 'unknown error')}</div>`;
+}
+function acctYT(r, scope, back) {
+  const y = r.youtube, t = (r.tests || {}).youtube, inh = r.fallback && !y && r.fallback.youtube;
+  let h = `<div class="acct"><div class="hd"><b>YouTube</b>${inh ? '<span class="chip">Uses the studio account</span>' : accChip(y, y && y.channel ? y.channel : 'Connected')}</div>`;
+  if (y && !y.connected) h += `<p class="err" style="margin:0">${esc(y.error)}</p>`;
+  if (!r.google) {
+    h += `<p class="note" style="margin:0"><b>Step 1.</b> Make a free Google sign-in key for your app (about 10 minutes, once):</p>
+    <ol><li>Open <a href="https://console.cloud.google.com/projectcreate" target="_blank" rel="noopener">Google Cloud</a> with the Google account that owns the channel and create a project.</li>
+    <li>Turn on <a href="https://console.cloud.google.com/apis/library/youtube.googleapis.com" target="_blank" rel="noopener">YouTube Data API v3</a>.</li>
+    <li>Set up the <a href="https://console.cloud.google.com/auth/branding" target="_blank" rel="noopener">consent screen</a>: External, then under Audience add your own Gmail as a test user.</li>
+    <li><a href="https://console.cloud.google.com/auth/clients/create" target="_blank" rel="noopener">Create an OAuth client</a> of type <b>Desktop app</b> and download its JSON.</li></ol>
+    <div class="arow"><label class="btn">Choose the downloaded JSON<input type="file" accept=".json,application/json" hidden onchange="gClientFile('${scope}','${back}',this)"></label></div>
+    <details><summary class="note">Or paste the client ID and secret</summary><div class="stack" style="gap:8px;margin-top:8px"><input id="gId-${scope}" placeholder="Client ID (ends in .apps.googleusercontent.com)" autocomplete="off"><input id="gSec-${scope}" placeholder="Client secret" type="password" autocomplete="off"><button class="btn" onclick="gClientSave('${scope}','${back}')">Save key</button></div></details>`;
+  } else {
+    h += `<p class="note" style="margin:0">Sign-in key added (<code>${esc(String(r.google.clientId).slice(0, 12))}…</code>). <a href="#" onclick="event.preventDefault();accDisc('${scope}','${back}','google-client','Remove the Google key and YouTube login?')">Change key</a></p>
+    <div class="arow"><button class="btn ${y && y.connected ? '' : 'cta'}" onclick="location.href='/connect/google/start?scope=${scope}&back=${back}'">${y ? 'Reconnect YouTube' : 'Connect YouTube'}</button>
+    ${y && y.connected ? `<button class="btn" onclick="accTest('${scope}','${back}','youtube')">Test upload (private)</button><button class="btn ghost" onclick="accDisc('${scope}','${back}','youtube','Disconnect YouTube?')">Disconnect</button>` : ''}</div>
+    ${!y ? `<p class="note" style="margin:0">Google will warn "Google hasn't verified this app". That is normal for your own app: press Continue and tick both boxes.</p>` : ''}`;
+  }
+  return h + testLine(t) + `</div>`;
+}
+function acctMeta(r, scope, back) {
+  const m = r.meta, ig = r.instagram, fb = r.facebook, T = r.tests || {}, fbk = r.fallback || {};
+  let h = `<div class="acct"><div class="hd"><b>Instagram + Facebook Page</b></div>
+    <div class="arow"><span class="note" style="min-width:90px">Instagram</span>${r.fallback && !ig && fbk.instagram ? '<span class="chip">Uses the studio account</span>' : accChip(ig, ig && ig.account ? '@' + ig.account : 'Connected')}</div>
+    <div class="arow"><span class="note" style="min-width:90px">Facebook Page</span>${r.fallback && !fb && fbk.facebook ? '<span class="chip">Uses the studio account</span>' : accChip(fb, fb && fb.page ? fb.page : 'Connected')}</div>`;
+  [ig, fb].forEach(s => { if (s && !s.connected) h += `<p class="err" style="margin:0">${esc(s.error)}</p>`; });
+  if (!m || !m.appId) {
+    h += `<p class="note" style="margin:0"><b>Step 1.</b> Instagram posting needs a Professional (Creator or Business) Instagram account linked to a Facebook Page, and a free Meta app:</p>
+    <ol><li>Open <a href="https://developers.facebook.com/apps/creation/" target="_blank" rel="noopener">Meta for Developers</a> and create an app. Pick the use case for managing a Page and Instagram content (or Other, type Business).</li>
+    <li>Add <b>Facebook Login for Business</b>. Leave the app in Development mode. If asked, add <code>${esc(r.metaRedirect)}</code> as a valid redirect.</li>
+    <li>From App settings, Basic, copy the App ID and App secret here.</li></ol>
+    <div class="stack" style="gap:8px"><input id="mId-${scope}" placeholder="App ID" inputmode="numeric" autocomplete="off"><input id="mSec-${scope}" placeholder="App secret" type="password" autocomplete="off"><button class="btn" onclick="metaAppSave('${scope}','${back}')">Save app</button></div>`;
+  } else {
+    h += `<p class="note" style="margin:0">Meta app <code>${esc(m.appId)}</code>${m.user ? `, logged in as <b>${esc(m.user)}</b>` : ''}${m.expiresAt ? `. Login renews by ${new Date(m.expiresAt).toLocaleDateString()}` : ''}. <a href="#" onclick="event.preventDefault();accDisc('${scope}','${back}','meta-app','Remove the Meta app and both logins?')">Change app</a></p>
+    <div class="arow"><button class="btn ${ig || fb ? '' : 'cta'}" onclick="location.href='/connect/meta/start?scope=${scope}&back=${back}'">${ig || fb ? 'Reconnect with Facebook' : 'Connect with Facebook'}</button></div>
+    <p class="note" style="margin:0">On the Facebook screen choose your Page <b>and</b> its Instagram account, and allow every permission.</p>`;
+  }
+  if (m && m.pages && m.pages.length > 1) h += `<label class="f">Post to this Page<select onchange="metaPick('${scope}','${back}',this.value)">${m.pages.map(p => `<option value="${esc(p.id)}" ${fb && fb.pageId === p.id ? 'selected' : ''}>${esc(p.name)}${p.ig ? ' (Instagram @' + esc(p.ig) + ')' : ' (no Instagram)'}</option>`).join('')}</select></label>`;
+  h += `<details><summary class="note">Or paste an access token from Graph API Explorer</summary><div class="stack" style="gap:8px;margin-top:8px"><p class="note" style="margin:0">In <a href="https://developers.facebook.com/tools/explorer/" target="_blank" rel="noopener">Graph API Explorer</a> pick your app, add <code>pages_show_list, pages_read_engagement, pages_manage_posts, instagram_basic, instagram_content_publish</code>, generate a User token and paste it.</p><input id="mTok-${scope}" placeholder="EAA..." type="password" autocomplete="off"><button class="btn" onclick="metaTok('${scope}','${back}')">Use this token</button></div></details>`;
+  if ((ig && ig.connected) || (fb && fb.connected)) h += `<div class="arow">${ig && ig.connected ? `<button class="btn" onclick="accTest('${scope}','${back}','instagram')">Test Instagram Reel</button>` : ''}${fb && fb.connected ? `<button class="btn" onclick="accTest('${scope}','${back}','facebook')">Test Facebook (unpublished)</button>` : ''}<button class="btn ghost" onclick="accDisc('${scope}','${back}','meta','Disconnect Instagram and Facebook?')">Disconnect</button></div>`;
+  return h + testLine(T.instagram) + testLine(T.facebook) + `</div>`;
+}
+async function accPost(scope, back, a, b, ok) { try { const r = await api('/api/connect/' + a, { scope, ...b }); if (ok) toast(typeof ok === 'function' ? ok(r) : ok); } catch (e) { alert(e.message); } loadConn(scope, back); }
+function gClientFile(scope, back, inp) { const f = inp.files[0]; if (!f) return; f.text().then(json => accPost(scope, back, 'google-client', { json }, 'Google key saved. Now press Connect YouTube.')); }
+function gClientSave(scope, back) { accPost(scope, back, 'google-client', { clientId: $('#gId-' + scope).value, clientSecret: $('#gSec-' + scope).value }, 'Google key saved. Now press Connect YouTube.'); }
+function metaAppSave(scope, back) { accPost(scope, back, 'meta-app', { appId: $('#mId-' + scope).value, appSecret: $('#mSec-' + scope).value }, 'Meta app saved. Now press Connect with Facebook.'); }
+function metaTok(scope, back) { accPost(scope, back, 'meta-token', { token: $('#mTok-' + scope).value }, r => r.picked ? 'Connected ' + r.picked.name : 'Token accepted. Pick a Page.'); }
+function metaPick(scope, back, pageId) { accPost(scope, back, 'meta-select', { pageId }, r => 'Posting to ' + r.page + (r.instagram ? ' and @' + r.instagram : '')); }
+function accDisc(scope, back, what, q) { if (confirm(q)) accPost(scope, back, 'disconnect', { what }, 'Disconnected'); }
+function accTest(scope, back, platform) {
+  const warn = { youtube: 'Upload your newest Short to YouTube as a PRIVATE test video? Only you can see it. Delete it in YouTube Studio afterwards.', instagram: 'Instagram has no private posts: this publishes your newest Short as a PUBLIC Reel on your account. Delete it afterwards in the Instagram app. Continue?', facebook: 'Upload your newest Short to your Facebook Page as an UNPUBLISHED video (only Page admins see it in Meta Business Suite)?' }[platform];
+  if (confirm(warn)) accPost(scope, back, 'test', { platform }, 'Test upload started');
+}
+// ---- several YouTube channels: one row per AutoTube Studio channel ----
+function chanList() {
+  setTimeout(() => { loadChanStatus(); loadVoice(); }, 0);
+  const F = (S && S.flows) || [];
+  if (!F.length) return `<p class="note">No channels yet.</p>`;
+  return `<div class="stack" style="gap:10px">${F.map(f => `<div class="acct" style="flex-direction:row;align-items:center;flex-wrap:wrap;padding:14px 18px"><b style="flex:1;min-width:160px">${esc(f.name)}</b><span id="yc-${f.id}"><span class="chip">Checking</span></span>
+    <button class="btn" onclick="location.href='/connect/google/start?scope=${f.id}&back=settings'">Connect its YouTube</button><button class="btn ghost" onclick="tab='channels';flowEdit='${f.id}';render(true)">Edit channel</button></div>`).join('')}</div>`;
+}
+async function loadChanStatus() {
+  for (const f of (S && S.flows) || []) {
+    const el = $('#yc-' + f.id); if (!el) continue;
+    try { const r = await api('/api/connect?scope=' + f.id); const y = r.youtube;
+      el.innerHTML = y && y.connected ? `<span class="chip done"><i></i>${esc(y.channel || 'Connected')}</span>` : y ? `<span class="chip bad"><i></i>Login broken</span>` : r.fallback && r.fallback.youtube ? `<span class="chip">Uses the studio account</span>` : `<span class="chip">Not connected</span>`;
+    } catch { el.innerHTML = `<span class="chip bad">?</span>`; }
+  }
+}
+async function addYtChannel() {
+  const name = (prompt('Name of the new channel (as on YouTube):') || '').trim(); if (!name) return;
+  const niche = (prompt('What is this channel about? Claude researches topics from this.', 'History documentaries') || 'History documentaries').trim();
+  try { const f = await api('/api/flows', { name, enabled: false, channel: { name, niche, audience: 'curious viewers worldwide', tone: 'warm, curious storyteller', language: 'English' } });
+    if (confirm(`"${name}" is added (schedule off for now). Connect its YouTube account now?`)) location.href = `/connect/google/start?scope=${f.id}&back=settings`; else await refresh(true);
+  } catch (e) { alert(e.message); }
+}
+
+// ---- workers: who is making which video ----
+function workersPanel() {
+  const W = S.workers || { workers: [] }, s = S.settings, jt = id => { const j = S.jobs.find(x => x.id === id); return j ? (j.title || j.topic) : id; };
+  const ago = t => { const s2 = Math.round((Date.now() - t) / 1000); return s2 < 60 ? s2 + ' s ago' : Math.round(s2 / 60) + ' min ago'; };
+  const cmd = `node worker.mjs --server http://${(W.ips || [])[0] || '<this-PC-IP>'}:${W.port || 4747} --token ${W.token || ''} --name "Second PC" --slots 2`;
+  return `<div class="grid2" style="gap:12px;grid-template-columns:1fr 1fr">
+     <label class="f">Videos at once on this PC <small>2 suits this laptop. Each extra video needs about 4 GB RAM and slows the others.</small><input data-k="renderSlots" type="number" min="1" max="6" value="${s.renderSlots || 2}" style="max-width:140px"></label>
+     <label class="f">Plans written at once <small>Claude writes several plans in parallel.</small><input data-k="writeSlots" type="number" min="1" max="6" value="${s.writeSlots || 2}" style="max-width:140px"></label></div>
+   <p class="note" style="margin:0">Right now: <b>${W.rendering || 0}</b> being made, <b>${W.waiting || 0}</b> waiting. Press Save settings to apply.</p>
+   <div class="stack" style="gap:10px">${(W.workers || []).length ? W.workers.map(w => `<div class="acct" style="padding:14px 18px"><div class="hd"><b>${esc(w.name)}</b><span class="chip ${w.jobs.length ? 'work' : 'done'}"><i></i>${w.jobs.length ? 'Making ' + w.jobs.length + ' of ' + w.slots : 'Ready, ' + w.slots + ' at once'}</span></div>${w.jobs.map(id => `<p class="note" style="margin:0">${esc(jt(id))}</p>`).join('')}<p class="note" style="margin:0;font-size:12.5px">${w.shared ? 'This PC' : esc(w.host)} · checked in ${ago(w.lastSeen)}</p></div>`).join('') : '<p class="note">No worker is running. It starts with the studio; if this stays empty, restart AutoTube Studio.</p>'}</div>
+   <details><summary class="note">Add another PC (same Wi-Fi or office network)</summary><div class="stack" style="gap:10px;margin-top:10px">
+     <label class="check"><input type="checkbox" class="sw" data-k="lanWorkers" ${s.lanWorkers ? 'checked' : ''}> Let PCs on my network make videos (needs a restart of AutoTube Studio). The dashboard stays private to this PC; other PCs can only use the worker connection, with the secret token.</label>
+     <ol class="note" style="margin:0;padding-left:20px;line-height:1.6"><li>On the other PC install Node.js, Python and FFmpeg, then copy the <code>autotube-studio</code> and <code>lemo-opuscar</code> folders onto it (or clone them) and set up the library as on this PC.</li><li>On that PC open a terminal in the <code>autotube-studio</code> folder and run:</li></ol>
+     <code style="display:block;font:12.5px var(--mono);background:var(--bg2);padding:12px;border-radius:12px;word-break:break-all">${esc(cmd)}</code>
+     <p class="note" style="margin:0">It appears in the list above within a few seconds and starts taking videos. Keep the token secret.${(W.ips || []).length > 1 ? ' This PC\'s network addresses: ' + W.ips.map(esc).join(', ') + '.' : ''}</p></div></details>`;
+}
+
+// ---- your voice (ElevenLabs) ----
+let EV = null;
+async function loadVoice() {
+  const el = $('#voicePanel'); if (!el) return;
+  try { EV = await api('/api/eleven'); } catch (e) { el.innerHTML = `<p class="err">${esc(e.message)}</p>`; return; }
+  const c = EV.lastCheck;
+  el.innerHTML = `<div class="accts"><div class="acct"><div class="hd"><b>ElevenLabs key</b>${EV.hasKey ? (c ? (c.tts ? '<span class="chip done"><i></i>Working</span>' : '<span class="chip bad"><i></i>Not allowed to speak</span>') : `<span class="chip">Saved ${esc(EV.keyTail)}</span>`) : '<span class="chip">Not added</span>'}</div>
+     ${c && !c.tts && c.error ? `<p class="err" style="margin:0">${esc(c.error)}</p>` : ''}
+     <ol><li>Open <a href="https://elevenlabs.io/app/settings/api-keys" target="_blank" rel="noopener">ElevenLabs API keys</a> and press <b>Create API key</b>.</li><li>Set <b>Text to Speech</b> to Access and <b>Voices</b> to Write (or turn off "Restrict key"). Paste the key here.</li></ol>
+     <div class="arow"><input id="elKey" type="password" placeholder="sk_..." autocomplete="off"><button class="btn" onclick="elKey()">Save key</button>${EV.hasKey ? `<button class="btn ghost" onclick="elCheck(this)">Test key</button>` : ''}</div></div>
+    <div class="acct"><div class="hd"><b>Your cloned voices</b></div>
+     ${EV.voices.length ? EV.voices.map(v => `<div class="arow"><span style="flex:1;min-width:140px"><b>${esc(v.name)}</b>${v.id === EV.defaultVoice ? ' <span class="chip done">Default</span>' : ''}</span><button class="btn" onclick="elSample('${v.id}',this)">Play sample</button><button class="btn ${S.settings.voice === 'eleven:' + v.id ? 'ghost' : 'cta'}" onclick="elUse('${v.id}')">${S.settings.voice === 'eleven:' + v.id ? 'Narrating all videos' : 'Narrate all videos'}</button><button class="btn ghost" onclick="elRemove('${v.id}')">Remove</button></div>`).join('') + '<audio id="elAudio" controls style="width:100%;display:none"></audio>' : '<p class="note" style="margin:0">No voice yet.</p>'}
+     ${EV.extractedReady ? `<button class="btn ${EV.voices.length ? '' : 'cta'}" onclick="elCloneExtracted(this)">Make my voice from my video recording</button>` : ''}
+     <label class="btn" style="cursor:pointer">Make a voice from another recording<input type="file" accept="audio/*,video/*" hidden onchange="elCloneUpload(this)"></label>
+     <p class="note" style="margin:0">Best results: 1 to 3 minutes of only your voice, no music. A phone recording in a quiet room is fine.</p>
+     <details><summary class="note">Already made a voice on the ElevenLabs website?</summary><div class="arow" style="margin-top:8px"><input id="elVid" placeholder="Voice ID" autocomplete="off"><button class="btn" onclick="elAddId()">Add</button></div></details></div>
+    <div class="acct"><div class="hd"><b>How it sounds</b></div>
+     <label class="f">Speed <small>1 is normal</small><input id="elSpeed" type="number" step="0.01" min="0.7" max="1.2" value="${EV.speed}" style="max-width:140px"></label>
+     <label class="f">Stability <small>Lower is more expressive, higher is steadier (0 to 1)</small><input id="elStab" type="number" step="0.05" min="0" max="1" value="${EV.stability}" style="max-width:140px"></label>
+     <label class="f">Likeness <small>How closely it copies your recording (0 to 1)</small><input id="elSim" type="number" step="0.05" min="0" max="1" value="${EV.similarity}" style="max-width:140px"></label>
+     <button class="btn" onclick="elSave()">Save sound settings</button></div></div>`;
+}
+async function elPost(a, b, ok) { try { const r = await api('/api/eleven/' + a, b); if (ok) toast(typeof ok === 'function' ? ok(r) : ok); S = await api('/api/state'); return r; } catch (e) { alert(e.message); } finally { loadVoice(); } }
+function elKey() { const k = $('#elKey').value.trim(); if (k) elPost('key', { apiKey: k }, 'Key saved').then(() => elPost('check', {}, r => r.tts ? 'Key works' : 'Key saved, but it cannot make speech yet')); }
+function elCheck(btn) { btn.disabled = true; btn.textContent = 'Testing'; elPost('check', {}, r => r.tts ? 'The key works' : 'The key cannot make speech'); }
+async function elCloneExtracted(btn) { btn.disabled = true; btn.textContent = 'Making your voice (about 30 s)'; await elPost('clone-extracted', { name: 'My narrator voice' }, 'Your voice is ready. Press Play sample.'); }
+async function elCloneUpload(inp) {
+  const f = inp.files[0]; if (!f) return; const name = (prompt('Name for this voice:', 'My narrator voice') || 'My narrator voice').trim(); toast('Uploading ' + (f.size / 1048576).toFixed(1) + ' MB');
+  try { const r = await fetch('/api/eleven/clone-upload', { method: 'POST', headers: { 'x-filename': encodeURIComponent(f.name), 'x-name': encodeURIComponent(name) }, body: f }); const j = await r.json(); if (!r.ok || j.error) throw new Error(j.error || 'failed'); toast('Your voice is ready'); S = await api('/api/state'); } catch (e) { alert(e.message); } loadVoice();
+}
+async function elSample(id, btn) { btn.disabled = true; btn.textContent = 'Making sample'; try { const r = await api('/api/eleven/sample', { voiceId: id }); const a = $('#elAudio'); a.style.display = 'block'; a.src = r.url; a.play(); } catch (e) { alert(e.message); } btn.disabled = false; btn.textContent = 'Play sample'; }
+async function elUse(id) { try { await api('/api/settings', { voice: 'eleven:' + id }); await api('/api/eleven/settings', { defaultVoice: id }); toast('New videos will be narrated in your voice'); S = await api('/api/state'); } catch (e) { alert(e.message); } loadVoice(); }
+function elRemove(id) { if (confirm('Remove this voice from AutoTube Studio? (It stays in your ElevenLabs account.)')) elPost('remove', { voiceId: id }, 'Removed'); }
+function elAddId() { elPost('add-id', { voiceId: $('#elVid').value.trim(), name: 'My ElevenLabs voice' }, 'Voice added'); }
+function elSave() { elPost('settings', { speed: $('#elSpeed').value, stability: $('#elStab').value, similarity: $('#elSim').value }, 'Saved'); }
+
+// came back from Google / Facebook sign-in
+(() => { const q = new URLSearchParams(location.search); if (!q.has('cmsg')) return; const back = q.get('back') || 'settings';
+  if (back === 'settings') tab = 'settings'; else { tab = 'channels'; flowEdit = back; }
+  history.replaceState(null, '', '/'); const m = q.get('cmsg'); setTimeout(() => q.get('cok') === '1' ? toast(m) : alert(m), 600); })();
+
+// ================= content calendar (per channel) =================
+let calFlow = null, CAL = null;
+const CALTYPE = { quiz: 'Quiz', concept: 'Real-life concept', trick: 'Trick', mistake: 'Mistake', mistakes: 'Mistakes', formula: 'Formula revision', strategy: 'Strategy', tips: 'Tips', notes: 'Notes', books: 'Books', pyq: 'Solved question', motivation: 'Mindset' };
+function openCal(id) { setCalChan(id); go('calendar'); loadAllCal(true); }   // channel card button: the main Calendar, filtered to that channel
+function calTopic(t) { // "quiz | Physics: Kinematics | title" -> parts
+  if (!t) return { type: null, subj: '', title: 'Claude researches a topic' };
+  const m = /^\s*([a-z]+)\s*\|\s*([^|]+)\|\s*(.+)$/i.exec(t); return m ? { type: m[1].toLowerCase(), subj: m[2].trim(), title: m[3].trim() } : { type: null, subj: '', title: t };
+}
+function viewCalendar() {
+  const f = (S.flows || []).find(x => x.id === calFlow); if (!f) { calFlow = null; return viewChannels(); }
+  const head = pagehead(f.name + ' calendar', 'What has been made, what waits for you, and what the channel makes next. Long videos have a highlighted card; click a made video to open it.', `<button class="btn" onclick="calFlow=null;render(true)">Back to channels</button><button class="btn" onclick="calFlow=null;flowEdit='${f.id}';render(true)">Edit channel</button>`);
+  if (!CAL) return head + '<p class="note">Loading the calendar</p>';
+  if (CAL.error) return head + `<p class="err">${esc(CAL.error)}</p>`;
+  const DN = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'], MN = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const item = (fmt, t, extra) => { const x = calTopic(t.topic || t.title); const title = t.title && t.id ? t.title : x.title; return `<li class="ci ${fmt}${t.id ? ' go' : ''}" ${t.id ? `onclick="openJ('${t.id}')" role="button" tabindex="0"` : ''}>${fmt === 'long' ? `<span class="cl">Long · ${esc(t.publishAt || '')}</span>` : `<span class="cl">Short · ${esc(t.publishAt || '')}</span>`}${x.type ? `<span class="ct">${esc(CALTYPE[x.type] || x.type)}</span>` : ''}<b>${esc(title)}</b>${x.subj ? `<small>${esc(x.subj)}</small>` : ''}${extra || ''}</li>`; };
+  const days = CAL.days.map(d => { const dt = new Date(d.date + 'T12:00:00'), isToday = d.date === S.today;
+    const made = d.jobs.slice().sort((a, b) => (a.format === 'long' ? 0 : 1) - (b.format === 'long' ? 0 : 1)).map(j => item(j.format, j, `<span class="chip ${st(j)[1]}" style="justify-self:start"><i></i>${esc(st(j)[0])}</span>`)).join('');
+    const plan = d.planned.map(p => item(p.format, p)).join('');
+    return `<article class="cday${isToday ? ' today' : ''}"><h4><span>${DN[d.dow]}</span> ${dt.getDate()} ${MN[dt.getMonth()]}${isToday ? ' <em>today</em>' : ''}</h4><ul>${made}${plan || (made ? '' : '<li class="ci none">No videos this day</li>')}</ul></article>`; });
+  const weeks = []; for (let i = 0; i < days.length; i += 7) weeks.push(days.slice(i, i + 7));
+  return head + `<p class="note" style="margin:0 0 18px">${f.enabled ? 'Running.' : 'Paused: turn it on in Channels to follow this calendar.'} ${CAL.longLeft || CAL.shortLeft ? `${CAL.longLeft} long and ${CAL.shortLeft} Short topics are queued beyond these weeks.` : 'When the planned topics run out,'} ${CAL.research === 'queue' ? 'the channel stops until you add topics.' : 'Claude researches new topics on its own.'} Change the order or add topics in Edit channel.</p>` +
+    weeks.map((w, i) => `<section class="cweek"><h3 class="h3">Week ${i + 1}</h3><div class="cdays">${w.join('')}</div></section>`).join('');
+}
+
+// ================= Calendar: every channel, past and future, on one grid =================
+let ALLCAL = null, calChan = (() => { try { return localStorage.getItem('hs-calchan') || 'all'; } catch { return 'all'; } })(), calLoading = false;
+async function loadAllCal(force) {
+  if (calLoading || (!force && ALLCAL && Date.now() - ALLCAL.at < 30000)) return; calLoading = true;
+  try { ALLCAL = { ...(await api('/api/calendar?back=14&days=35')), at: Date.now() }; } catch (e) { ALLCAL = { error: e.message, at: Date.now() }; }
+  calLoading = false; if (tab === 'calendar') render(true);
+}
+function setCalChan(id) { calChan = id; try { localStorage.setItem('hs-calchan', id); } catch {} render(true); }
+const CHCOL = ['#e4573d', '#2f80ff', '#18a874', '#b05de6', '#e0a321', '#e0458c'];
+function viewCalendarAll() {
+  if (!ALLCAL || Date.now() - ALLCAL.at > 30000) loadAllCal();
+  const head = pagehead('Calendar', 'Every video for every channel: what went out, what waits for you, and what comes next.', `<button class="btn" onclick="loadAllCal(true)">Refresh</button>`);
+  if (!ALLCAL) return head + '<p class="note">Loading the calendar</p>';
+  if (ALLCAL.error) return head + `<p class="err">${esc(ALLCAL.error)}</p>`;
+  const chans = ALLCAL.channels, colOf = id => id ? CHCOL[Math.max(0, chans.findIndex(c => c.id === id)) % CHCOL.length] : '#8a8f98';
+  const days = new Map(ALLCAL.days.map(d => [d.date, d]));
+  // grid: Monday of the first week shown through Sunday of the last
+  const first = new Date((ALLCAL.days[0] || { date: S.today }).date + 'T12:00:00'); first.setDate(first.getDate() - ((first.getDay() + 6) % 7));
+  const lastD = new Date((ALLCAL.days[ALLCAL.days.length - 1] || { date: S.today }).date + 'T12:00:00'); lastD.setDate(lastD.getDate() + (7 - ((lastD.getDay() + 6) % 7)) % 7);
+  const pick = it => calChan === 'all' || it.flowId === calChan || (calChan === 'hand' && !it.flowId);
+  const all = ALLCAL.days.flatMap(d => d.items.filter(pick).map(it => ({ ...it, date: d.date })));
+  const wk0 = new Date(S.today + 'T12:00:00'); wk0.setDate(wk0.getDate() - ((wk0.getDay() + 6) % 7)); const wkS = wk0.toISOString().slice(0, 10), wkE = new Date(wk0.getTime() + 6 * 864e5).toISOString().slice(0, 10);
+  const inWeek = all.filter(x => x.date >= wkS && x.date <= wkE);
+  const stat = (lab, n, cls) => `<div class="cstat ${cls}"><b>${n}</b><span>${lab}</span></div>`;
+  const summary = `<div class="cstats">${stat('published this week', inWeek.filter(x => x.status === 'published').length, 'ok')}${stat('waiting for you', all.filter(x => ['script_review', 'video_review', 'upload_failed'].includes(x.status)).length, 'need')}${stat('being written or made', all.filter(x => ['writing', 'queued_render', 'rendering', 'approved', 'uploading'].includes(x.status)).length, 'work')}${stat('planned ahead', all.filter(x => x.planned).length, '')}</div>`;
+  const chips = `<div class="cfilter" role="tablist" aria-label="Channel">${[['all', 'All channels'], ...chans.map(c => [c.id, c.name]), ...(ALLCAL.days.some(d => d.items.some(i => !i.flowId)) ? [['hand', 'Made by hand']] : [])].map(([id, n]) => `<button role="tab" aria-selected="${calChan === id}" class="${calChan === id ? 'on' : ''}" onclick="setCalChan('${id}')">${id !== 'all' ? `<i style="background:${id === 'hand' ? '#8a8f98' : colOf(id)}"></i>` : ''}${esc(n)}</button>`).join('')}</div>`;
+  const MN = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const entry = it => { const x = calTopic(it.topic || it.title), title = it.id && it.title ? it.title : x.title, s2 = it.id ? st(it) : null;
+    const click = it.id ? `onclick="openJ('${it.id}')" role="button" tabindex="0"` : it.mid ? `onclick="openMonthItem('${it.flowId}','${it.date}','${it.mid}')" role="button" tabindex="0"` : '';
+    return `<li class="ce ${it.format}${it.planned ? ' plan' : ''}${it.id || it.mid ? ' go' : ''}" style="--cc:${colOf(it.flowId)}" ${click} title="${esc(it.channel + ' · ' + title + (it.mid ? ' (click to change the title or theme)' : ''))}">
+      <span class="cm"><em>${it.format === 'long' ? 'Long' : 'Short'}</em>${it.publishAt ? esc(it.publishAt) : ''}${x.type ? ' · ' + esc(CALTYPE[x.type] || x.type) : it.kind ? ' · ' + esc(it.kind) : ''}</span>
+      <b>${esc(title)}</b>${it.mid ? `<span class="cm">Theme: ${it.themes && it.themes.length ? esc(it.themes.join(', ')) : 'Auto'}</span>` : ''}
+      ${s2 ? `<span class="cs ${s2[1]}"><i></i>${esc(s2[0])}</span>` : `<span class="cs"><i></i>Planned</span>`}
+      ${it.urls && Object.keys(it.urls).length ? `<span class="cu">${Object.entries(it.urls).map(([k, u]) => `<a href="${esc(u)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">${{ youtube: 'YouTube', instagram: 'Instagram', facebook: 'Facebook' }[k] || k}</a>`).join('')}</span>` : ''}</li>`; };
+  let cells = '';
+  for (let d = new Date(first); d <= lastD; d.setDate(d.getDate() + 1)) {
+    const ds = d.toISOString().slice(0, 10), day = days.get(ds), its = day ? day.items.filter(pick).sort((a, b) => (a.format === 'long' ? 0 : 1) - (b.format === 'long' ? 0 : 1) || String(a.publishAt || '').localeCompare(String(b.publishAt || ''))) : [];
+    const past = ds < S.today, today = ds === S.today;
+    cells += `<div class="cc${past ? ' past' : ''}${today ? ' today' : ''}"><div class="cd"><span>${['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][d.getDay()]}</span><b>${d.getDate()}</b>${d.getDate() === 1 || ds === first.toISOString().slice(0, 10) ? `<small>${MN[d.getMonth()]}</small>` : ''}${today ? '<em>Today</em>' : ''}</div>${its.length ? `<ul>${its.map(x => entry({ ...x, date: ds })).join('')}</ul>` : ''}</div>`;
+  }
+  return head + summary + chips + `<div class="cgrid-wrap"><div class="cgrid"><div class="cwd">Mon</div><div class="cwd">Tue</div><div class="cwd">Wed</div><div class="cwd">Thu</div><div class="cwd">Fri</div><div class="cwd">Sat</div><div class="cwd">Sun</div>${cells}</div></div>`;
+}
+
+// ---- month plan: change a planned title, its day and time, or its themes ----
+let MONTH = {};   // flowId -> { month, themes }
+async function openMonthItem(fid, date, mid) {
+  try { MONTH[fid] = await api('/api/flows/' + fid + '/month'); } catch (e) { return alert(e.message); }
+  const it = (MONTH[fid].month[date] || []).find(x => x.id === mid); if (!it) return alert('That planned title is not in the month plan any more.');
+  const on = new Set(it.themes || []);
+  $('#overlay').innerHTML = `<div class="modal" onclick="if(event.target===this)closeOv()"><div class="box" style="width:min(760px,100%)"><div style="padding:20px 22px;display:grid;gap:14px">
+    <div style="display:flex;justify-content:space-between;gap:12px;align-items:center"><h2 class="h2" style="margin:0">Planned Short</h2><button class="x" onclick="closeOv()" aria-label="Close">${ic('x')}</button></div>
+    <p class="note" style="margin:0">Claude researches this title on the web and writes the plan on its day; you approve the plan and the video as usual.${it.kind ? ' Kind: ' + esc(it.kind) + '.' : ''}${it.why ? ' Why: ' + esc(it.why) : ''}</p>
+    <label class="note" style="display:grid;gap:6px">Title<input id="miTitle" value="${esc(it.title)}" maxlength="100" style="font:inherit;padding:10px 12px;border-radius:12px;border:1px solid var(--line2);background:var(--bg);color:var(--ink)"></label>
+    <div style="display:flex;gap:12px;flex-wrap:wrap"><label class="note" style="display:grid;gap:6px">Day<input id="miDate" type="date" value="${date}" style="font:inherit;padding:8px 10px;border-radius:12px;border:1px solid var(--line2);background:var(--bg);color:var(--ink)"></label>
+    <label class="note" style="display:grid;gap:6px">Publish time<input id="miTime" type="time" value="${esc(it.publishAt || '')}" style="font:inherit;padding:8px 10px;border-radius:12px;border:1px solid var(--line2);background:var(--bg);color:var(--ink)"></label></div>
+    <div class="note">Theme: leave all unticked for <b>Auto</b> (Claude picks the best themes for the content), or tick 1-3 themes you want this Short made in.</div>
+    <div id="miThemes" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:4px 12px;max-height:260px;overflow:auto;padding:8px;border:1px solid var(--line2);border-radius:12px">${MONTH[fid].themes.map(t => `<label style="display:flex;gap:8px;align-items:center;font-size:13px"><input type="checkbox" value="${esc(t.slug)}" ${on.has(t.slug) ? 'checked' : ''}>${esc(t.name)}</label>`).join('')}</div>
+    <p id="miErr" class="err" style="margin:0"></p>
+    <div style="display:flex;gap:10px;justify-content:space-between;flex-wrap:wrap"><button class="btn" onclick="saveMonthItem('${fid}','${date}','${mid}',true)">Remove this title</button><button class="btn cta" onclick="saveMonthItem('${fid}','${date}','${mid}')">Save</button></div>
+  </div></div></div>`;
+}
+async function saveMonthItem(fid, date, mid, remove) {
+  if (remove && !confirm('Remove this planned title from the month plan?')) return;
+  const themes = [...document.querySelectorAll('#miThemes input:checked')].map(x => x.value);
+  if (themes.length > 3) { $('#miErr').textContent = 'Pick at most 3 themes (or none for Auto).'; return; }
+  try { await api('/api/flows/' + fid + '/month', remove ? { date, id: mid, remove: true } : { date, id: mid, title: $('#miTitle').value, themes, publishAt: $('#miTime').value, ...($('#miDate').value && $('#miDate').value !== date ? { date, newDate: $('#miDate').value } : {}) }); closeOv(); loadAllCal(true); }
+  catch (e) { $('#miErr').textContent = e.message; }
+}
+
+// ================= Looks =================
+function viewLooks() {
+  if (!STY.length) { api('/api/styles').then(x => { STY = x; render(true); }).catch(() => {}); return pagehead('Looks', 'Loading the style library.'); }
+  return pagehead('Looks', `${Object.keys(S.v2styles).length} looks are used in your videos. Hover a sample to play it.`) +
+    `<div class="gal" style="--i:1">${STY.map(x => `<button onclick="openLook('${x.slug}')" onmouseenter="hoverPlay(this,1)" onmouseleave="hoverPlay(this,0)"><div class="m"><img loading="lazy" src="${x.posterUrl || (x.presetImg && x.presetImg.h) || ''}" alt="">${x.previewUrl ? `<video muted loop playsinline preload="none" data-src="${x.previewUrl}"></video>` : ''}</div><div class="t"><b>${esc(x.name)}</b><span>${esc(x.category)}</span></div></button>`).join('')}</div>`;
+}
+function openLook(slug) { const x = STY.find(y => y.slug === slug); if (!x) return; gal = slug; $('#overlay').innerHTML = `<div class="modal" onclick="if(event.target===this)closeOv()"><div class="box"><div style="display:flex;justify-content:space-between;align-items:center;padding:18px 22px;gap:12px"><div><h2 class="h2">${esc(x.name)}</h2><p class="note" style="margin:4px 0 0">${esc(x.line)}</p></div><button class="x" onclick="closeOv()" aria-label="Close">${ic('x')}</button></div>${x.previewUrl ? `<video controls autoplay src="${x.previewUrl}" style="width:100%;display:block;background:#000"></video>` : `<img src="${x.posterUrl}" style="width:100%;display:block" alt="">`}</div></div>`; }
+function closeOv() { $('#overlay').innerHTML = ''; gal = null; }
+
+// ================= Settings =================
+// ---- Settings > Claude: Claude writes, researches and directs every video ----
+let claudeWait = null;
+async function loadClaude(fresh = false, msg = '') {
+  const el = $('#claudePanel'); if (!el) return;
+  let c; try { c = await api('/api/claude/status', { fresh }); } catch (e) { el.innerHTML = '<h2 class="h2">Claude</h2><p class="err">' + esc(e.message) + '</p>'; return; }
+  const how = c.apiKey ? 'an Anthropic API key (billed per use)' : c.loggedIn ? 'your Claude account' + (c.plan ? ' (' + esc(c.plan) + ' plan)' : '') : '';
+  el.innerHTML = `<h2 class="h2">Claude</h2>
+    <p class="note" style="margin:0">Claude researches ideas, writes every plan and directs every scene. Connect it once, with your Claude account (Pro, Max or Team plan) or with an API key.</p>
+    ${!c.installed ? `<p class="err" style="margin:0">Claude Code is not installed on this computer. Run install.ps1 again, or install it from claude.com/claude-code, then come back here.</p>`
+      : `<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><span class="chip ${c.ready ? 'done' : 'bad'}"><i></i>${c.ready ? 'Connected' : 'Not connected'}</span><span>${c.ready ? 'Using ' + how + '.' : 'Videos cannot be planned until Claude is connected.'}</span>${c.version ? `<span class="note">Claude Code ${esc(c.version)}</span>` : ''}</div>`}
+    ${msg ? `<p class="note" style="margin:0">${msg}</p>` : ''}
+    ${c.installed ? `<div class="acts">
+      ${c.loggedIn ? `<button class="btn" onclick="claudeAct('logout')">Sign out of the Claude account</button>` : `<button class="btn ${c.ready ? '' : 'cta'}" onclick="claudeAct('login')">Sign in with my Claude account</button>`}
+      <button class="btn ghost" onclick="claudeAct('test',this)">Test the connection</button></div>
+    <p class="note" style="margin:0">Sign-in opens a window and your browser on the computer that runs AutoTube Studio. Using the studio from another device? Use an API key instead.</p>
+    <details${c.apiKey ? ' open' : ''}><summary>Use an Anthropic API key instead${c.apiKey ? ' (in use)' : ''}</summary><div class="stack" style="margin-top:12px">
+      <p class="note" style="margin:0">From console.anthropic.com > API keys. It is saved only on this computer (config\.env), billed per use, and used instead of the account while it is set.</p>
+      <div class="acts"><input id="claudeKey" type="password" autocomplete="off" placeholder="${c.apiKey ? 'A key is saved. Paste a new one to replace it.' : 'sk-ant-...'}" style="flex:1;min-width:240px"><button class="btn" onclick="claudeAct('key')">Save key</button>${c.apiKey ? `<button class="btn danger" onclick="claudeAct('nokey')">Remove key</button>` : ''}</div></div></details>` : ''}`;
+}
+async function claudeAct(a, btn) {
+  try {
+    if (a === 'login') {
+      await api('/api/claude/login', {});
+      loadClaude(false, 'A "Sign in to Claude" window opened, with your browser. Sign in there; this page updates by itself.');
+      clearInterval(claudeWait); let n = 0;
+      claudeWait = setInterval(async () => { const c = await api('/api/claude/status', { fresh: true }).catch(() => null); if ((c && c.loggedIn) || ++n > 60 || !$('#claudePanel')) { clearInterval(claudeWait); if (c && c.loggedIn) { loadClaude(false, 'Signed in.'); refresh(); } } }, 5000);
+    }
+    if (a === 'logout') { if (!confirm('Sign this computer out of the Claude account? Videos cannot be planned until you sign in again or add an API key.')) return; await api('/api/claude/logout', {}); loadClaude(true, 'Signed out.'); }
+    if (a === 'key') { const k = $('#claudeKey').value.trim(); if (!k) return alert('Paste the API key first.'); await api('/api/claude/key', { key: k }); $('#claudeKey').value = ''; loadClaude(true, 'API key saved. Press "Test the connection" to check it.'); }
+    if (a === 'nokey') { if (!confirm('Remove the API key? Claude then uses the signed-in account.')) return; await api('/api/claude/key', { key: '' }); loadClaude(true, 'API key removed.'); }
+    if (a === 'test') { btn.disabled = true; btn.textContent = 'Testing...'; const r = await api('/api/claude/test', {}); loadClaude(true, r.ok ? `Working: Claude answered in ${r.seconds} s.` : 'Not working: ' + esc(r.error || 'no answer')); }
+  } catch (e) { alert(e.message); if (btn) { btn.disabled = false; btn.textContent = 'Test the connection'; } }
+}
+function viewSettings() {
+  const s = S.settings;
+  setTimeout(() => loadClaude(), 0);
+  return pagehead('Settings', 'Studio-wide defaults. Each channel has its own schedule, look and accounts.') + `<div class="panel stack" id="claudePanel" style="--i:0;margin-bottom:18px"><h2 class="h2">Claude</h2><p class="note" style="margin:0"><span class="spin"></span> Checking the Claude connection...</p></div><div class="grid2" style="grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));align-items:start">
+   <div class="panel stack" style="--i:1"><h2 class="h2">Production</h2>
+     <label class="f">Default narrator<select data-k="voice">${voiceOpts(s.voice)}</select></label>
+     <label class="f">Speaking speed <small>1 is normal. Slightly under 1 sounds calmer.</small><input data-k="voiceSpeed" type="number" step="0.01" min="0.8" max="1.2" value="${s.voiceSpeed}" style="max-width:140px"></label>
+     <label class="check"><input type="checkbox" class="sw" data-k="burnCaptions" ${s.burnCaptions ? 'checked' : ''}> Word-by-word captions in the video</label>
+     <label class="check"><input type="checkbox" class="sw" data-k="claudePicksImages" ${s.claudePicksImages ? 'checked' : ''}> Claude picks the best photo (slower, better)</label>
+     <label class="f">Render workers <small>Browser windows drawing frames at once. 3 suits this PC.</small><input data-k="renderWorkers" type="number" min="1" max="8" value="${s.renderWorkers}" style="max-width:140px"></label>
+   </div>
+   <div class="panel stack" style="--i:2"><h2 class="h2">Claude</h2>
+     <label class="f">Model <small>Empty uses Claude Code's default.</small><input data-k="claudeModel" value="${esc(s.claudeModel)}"></label>
+     <p class="note" style="margin:0">Claude runs through the Claude Code login on this PC. No API key is stored here.</p>
+     <label class="f">Style library folder<input data-k="libraryPath" value="${esc(s.libraryPath)}"></label>
+   </div></div>
+   <div class="panel stack" style="--i:3;margin-top:20px"><h2 class="h2">Accounts</h2><p class="note" style="margin:0">Connect once here and every channel uploads with these accounts. A channel can use its own accounts instead (Channels, Edit, Uploads). Logins stay on this PC.</p>${connPanel('studio', 'settings')}</div>
+   <div class="panel stack" style="--i:4;margin-top:20px"><h2 class="h2">YouTube channels</h2><p class="note" style="margin:0">Each AutoTube Studio channel can post to its own YouTube channel. Connect each with the Google account (or Brand Account) that owns it. A channel without its own login uses the studio account above.</p><div id="ytChans">${chanList()}</div>
+     <div class="acts"><button class="btn cta" onclick="addYtChannel()">Add another YouTube channel</button></div></div>
+   <div class="panel stack" style="--i:5;margin-top:20px"><h2 class="h2">Workers</h2><p class="note" style="margin:0">Workers make the videos. Each one takes the next video from the queue (Shorts first), so several videos are made at the same time. Add more PCs to make more at once.</p>${workersPanel()}</div>
+   <div class="panel stack" style="--i:6;margin-top:20px"><h2 class="h2">Your voice</h2><p class="note" style="margin:0">Narrate videos in your own voice with ElevenLabs. Your recording becomes a voice clone, and every video can be read in it, with exact word timing for the captions.</p><div id="voicePanel"><p class="note">Loading</p></div></div>
+   <div class="actionbar" style="justify-content:flex-end"><button class="btn cta big" onclick="saveSettings()">Save settings</button></div>`;
+}
+async function saveSettings() { const p = {}; $$('[data-k]').forEach(e => { p[e.dataset.k] = e.type === 'checkbox' ? e.checked : e.type === 'number' ? +e.value : e.value; }); try { await api('/api/settings', p); toast('Settings saved'); await refresh(true); } catch (e) { alert(e.message); } }
+
+// ================= command palette =================
+let palItems = [], palSel = 0;
+function palette() {
+  if (!S) return;
+  palItems = [...TABS.map(([k, l]) => ({ l: 'Go to ' + l, h: 'page', run: () => go(k) })), { l: 'Make a video', h: 'action', run: () => go('ideas') }, { l: 'Add a channel', h: 'action', run: () => { tab = 'channels'; openId = null; flowEdit = 'new'; render(true); } }, { l: 'Switch light or dark', h: 'action', run: toggleTheme },
+    ...(S.flows || []).map(f => ({ l: 'Edit channel ' + f.name, h: 'channel', run: () => { tab = 'channels'; openId = null; flowEdit = f.id; render(true); } })),
+    ...S.jobs.slice().reverse().map(j => ({ l: j.title || j.topic, h: (j.format === 'long' ? 'long' : 'short') + (j.slot ? ' ' + j.slot : '') + ', ' + st(j)[0].toLowerCase(), run: () => openJ(j.id) }))];
+  palSel = 0;
+  $('#overlay').innerHTML = `<div class="modal" onclick="if(event.target===this)closeOv()"><div class="box pal" role="dialog" aria-label="Jump to anything"><input id="palq" placeholder="Type a page, channel or video" autocomplete="off" oninput="palSel=0;palList()" onkeydown="palKey(event)"><ul id="pall" role="listbox"></ul></div></div>`;
+  palList(); $('#palq').focus();
+}
+function palMatches() { const q = ($('#palq')?.value || '').toLowerCase(); return palItems.filter(x => !q || x.l.toLowerCase().includes(q)).slice(0, 40); }
+function palList() { const m = palMatches(); $('#pall').innerHTML = m.map((x, i) => `<li class="${i === palSel ? 'on' : ''}" role="option" aria-selected="${i === palSel}" onmousemove="if(palSel!==${i}){palSel=${i};palList()}" onclick="palRun(${i})">${esc(x.l)}<small>${esc(x.h)}</small></li>`).join('') || '<li style="cursor:default;color:var(--mute)">Nothing found</li>'; }
+function palKey(e) { const n = palMatches().length || 1; if (e.key === 'ArrowDown') { palSel = (palSel + 1) % n; palList(); e.preventDefault(); } else if (e.key === 'ArrowUp') { palSel = (palSel - 1 + n) % n; palList(); e.preventDefault(); } else if (e.key === 'Enter') palRun(palSel); else if (e.key === 'Escape') closeOv(); }
+function palRun(i) { const x = palMatches()[i]; closeOv(); if (x) x.run(); }
+addEventListener('keydown', e => { if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); $('#palq') ? closeOv() : palette(); } else if (e.key === 'Escape' && $('#overlay').innerHTML) closeOv(); });
+
+// ================= render loop =================
+function render() {
+  chrome(); if (!S) return;
+  const V = { ideas: viewIdeas, desk: viewDesk, review: viewReview, make: viewMake, log: viewLog, channels: viewChannels, calendar: viewCalendarAll, looks: viewLooks, settings: viewSettings };
+  const key = openId ? 'job:' + openId : tab + ':' + (flowEdit || '');
+  const m = $('#main'); m.innerHTML = openId ? viewJob() : V[tab]();
+  m.classList.toggle('enter', key !== lastView); lastView = key;
+  const nw = $('.rs-now'); if (nw) placeNow(nw);
+}
+// polls every 4 s, but only redraws when something changed and you're not typing, editing or watching
+async function refresh(force) {
+  try { S = await api('/api/state'); } catch { return; }
+  const sig = JSON.stringify([S.jobs.map(j => [j.id, j.status, j.updatedAt]), (S.flows || []).map(f => [f.id, f.enabled, f.next && f.next.start, f.topics.length, f.jobs]), S.queues, (S.activity || [])[0], S.settings, (S.ideaRuns || []).map(r => [r.id, r.status, r.ideas.map(i => i.status + (i.jobStatus || ''))])]);
+  const changed = sig !== lastSig; lastSig = sig;
+  if (force === true) return render();
+  if (!changed) return chrome();
+  const typing = document.activeElement && ['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement.tagName);
+  const watching = $$('#main video[controls]').some(v => !v.paused) || $$('.playing').length > 0;
+  if (openId) { const j = S.jobs.find(x => x.id === openId); if (j && openJob && j.updatedAt !== openJob.updatedAt && !typing && !watching && !['script_review', 'draft'].includes(openJob.status)) await reloadJob(); else chrome(); return; }
+  if (typing || watching || (tab === 'channels' && flowEdit) || ['make', 'settings'].includes(tab) || $('#overlay').innerHTML) return chrome();
+  render();
+}
+tickClock(); setInterval(tickClock, 15000);
+refresh(true); setInterval(refresh, 4000);
+</script></body></html>

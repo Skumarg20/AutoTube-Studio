@@ -1,0 +1,507 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>History Studio</title>
+<style>
+:root{
+  --bg:#f5f4f1;--surface:#ffffff;--surface2:#faf9f7;--line:#e7e4de;--line2:#d9d5cd;--ink:#1d1b19;--soft:#6e6962;--faint:#a19b93;
+  --accent:#d24a1f;--accent-ink:#fff;--accent-soft:#fdeee7;--ok:#178a4c;--ok-soft:#e5f5ec;--warn:#b86e00;--warn-soft:#fff3dc;--err:#c9302c;--err-soft:#fdecea;--info:#2b62d9;--info-soft:#e8effd;--vio:#7a45d6;--vio-soft:#f1eafd;
+  --r:14px;--r2:10px;--sh:0 1px 2px rgba(20,16,10,.05),0 2px 8px rgba(20,16,10,.04);--sh2:0 8px 28px rgba(20,16,10,.10);
+  --side:248px;color-scheme:light
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#111113;--surface:#1a1a1d;--surface2:#151517;--line:#2a2a2f;--line2:#36363c;--ink:#ecebe8;--soft:#a3a09a;--faint:#6f6c68;
+  --accent:#f26a3d;--accent-soft:#3a2219;--ok:#3cc47a;--ok-soft:#163323;--warn:#f0a63a;--warn-soft:#3a2a10;--err:#f26b62;--err-soft:#3d1a18;--info:#6d9bff;--info-soft:#172645;--vio:#a985ff;--vio-soft:#2a1f45;
+  --sh:0 1px 2px rgba(0,0,0,.4);--sh2:0 10px 30px rgba(0,0,0,.5);color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#111113;--surface:#1a1a1d;--surface2:#151517;--line:#2a2a2f;--line2:#36363c;--ink:#ecebe8;--soft:#a3a09a;--faint:#6f6c68;
+  --accent:#f26a3d;--accent-soft:#3a2219;--ok:#3cc47a;--ok-soft:#163323;--warn:#f0a63a;--warn-soft:#3a2a10;--err:#f26b62;--err-soft:#3d1a18;--info:#6d9bff;--info-soft:#172645;--vio:#a985ff;--vio-soft:#2a1f45;
+  --sh:0 1px 2px rgba(0,0,0,.4);--sh2:0 10px 30px rgba(0,0,0,.5);color-scheme:dark}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font:14.5px/1.5 "Segoe UI Variable Text","Segoe UI",system-ui,-apple-system,Inter,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+svg.i{width:18px;height:18px;flex:none;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+/* ---------- layout ---------- */
+.app{display:grid;grid-template-columns:var(--side) 1fr;min-height:100vh}
+.side{position:sticky;top:0;height:100vh;display:flex;flex-direction:column;gap:6px;padding:18px 14px;background:var(--surface);border-right:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:10px;padding:4px 8px 16px}
+.logo{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--accent),#f0a63a);display:grid;place-items:center;color:#fff;font:800 15px/1 Georgia,serif;box-shadow:0 4px 14px rgba(210,74,31,.35)}
+.brand b{display:block;font-size:15px;letter-spacing:-.01em}.brand span{display:block;font-size:12px;color:var(--soft)}
+#nav{display:flex;flex-direction:column;gap:2px}
+#nav button{display:flex;align-items:center;gap:11px;width:100%;padding:9px 11px;border:0;border-radius:9px;background:none;color:var(--soft);font:inherit;font-weight:500;cursor:pointer;text-align:left}
+#nav button:hover{background:var(--surface2);color:var(--ink)}
+#nav button.on{background:var(--accent-soft);color:var(--accent);font-weight:650}
+#nav .cnt{margin-left:auto;min-width:22px;padding:1px 7px;border-radius:99px;background:var(--accent);color:#fff;font-size:11.5px;font-weight:700;text-align:center}
+#nav .sep{height:1px;background:var(--line);margin:8px 6px}
+.side .foot{margin-top:auto;display:grid;gap:8px;padding:10px 6px 0;border-top:1px solid var(--line)}
+.conn{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--soft)}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--faint);flex:none}.dot.on{background:var(--ok);box-shadow:0 0 0 3px var(--ok-soft)}.dot.busy{background:var(--info);box-shadow:0 0 0 3px var(--info-soft);animation:pulse 1.4s infinite}
+@keyframes pulse{50%{opacity:.45}}
+.themebtn{border:1px solid var(--line);background:var(--surface2);color:var(--soft);border-radius:8px;padding:6px 10px;font:inherit;font-size:12.5px;cursor:pointer;display:flex;align-items:center;gap:8px}
+main#main{padding:28px 34px 60px;max-width:1400px;width:100%}
+.ph{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;margin:0 0 22px}
+.ph h1{margin:0;font-size:26px;letter-spacing:-.02em;font-weight:700}.ph p{margin:4px 0 0;color:var(--soft)}
+.ph .acts{display:flex;gap:8px;flex-wrap:wrap}
+@media(max-width:900px){.app{grid-template-columns:1fr}.side{position:static;height:auto;flex-direction:row;flex-wrap:wrap;align-items:center;padding:10px}#nav{flex-direction:row;flex-wrap:wrap}#nav .sep,.side .foot{display:none}.brand{padding:0 8px 0 0}main#main{padding:18px 16px}}
+/* ---------- surfaces ---------- */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:18px;box-shadow:var(--sh)}
+.card h3{margin:0 0 6px;font-size:16px;font-weight:650;letter-spacing:-.01em}
+.muted{color:var(--soft);font-size:13px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:16px}
+.two{display:grid;grid-template-columns:1.25fr 1fr;gap:18px}@media(max-width:1000px){.two{grid-template-columns:1fr}}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:12px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px;margin-bottom:22px}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px 18px;box-shadow:var(--sh);display:flex;gap:14px;align-items:center;cursor:default}
+.stat .ic{width:42px;height:42px;border-radius:12px;display:grid;place-items:center}.stat .ic svg{width:21px;height:21px}
+.stat b{display:block;font-size:24px;line-height:1.1;letter-spacing:-.02em}.stat span{font-size:12.5px;color:var(--soft)}
+.t-warn{background:var(--warn-soft);color:var(--warn)}.t-info{background:var(--info-soft);color:var(--info)}.t-ok{background:var(--ok-soft);color:var(--ok)}.t-acc{background:var(--accent-soft);color:var(--accent)}.t-vio{background:var(--vio-soft);color:var(--vio)}
+.sec{display:flex;align-items:center;justify-content:space-between;margin:26px 0 12px}.sec h2{margin:0;font-size:16px;font-weight:650}
+/* ---------- job cards ---------- */
+.job{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;box-shadow:var(--sh);display:flex;flex-direction:column;transition:box-shadow .15s,transform .15s}
+.job:hover{box-shadow:var(--sh2);transform:translateY(-2px)}
+.job .media{position:relative;aspect-ratio:16/9;background:linear-gradient(135deg,var(--surface2),var(--line));display:grid;place-items:center;color:var(--faint);overflow:hidden}
+.job .media img{width:100%;height:100%;object-fit:cover}
+.job .media.short{background:#000}.job .media .bgblur{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:blur(16px) brightness(.6);transform:scale(1.15)}.job .media .fg{position:relative;width:auto;height:100%;object-fit:contain;box-shadow:0 0 30px rgba(0,0,0,.5)}
+.job .media .ovl{position:absolute;inset:auto 10px 10px 10px;display:flex;gap:6px;justify-content:space-between;align-items:flex-end}
+.job .media .fmt{font-size:11.5px;font-weight:700;padding:3px 8px;border-radius:7px;background:rgba(0,0,0,.62);color:#fff;backdrop-filter:blur(4px)}
+.job .body{padding:14px 16px 16px;display:flex;flex-direction:column;gap:6px;flex:1}
+.job h3{margin:2px 0 0;font-size:15.5px;line-height:1.35;font-weight:650;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.job .meta{font-size:12.5px;color:var(--soft);display:flex;gap:6px;flex-wrap:wrap}
+.job .last{font-size:12px;color:var(--faint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.job .acts{margin-top:auto;padding-top:8px;display:flex;gap:8px;align-items:center}
+.steps{display:flex;gap:3px;margin:6px 0 2px}.steps i{flex:1;height:4px;border-radius:3px;background:var(--line)}.steps i.on{background:var(--ok)}.steps i.cur{background:var(--info)}
+/* ---------- chips & pills ---------- */
+.st{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:700;padding:3px 9px;border-radius:99px;background:var(--surface2);color:var(--soft);border:1px solid var(--line)}
+.st::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+.st.script_review,.st.video_review{background:var(--warn-soft);color:var(--warn);border-color:transparent}
+.st.published,.st.approved{background:var(--ok-soft);color:var(--ok);border-color:transparent}
+.st.failed,.st.upload_failed,.st.rejected{background:var(--err-soft);color:var(--err);border-color:transparent}
+.st.rendering,.st.writing,.st.uploading,.st.queued_render{background:var(--info-soft);color:var(--info);border-color:transparent}
+.job .media .st{background:rgba(255,255,255,.92);border:0}
+.pill{display:inline-flex;align-items:center;gap:4px;font-size:12px;padding:2px 9px;border-radius:99px;border:1px solid var(--line);background:var(--surface2);color:var(--soft);white-space:nowrap}
+/* ---------- buttons & forms ---------- */
+button.b,a.b,label.b{display:inline-flex;align-items:center;justify-content:center;gap:7px;font:inherit;font-weight:600;font-size:13.5px;padding:8px 14px;border-radius:var(--r2);border:1px solid var(--line2);background:var(--surface);color:var(--ink);cursor:pointer;text-decoration:none;transition:background .12s,border-color .12s,box-shadow .12s}
+button.b:hover,a.b:hover,label.b:hover{background:var(--surface2);border-color:var(--faint);text-decoration:none}
+button.b:disabled{opacity:.5;cursor:not-allowed}
+button.p{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);box-shadow:0 2px 10px rgba(210,74,31,.25)}button.p:hover{background:var(--accent);filter:brightness(1.06)}
+button.g{background:var(--ok);border-color:var(--ok);color:#fff}button.g:hover{background:var(--ok);filter:brightness(1.06)}
+button.r{color:var(--err);border-color:var(--line)}button.r:hover{background:var(--err-soft);border-color:var(--err)}
+input,select,textarea{font:inherit;font-size:14px;padding:9px 11px;border-radius:var(--r2);border:1px solid var(--line2);background:var(--surface);color:var(--ink);outline:none;transition:border-color .12s,box-shadow .12s;max-width:100%}
+input:focus,select:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+input[type=checkbox]{width:17px;height:17px;accent-color:var(--accent);padding:0}
+textarea{width:100%;min-height:64px;resize:vertical;line-height:1.5}
+label.f{display:flex;flex-direction:column;gap:6px;font-size:12.5px;font-weight:600;color:var(--soft)}
+label.f>input,label.f>select,label.f>textarea{font-weight:400;color:var(--ink)}
+.warn{color:var(--warn);font-size:13px;margin:3px 0}.err{color:var(--err);font-size:13px;margin:3px 0}
+/* ---------- tables (plan editor) ---------- */
+table{width:100%;border-collapse:separate;border-spacing:0;font-size:14px}
+th{font-size:11.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--faint);font-weight:700;text-align:left;padding:8px 10px;border-bottom:1px solid var(--line)}
+td{padding:10px;border-bottom:1px solid var(--line);vertical-align:top}
+tr.scene:hover td{background:var(--surface2)}
+td[colspan] {padding-top:16px}
+.scene td input,.scene td textarea{width:100%}
+details summary{cursor:pointer;font-weight:600;color:var(--soft)}
+/* ---------- misc ---------- */
+.log{font:12px/1.6 ui-monospace,"Cascadia Code",Consolas,monospace;white-space:pre-wrap;max-height:300px;overflow:auto;background:var(--surface2);border:1px solid var(--line);padding:12px 14px;border-radius:var(--r2);color:var(--soft)}
+video{width:100%;border-radius:12px;background:#000;max-height:72vh;box-shadow:var(--sh2)}
+.thumb{width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:10px;background:var(--line)}
+.empty{text-align:center;padding:48px 20px;color:var(--soft)}.empty .big{font-size:38px;margin-bottom:6px}
+code{font:12.5px ui-monospace,Consolas,monospace;background:var(--surface2);border:1px solid var(--line);padding:1px 6px;border-radius:6px}
+/* style gallery + modal */
+.sg{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px}
+.sc{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;cursor:pointer;box-shadow:var(--sh);transition:transform .15s,box-shadow .15s}
+.sc:hover{transform:translateY(-3px);box-shadow:var(--sh2)}.sc .im{position:relative;aspect-ratio:16/9;background:#111}
+.sc .im img,.sc .im video{width:100%;height:100%;object-fit:cover;display:block}.sc .bd{padding:10px 12px}
+.badge{position:absolute;top:8px;left:8px;font-size:10.5px;font-weight:800;letter-spacing:.04em;padding:3px 8px;border-radius:7px;background:rgba(0,0,0,.7);color:#fff}
+.badge.fast{background:var(--ok)}.badge.ai{background:var(--vio)}
+.modal{position:fixed;inset:0;background:rgba(10,8,6,.62);backdrop-filter:blur(3px);z-index:20;display:flex;align-items:center;justify-content:center;padding:20px}
+.modal .box{background:var(--surface);border-radius:18px;max-width:1120px;width:100%;max-height:94vh;overflow:auto;padding:22px;box-shadow:var(--sh2)}
+.toast{position:fixed;right:22px;bottom:22px;background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:10px;box-shadow:var(--sh2);font-weight:600;z-index:30;opacity:0;transform:translateY(8px);transition:.2s}
+.toast.on{opacity:1;transform:none}
+.feed{display:grid;gap:0;max-height:340px;overflow:auto}
+.feed div{display:flex;gap:12px;padding:9px 4px;border-bottom:1px solid var(--line);font-size:13px}.feed div:last-child{border:0}
+.feed time{color:var(--faint);font:12px ui-monospace,Consolas,monospace;min-width:84px}
+</style></head><body>
+<div class="app">
+<aside class="side">
+  <div class="brand"><div class="logo">HS</div><div><b>History Studio</b><span id="chan"></span></div></div>
+  <nav id="nav"></nav>
+  <div class="foot"><div id="conn"></div><div id="q" class="conn"></div><button class="themebtn" onclick="toggleTheme()">◐ Light / dark</button></div>
+</aside>
+<main id="main"></main>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+const $ = s => document.querySelector(s), esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const api = async (p, b) => { const r = await fetch(p, b === undefined ? {} : { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(b) }); const j = await r.json(); if (!r.ok) throw new Error(j.error || r.status); return j; };
+let STY = [], pickFor = null, modalSlug = null, sFilter = { q: '', cat: '', mode: '' };
+let S = null, tab = 'today', openId = null, openJob = null, dirty = false;
+const TABS = [['today', 'Today'], ['review', 'Needs review'], ['create', 'Create'], ['styles', 'Styles 🎨'], ['themes', 'Themes'], ['library', 'All videos'], ['settings', 'Settings']];
+const STEPS = ['writing', 'script_review', 'queued_render', 'rendering', 'video_review', 'approved', 'uploading', 'published'];
+const LABEL = { draft: 'Add your content', writing: 'Writing script', script_review: 'Check script', queued_render: 'Waiting to render', rendering: 'Rendering', video_review: 'Check video', approved: 'Approved – scheduled', uploading: 'Uploading', published: 'Published', failed: 'Failed', upload_failed: 'Upload failed', rejected: 'Rejected' };
+
+// ---------- UI shell (redesign) ----------
+const ICON = {
+  today: '<svg class="i" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="17" rx="3"/><path d="M8 2v4M16 2v4M3 10h18"/></svg>',
+  review: '<svg class="i" viewBox="0 0 24 24"><path d="M9 11l3 3 8-8"/><path d="M20 12v6a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3V7a3 3 0 0 1 3-3h9"/></svg>',
+  create: '<svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg>',
+  styles: '<svg class="i" viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 0 18c1.1 0 1.6-.9 1.2-1.8-.5-1 .1-2.2 1.3-2.2H17a4 4 0 0 0 4-4c0-5.5-4-10-9-10z"/><circle cx="7.5" cy="11" r="1.2"/><circle cx="10.5" cy="7" r="1.2"/><circle cx="15" cy="7.5" r="1.2"/></svg>',
+  themes: '<svg class="i" viewBox="0 0 24 24"><path d="M4 5h16M4 12h16M4 19h10"/></svg>',
+  library: '<svg class="i" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M10 9l5 3-5 3z"/></svg>',
+  settings: '<svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>',
+  pen: '<svg class="i" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>',
+  film: '<svg class="i" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M7 3v18M17 3v18M3 8h4M3 16h4M17 8h4M17 16h4"/></svg>',
+  spin: '<svg class="i" viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 4v5h-5"/></svg>',
+  up: '<svg class="i" viewBox="0 0 24 24"><path d="M12 19V5M5 12l7-7 7 7"/></svg>',
+};
+const PAGES = {
+  today: ['Today', () => `Plan for ${S.today} · ${esc(S.settings.activeTheme)} · 2 long videos + 4 Shorts`],
+  review: ['Needs review', () => 'Scripts and videos waiting for your approval'],
+  create: ['Create a video', () => 'Make one extra video on any topic'],
+  styles: ['Style gallery', () => 'All library styles with sample videos, for inspiration'],
+  themes: ['Themes & packs', () => 'Your series, their style packs and topic queues'],
+  library: ['All videos', () => `${S.jobs.length} videos made so far`],
+  settings: ['Settings', () => 'Channel, voice, automation and publishing'],
+};
+const needCount = () => S ? S.jobs.filter(j => j.status === 'script_review' || j.status === 'video_review').length : 0;
+function nav() {
+  const items = [['today', 'Today'], ['review', 'Needs review'], ['create', 'Create'], ['library', 'All videos'], 'sep', ['flows', 'Autoflows'], ['themes', 'Themes & packs'], ['styles', 'Style gallery'], ['settings', 'Settings']];
+  $('#nav').innerHTML = items.map(it => it === 'sep' ? '<div class="sep"></div>' : `<button class="${tab === it[0] && !openId ? 'on' : ''}" onclick="go('${it[0]}')">${ICON[it[0]]}<span>${it[1]}</span>${it[0] === 'review' && needCount() ? `<span class="cnt">${needCount()}</span>` : ''}</button>`).join('');
+  if (S) $('#chan').textContent = S.settings.channelName || '';
+}
+function go(t) { tab = t; openId = null; render(); window.scrollTo(0, 0); }
+function toast(msg) { const t = $('#toast'); t.textContent = msg; t.classList.add('on'); clearTimeout(window._tt); window._tt = setTimeout(() => t.classList.remove('on'), 2600); }
+function toggleTheme() { const r = document.documentElement, cur = r.dataset.theme || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'), nx = cur === 'dark' ? 'light' : 'dark'; r.dataset.theme = nx; try { localStorage.setItem('hs-theme', nx); } catch {} }
+try { const th = localStorage.getItem('hs-theme'); if (th) document.documentElement.dataset.theme = th; } catch {}
+function steps(j) { const k = STEPS.indexOf(j.status); return `<div class="steps" title="${esc(LABEL[j.status] || j.status)}">${STEPS.map((s, i) => `<i class="${i < k ? 'on' : i === k ? (['published'].includes(j.status) ? 'on' : 'cur') : ''}"></i>`).join('')}</div>`; }
+function card(j) {
+  const act = j.status === 'script_review' ? ['Review plan', 'p'] : j.status === 'video_review' ? ['Review video', 'p'] : ['Open', ''];
+  const styles = j.engine === 'v2' ? (j.styles || []).map(x => (S.v2styles[x] || {}).name || x).join(' → ') : sName(j.style);
+  return `<div class="job"><div class="media ${j.format === 'short' ? 'short' : ''}">${j.files?.thumb ? (j.format === 'short' ? `<img class="bgblur" src="/${j.files.thumb}?${j.updatedAt}" alt=""><img class="fg" src="/${j.files.thumb}?${j.updatedAt}" alt="">` : `<img src="/${j.files.thumb}?${j.updatedAt}" alt="">`) : (j.format === 'short' ? ICON.film : ICON.library).replace('class="i"', 'class="i" style="width:46px;height:46px;opacity:.5"')}
+    <div class="ovl"><span class="st ${j.status}">${LABEL[j.status] || j.status}</span><span class="fmt">${j.format === 'long' ? 'LONG · YT' : 'SHORT · YT + IG'}${j.files?.duration ? ' · ' + Math.floor(j.files.duration / 60) + ':' + String(Math.round(j.files.duration % 60)).padStart(2, '0') : ''}</span></div></div>
+    <div class="body"><h3>${esc(j.title || j.topic)}</h3>
+    <div class="meta"><span>${esc(j.theme)}</span>${j.slot ? `<span>· ${j.slot} at ${j.publishAt || S.settings.publishTimes[j.slot] || ''}</span>` : ''}</div>
+    ${styles ? `<div class="meta" title="chapter styles">🎨 ${esc(styles)}</div>` : ''}
+    ${steps(j)}<div class="last">${esc(j.logTail || '')}</div>
+    ${Object.entries(j.uploads || {}).map(([k, r]) => r.ok ? `<div class="meta"><a href="${esc(r.url)}" target="_blank">${k} ↗</a></div>` : `<div class="err">${k}: ${esc(r.error)}</div>`).join('')}
+    <div class="acts"><button class="b ${act[1]}" onclick="openJ('${j.id}')">${act[0]}</button>${j.voiceFile ? '<span class="pill">🎙 your voice</span>' : ''}</div></div></div>`;
+}
+async function openJ(id) { openId = id; openJob = await api('/api/jobs/' + id); dirty = false; render(); window.scrollTo(0, 0); }
+function statTiles() {
+  const J = S.jobs, by = st => J.filter(j => st.includes(j.status)).length, today = J.filter(j => j.date === S.today);
+  const tile = (n, l, ic, t, tab2) => `<div class="stat" ${tab2 ? `style="cursor:pointer" onclick="go('${tab2}')"` : ''}><div class="ic ${t}">${ICON[ic]}</div><div><b>${n}</b><span>${l}</span></div></div>`;
+  return `<div class="stats">${tile(by(['script_review']), 'Plans to check', 'pen', 't-warn', 'review')}${tile(by(['video_review']), 'Videos to check', 'film', 't-acc', 'review')}${tile(by(['writing', 'queued_render', 'rendering']), 'In production', 'spin', 't-info')}${tile(by(['approved', 'uploading']), 'Scheduled', 'up', 't-vio')}${tile(J.filter(j => j.status === 'published').length, 'Published', 'review', 't-ok', 'library')}</div>`;
+}
+function viewToday() {
+  const t = S.jobs.filter(j => j.date === S.today && j.slot).sort((a, b) => a.slot.localeCompare(b.slot));
+  const feed = (S.activity || []).slice(0, 30).map(l => { const m = /^(\S+\s?[ap]?m?)\s+(.*)$/i.exec(l) || [0, '', l]; return `<div><time>${esc(m[1])}</time><span>${esc(m[2])}</span></div>`; }).join('');
+  return statTiles() + `<div class="sec"><h2>Today's 6 slots</h2>${t.length ? '' : `<button class="b p" onclick="act('/api/run-daily',{})">${ICON.create} Create today's 6 videos now</button>`}</div>
+  ${t.length ? `<div class="grid">${t.map(card).join('')}</div>` : `<div class="card empty"><div class="big">🗓️</div><b>Nothing planned yet today</b><div class="muted">${S.settings.autoDaily ? `The daily plan is created automatically at ${S.settings.dailyRunTime}.` : 'The automatic daily plan is off (Settings).'}</div></div>`}
+  <div class="sec"><h2>Activity</h2><span class="muted">writing ${S.queues.writing} · rendering ${S.queues.rendering}</span></div><div class="card feed">${feed || '<div class="muted">No activity yet.</div>'}</div>`;
+}
+function viewReview() {
+  const r = S.jobs.filter(j => ['script_review', 'video_review', 'failed', 'upload_failed'].includes(j.status));
+  return r.length ? `<div class="grid">${r.map(card).join('')}</div>` : `<div class="card empty"><div class="big">🎉</div><b>Nothing is waiting for you</b><div class="muted">New plans and videos appear here when they're ready to check.</div></div>`;
+}
+function viewLibrary() { return S.jobs.length ? `<div class="grid">${S.jobs.slice().reverse().map(card).join('')}</div>` : `<div class="card empty"><div class="big">🎬</div><b>No videos yet</b></div>`; }
+function pageHead() { if (openId) return ''; const P = PAGES[tab]; if (!P) return ''; return `<div class="ph"><div><h1>${P[0]}</h1><p>${P[1]()}</p></div></div>`; }
+
+function viewThemes() {
+  return `<div class="row" style="margin:0 0 14px"><input id="nt" placeholder="New theme / series name"><button class="b" onclick="addTheme()">Add theme</button></div>
+  <div class="grid">${S.themes.map((t, i) => `<div class="card"><h3>${esc(t.name)} ${t.name === S.settings.activeTheme ? '<span class="pill">daily theme</span>' : ''}</h3>
+  ${S.settings.engine === 'v1' ? `<div class="row" style="margin:4px 0 8px"><span class="pill">Long: 🎨 ${esc(sName(t.longStyle || 'archive-lighttable'))}</span><button class="b" onclick="pick(${i},'longStyle')">Change</button><span class="pill">Shorts: 🎨 ${esc(sName(t.shortStyle || 'archive-lighttable'))}</span><button class="b" onclick="pick(${i},'shortStyle')">Change</button></div>` : ''}<div class="row" style="margin:0 0 8px"><label class="f" style="flex:1;min-width:0">Style pack<select style="width:100%" onchange="act('/api/themes',{name:S.themes[${i}].name,pack:this.value})">${Object.entries(S.packs || {}).map(([k, p]) => `<option value="${k}" ${(t.pack || 'auto') === k ? 'selected' : ''}>${esc(p.name)}${p.for ? ' · ' + esc(p.for) : ''}</option>`).join('')}</select></label></div><div class="muted">Topic queue (one per line, top is used next)</div><textarea id="tq${i}" rows="7">${esc(t.topics.join('\n'))}</textarea>
+  <div class="row"><button class="b" onclick="saveTopics(${i})">Save topics</button><button class="b" onclick="suggest(${i},this)">✨ Suggest 12 topics</button>
+  ${t.name !== S.settings.activeTheme ? `<button class="b p" onclick="act('/api/settings',{activeTheme:S.themes[${i}].name})">Use for daily plan</button>` : ''}<button class="b r" onclick="if(confirm('Delete theme?'))act('/api/themes/delete',{name:S.themes[${i}].name})">Delete</button></div></div>`).join('')}</div>`;
+}
+async function addTheme() { const n = $('#nt').value.trim(); if (n) await act('/api/themes', { name: n, topics: [] }); }
+async function saveTopics(i) { await act('/api/themes', { name: S.themes[i].name, topics: $('#tq' + i).value.split('\n').map(s => s.trim()).filter(Boolean) }); }
+async function suggest(i, btn) { btn.disabled = true; btn.textContent = 'Claude is thinking…'; try { await api('/api/topics/suggest', { theme: S.themes[i].name }); } catch (e) { alert(e.message); } await refresh(); }
+function viewSettings() {
+  const s = S.settings, f = (k, l, type = 'text') => `<label class="f">${l}<input data-k="${k}" type="${type}" value="${esc(s[k])}"></label>`, c = (k, l) => `<label style="display:flex;gap:8px;align-items:center"><input type="checkbox" data-k="${k}" ${s[k] ? 'checked' : ''}>${l}</label>`;
+  return `<div class="two"><div class="card"><h3>Channel & production</h3><div style="display:grid;gap:10px;margin-top:10px">
+  ${f('channelName', 'Channel name')}${f('longMinutes', 'Long video length (minutes)', 'number')}
+  <label class="f">Narrator voice<select data-k="voice">${['bf_emma', 'bf_isabella', 'bf_alice', 'bf_lily', 'af_bella', 'af_heart', 'af_nicole', 'bm_george', 'bm_lewis', 'am_michael', 'bm_fable', 'hf_alpha', 'hf_beta', 'hm_omega'].map(v => `<option ${v === s.voice ? 'selected' : ''}>${v}</option>`).join('')}</select></label>
+  ${f('voiceSpeed', 'Voice speed', 'number')}${f('claudeModel', 'Claude model (blank = default, e.g. claude-opus-4-5)')}
+  <label class="f">Video engine<select data-k="engine"><option value="v2" ${s.engine !== 'v1' ? 'selected' : ''}>v2: multi-style documentary (photos, maps, boards, countdowns)</option><option value="v1" ${s.engine === 'v1' ? 'selected' : ''}>v1: simple text-card template</option></select></label>${c('claudePicksImages', 'Let Claude choose between photo candidates (slower, better matches)')}${c('burnCaptions', 'Burn captions into the video')}${f('renderWorkers', 'Render workers (CPU threads)', 'number')}</div></div>
+  <div class="card"><h3>Automation & publishing</h3><div style="display:grid;gap:10px;margin-top:10px">
+  ${c('autoDaily', 'Create 2 long + 4 shorts automatically every day')}${f('dailyRunTime', 'Daily plan time', 'time')}
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">${Object.keys(s.publishTimes).map(k => `<label class="f">Publish time · ${k}<input data-pt="${k}" type="time" value="${s.publishTimes[k]}"></label>`).join('')}</div>
+  ${c('youtube', 'Upload to YouTube')}${c('instagram', 'Upload shorts to Instagram Reels')}
+  <label class="f">YouTube privacy<select data-k="youtubePrivacy">${['public', 'unlisted', 'private'].map(v => `<option ${v === s.youtubePrivacy ? 'selected' : ''}>${v}</option>`).join('')}</select></label>
+  <div><b>Connections</b> <button class="b" onclick="checkConn(this)">Check</button><div class="muted" id="cd">${connText()}</div>
+  <div class="muted">Setup guide: <code>uploaders\\SETUP.md</code> in the project folder.</div></div></div></div></div>
+  <div class="row"><button class="b p" onclick="saveSettings()">Save settings</button></div>`;
+}
+function connText() { const c = S.connections || {}; return `YouTube: ${c.youtube ? (c.youtube.connected ? '✅ ' + esc(c.youtube.channel || '') : '❌ not connected') : '…'} · Instagram: ${c.instagram ? (c.instagram.connected ? '✅ ' + esc(c.instagram.account || '') : '❌ not connected') : '…'}`; }
+async function checkConn(b) { b.disabled = true; await api('/api/connections'); await refresh(); }
+async function saveSettings() {
+  const p = { publishTimes: { ...S.settings.publishTimes } };
+  document.querySelectorAll('[data-k]').forEach(e => { const k = e.dataset.k; p[k] = e.type === 'checkbox' ? e.checked : e.type === 'number' ? +e.value : e.value; });
+  document.querySelectorAll('[data-pt]').forEach(e => p.publishTimes[e.dataset.pt] = e.value);
+  await act('/api/settings', p); toast('Settings saved');
+}
+
+// ---------- job detail ----------
+function viewJob() {
+  const j = openJob, sc = j.script, v = j.validation || {};
+  const v2 = j.engine === 'v2';
+  const sceneRows = sc && !v2 ? sc.scenes.map((s, i) => `<tr class="scene"><td style="width:110px"><select data-i="${i}" data-f="kind">${['title', 'chapter', 'date', 'place', 'fact', 'quote', 'list', 'text', 'outro'].map(k => `<option ${k === s.kind ? 'selected' : ''}>${k}</option>`).join('')}</select></td>
+    <td style="width:30%"><input data-i="${i}" data-f="heading" value="${esc(s.heading)}" placeholder="heading"><input data-i="${i}" data-f="${s.kind === 'date' || s.kind === 'fact' ? 'big' : 'sub'}" value="${esc(s.kind === 'date' || s.kind === 'fact' ? s.big : s.sub)}" placeholder="${s.kind === 'date' || s.kind === 'fact' ? 'big text / year' : 'sub'}" style="margin-top:4px">${s.kind === 'list' ? `<input data-i="${i}" data-f="items" value="${esc((s.items || []).join(' | '))}" placeholder="items separated by |" style="margin-top:4px">` : ''}</td>
+    <td><textarea data-i="${i}" data-f="narration">${esc(s.narration)}</textarea></td><td style="width:34px"><button class="b r" onclick="delScene(${i})" title="remove">✕</button></td></tr>`).join('') : '';
+  return `<div class="row" style="margin:0 0 12px"><button class="b" onclick="openId=null;render()">← Back</button><span class="st ${j.status}">${LABEL[j.status] || j.status}</span><span class="pill">${j.format}</span><span class="muted">${esc(j.theme)} · ${esc(j.topic)}${j.angle ? ' · angle: ' + esc(j.angle) : ''}</span></div>
+  ${j.status === 'video_review' || j.files?.video ? `<div class="two"><div><video controls src="/${j.files.video}?${j.updatedAt}" ${j.format === 'short' ? 'style="max-height:72vh;width:auto;display:block;margin:auto"' : ''}></video></div>
+   <div class="card"><h3>Video check</h3><div class="muted">Watch it fully. Check names, dates and spelling on screen, and that the voice says names correctly.</div>
+   ${j.files.thumb ? `<img src="/${j.files.thumb}?${j.updatedAt}" style="width:100%;border-radius:10px;margin:10px 0 4px;border:1px solid var(--line)"><div class="row" style="margin:0"><input id="thText" placeholder="Thumbnail headline (2-4 words)" value="${esc((j.script && j.script.thumbText) || '')}" style="flex:1"><button class="b" onclick="remakeThumb(this)">Remake thumbnail</button></div>` : ''}
+   <div class="muted" style="margin-top:6px">Length: ${Math.round(j.files.duration || 0)} s ·${j.files.shots ? ` ${j.files.shots} shots (one every ${j.files.avgShot} s) · ${j.files.photos} photos ·` : ''} <a href="/${j.files.srt}" target="_blank">subtitles</a> · <a href="/${j.files.thumb}" target="_blank">thumbnail</a></div>
+   ${j.status === 'video_review' ? `<div style="margin-top:10px;display:grid;gap:6px"><label><input type="checkbox" id="toYT" ${S.settings.youtube ? 'checked' : ''}> YouTube${j.format === 'short' ? ' Shorts' : ''}</label>
+   <label><input type="checkbox" id="toIG" ${S.settings.instagram && j.format === 'short' ? 'checked' : ''}> Instagram Reels</label></div>
+   <div class="row"><button class="b g" onclick="apV(false)">✓ Approve – publish at ${S.settings.publishTimes[j.slot] || 'next slot'}</button><button class="b" onclick="apV(true)">Approve & publish now</button></div>
+   <div class="row"><button class="b" onclick="jact('rerender')">Re-render</button><button class="b r" onclick="rej()">Reject</button></div>` : ''}
+   ${['upload_failed'].includes(j.status) ? `<div class="row"><button class="b p" onclick="jact('retry-upload')">Retry upload</button></div>` : ''}</div></div>` : ''}
+  ${v2 ? '' : `<div class="card" style="margin-top:14px"><h3>Visual style</h3><div class="row"><select id="jStyle">${STY.filter(x => j.format === 'short' || x.mode === 'fast').map(x => `<option value="${x.slug}" ${x.slug === (j.style || 'archive-lighttable') ? 'selected' : ''}>${x.mode === 'fast' ? '⚡' : '🤖'} ${esc(x.name)}</option>`).join('')}</select><button class="b" onclick="setStyle(false)">Save style</button>${j.files?.video ? `<button class="b" onclick="setStyle(true)">Save & re-render</button>` : ''}<button class="b" onclick="modalSlug=$('#jStyle').value;render()">Preview</button></div><div class="muted">⚡ fast template (minutes) · 🤖 AI-built by Claude, Shorts only (20-60 min per video)</div></div>`}
+  ${j.status === 'draft' ? viewOwnContent(j) : sc && v2 ? viewPlanV2(j) : sc ? `<div class="card" style="margin-top:14px"><h3>Script</h3>
+   <label class="f">Title<input id="sTitle" value="${esc(sc.title)}" maxlength="100"></label>
+   <label class="f" style="margin-top:8px">Description<textarea id="sDesc" rows="4">${esc(sc.description)}</textarea></label>
+   <label class="f" style="margin-top:8px">Tags (comma separated)<input id="sTags" value="${esc((sc.tags || []).join(', '))}"></label>
+   <div style="margin-top:10px">${(v.errs || []).map(e => `<div class="err">✖ ${esc(e)}</div>`).join('')}${(v.warns || []).slice(0, 8).map(e => `<div class="warn">⚠ ${esc(e)}</div>`).join('')}
+   <div class="muted">${v.words || 0} words · about ${Math.round((v.estSeconds || 0) / 6) / 10} min</div></div>
+   <table style="margin-top:10px"><tr><th>Kind</th><th>On screen</th><th>Narration</th><th></th></tr>${sceneRows}</table>
+   <div class="row"><button class="b" onclick="saveScript()">Save edits</button>
+   ${j.status === 'script_review' ? `<button class="b g" onclick="apS()">✓ Approve script → make video</button>` : ''}
+   ${['script_review', 'failed', 'rejected'].includes(j.status) ? `<input id="notes" placeholder="Notes for Claude (optional)" style="flex:1;min-width:200px"><button class="b" onclick="regen()">↻ Rewrite with Claude</button>` : ''}
+   <button class="b r" onclick="if(confirm('Delete this job?'))jact('delete').then(()=>go('library'))">Delete</button></div></div>` : `<div class="card">${j.status === 'failed' ? `<div class="row"><button class="b" onclick="regen()">↻ Try again</button></div>` : 'Script is being written…'}</div>`}
+  <div class="card" style="margin-top:14px"><h3>Log</h3><div class="log">${esc((j.log || []).slice(-80).join('\n'))}</div></div>`;
+}
+function collect() {
+  if (openJob.engine === 'v2') return collectV2();
+  const sc = openJob.script; sc.title = $('#sTitle').value; sc.description = $('#sDesc').value; sc.tags = $('#sTags').value.split(',').map(s => s.trim()).filter(Boolean);
+  document.querySelectorAll('[data-i]').forEach(e => { const s = sc.scenes[+e.dataset.i], f = e.dataset.f; s[f] = f === 'items' ? e.value.split('|').map(x => x.trim()).filter(Boolean) : e.value; });
+  return sc;
+}
+async function saveScript() { openJob = await api(`/api/jobs/${openJob.id}/script`, { script: collect() }); render(); }
+function delScene(i) { collect(); openJob.script.scenes.splice(i, 1); render(); }
+async function apS() { try { await api(`/api/jobs/${openJob.id}/script`, { script: collect() }); await api(`/api/jobs/${openJob.id}/approve-script`, {}); openId = null; await refresh(); } catch (e) { alert(e.message); } }
+async function apV(now) { await api(`/api/jobs/${openJob.id}/approve-video`, { youtube: $('#toYT').checked, instagram: $('#toIG').checked, now }); openId = null; await refresh(); }
+async function rej() { const r = prompt('Reason (optional)') ?? ''; await jact('reject', { reason: r }); }
+async function regen() { await jact('regenerate', { notes: $('#notes')?.value || '' }); }
+async function jact(a, b = {}) { await api(`/api/jobs/${openJob.id}/${a}`, b); await openJ(openJob.id); await refresh(); }
+async function act(p, b) { try { await api(p, b); } catch (e) { alert(e.message); } await refresh(); }
+
+const sName = slug => (STY.find(x => x.slug === slug) || {}).name || slug || 'Archive Light Table';
+const sMode = slug => (STY.find(x => x.slug === slug) || {}).mode;
+async function setStyle(rr) { try { await api(`/api/jobs/${openJob.id}/style`, { style: $('#jStyle').value }); if (rr) await api(`/api/jobs/${openJob.id}/rerender`, {}); await openJ(openJob.id); } catch (e) { alert(e.message); } }
+function pick(i, which) { pickFor = { theme: S.themes[i].name, which }; tab = 'styles'; render(); }
+async function useStyle(slug, themeName, which) {
+  try { await api('/api/themes', { name: themeName, [which]: slug }); modalSlug = null; const back = !!pickFor; pickFor = null; if (back) tab = 'themes'; await refresh(); render(); alert(`${sName(slug)} is now the ${which === 'longStyle' ? 'long-video' : 'Shorts'} style for "${themeName}"`); } catch (e) { alert(e.message); }
+}
+function pickForJob(slug) { modalSlug = null; render(); const s = $('#jStyle'); if (s) s.value = slug; }
+function viewStyles() {
+  const cats = [...new Set(STY.map(x => x.category))].sort();
+  const q = sFilter.q.toLowerCase();
+  const list = STY.filter(x => (!q || (x.name + ' ' + x.line + ' ' + x.uses.join(' ') + ' ' + x.category).toLowerCase().includes(q)) && (!sFilter.cat || x.category === sFilter.cat) && (!sFilter.mode || x.mode === sFilter.mode));
+  return `${pickFor ? `<div class="card" style="margin-bottom:12px;border-color:var(--green)">Choosing the <b>${pickFor.which === 'longStyle' ? 'long-video' : 'Shorts'}</b> style for <b>${esc(pickFor.theme)}</b>. Click a style, then "Use this style". ${pickFor.which === 'longStyle' ? 'Long videos can only use ⚡ fast styles.' : ''} <button class="b" onclick="pickFor=null;render()">Cancel</button></div>` : ''}
+  <div class="row" style="margin:0 0 12px"><input id="sq" placeholder="Search styles…" value="${esc(sFilter.q)}" oninput="sFilter.q=this.value;clearTimeout(window._st);window._st=setTimeout(()=>{render();const e=$('#sq');e.focus();e.setSelectionRange(e.value.length,e.value.length)},300)" style="min-width:220px">
+  <select onchange="sFilter.cat=this.value;render()"><option value="">All categories</option>${cats.map(c => `<option ${c === sFilter.cat ? 'selected' : ''}>${esc(c)}</option>`).join('')}</select>
+  <select onchange="sFilter.mode=this.value;render()"><option value="">⚡ Fast + 🤖 AI-built</option><option value="fast" ${sFilter.mode === 'fast' ? 'selected' : ''}>⚡ Fast templates (long + shorts)</option><option value="ai" ${sFilter.mode === 'ai' ? 'selected' : ''}>🤖 AI-built (Shorts)</option></select>
+  <span class="muted">${list.length} of ${STY.length} styles · hover a card to play it, click to open</span></div>
+  <div class="sg">${list.map(x => `<div class="sc" onclick="modalSlug='${x.slug}';render()" onmouseenter="const v=this.querySelector('video');if(v){v.play().catch(()=>{})}" onmouseleave="const v=this.querySelector('video');if(v){v.pause()}">
+    <div class="im">${x.previewUrl ? `<video muted loop playsinline preload="none" poster="${x.posterUrl || ''}" src="${x.previewUrl}"></video>` : `<img src="${x.posterUrl || (x.presetImg && x.presetImg.h) || ''}">`}<span class="badge ${x.mode}">${x.mode === 'fast' ? '⚡ FAST' : '🤖 AI-BUILT'}</span></div>
+    <div class="bd"><b>${esc(x.name)}</b><div class="muted">${esc(x.category)}${x.uses.length ? ' · ' + esc(x.uses.slice(0, 2).join(', ')) : ''}</div></div></div>`).join('')}</div>`;
+}
+function viewModal() {
+  const x = STY.find(y => y.slug === modalSlug); if (!x) return '';
+  const themesSel = S.themes.map(t => `<option ${(pickFor ? pickFor.theme : S.settings.activeTheme) === t.name ? 'selected' : ''}>${esc(t.name)}</option>`).join('');
+  return `<div class="modal" onclick="if(event.target===this){modalSlug=null;render()}"><div class="box">
+  <div class="row" style="margin:0 0 10px;justify-content:space-between"><h3 style="margin:0;font:600 20px Georgia,serif">${esc(x.name)} <span class="badge ${x.mode}" style="position:static">${x.mode === 'fast' ? '⚡ FAST TEMPLATE' : '🤖 AI-BUILT'}</span></h3><button class="b" onclick="modalSlug=null;render()">✕ Close</button></div>
+  <div class="two"><div>${x.previewUrl ? `<video controls autoplay src="${x.previewUrl}" poster="${x.posterUrl || ''}"></video><div class="muted">Sample film made in this style (about a different topic).</div>` : x.posterUrl ? `<img class="thumb" src="${x.posterUrl}"><div class="muted">No sample video for this style yet: poster only.</div>` : ''}</div>
+  <div><div class="muted">${esc(x.category)}</div><p>${esc(x.line)}</p>${x.uses.length ? `<p class="muted">Good for: ${esc(x.uses.join(', '))}</p>` : ''}
+  ${x.mode === 'fast' ? `<p><b>Your videos in this style</b> use the fast template look below: long videos and Shorts, built in minutes.</p><div class="row" style="align-items:flex-start"><img src="${x.presetImg.h}" style="width:62%;border-radius:8px"><img src="${x.presetImg.v}" style="width:30%;border-radius:8px"></div>`
+   : `<p><b>AI-built:</b> for each Short, Claude Code designs a custom animated film in this style from the library's style guide, so it looks like the sample and is never the same twice. Shorts only. It takes 20-60 minutes per video and uses a lot of your Claude usage. If it fails, the video falls back to the template.</p>`}
+  <div class="card" style="margin-top:10px"><b>Use this style</b><div class="row"><select id="mTheme">${themesSel}</select>
+  ${(!pickFor || pickFor.which === 'shortStyle') ? `<button class="b g" onclick="useStyle('${x.slug}',$('#mTheme').value,'shortStyle')">For Shorts</button>` : ''}
+  ${(!pickFor || pickFor.which === 'longStyle') ? `<button class="b ${x.mode === 'fast' ? 'g' : ''}" ${x.mode === 'fast' ? '' : 'disabled title="Long videos need a fast style"'} onclick="useStyle('${x.slug}',$('#mTheme').value,'longStyle')">For long videos</button>` : ''}</div>
+  ${openId ? `<div class="row"><button class="b p" onclick="pickForJob('${x.slug}')">Pick for this video</button><span class="muted">then press Save style</span></div>` : ''}</div></div></div></div></div>`;
+}
+
+// ---------- engine v2 plan editor ----------
+const MOODS = ['tense', 'curious', 'suspense', 'march', 'drama', 'rise', 'outro'];
+function shotChip(s) {
+  const txt = s.head ? [].concat(s.head).join(' / ') : s.text || (s.lines || []).join(' / ') || s.quote || s.label || s.big || (s.value ? (s.prefix || '') + s.value + (s.suffix || '') + ' ' + (s.label || '') : '') || (s.items || []).map(x => x[0] || x).join(', ') || (s.pins ? 'pins: ' + s.pins.join(',') : '') || (s.n ? '#' + s.n : '');
+  return `<span class="pill" title="${esc(JSON.stringify(s))}" style="margin:2px 4px 2px 0;display:inline-block">${s.at ? '✂ ' + esc(s.at) + ' → ' : ''}<b>${esc(s.type)}</b>${s.img ? ' 🖼' + esc(s.img) : ''}${txt ? ': ' + esc(String(txt).slice(0, 60)) : ''}</span>`;
+}
+function viewPlanV2(j) {
+  const sc = j.script, v = j.validation || {}, ST = S.v2styles || {};
+  const chapters = sc.chapters.map((ch, ci) => `<tr><td colspan="3" style="background:var(--bg)"><div class="row" style="margin:4px 0">
+    <b>${ci === 0 && !ch.title ? 'Cold open' : 'Chapter ' + ci}</b>
+    <select data-ci="${ci}" data-cf="style">${Object.entries(ST).map(([k, x]) => `<option value="${k}" ${k === ch.style ? 'selected' : ''}>${esc(x.name)}</option>`).join('')}</select>
+    <select data-ci="${ci}" data-cf="mood">${MOODS.map(m => `<option ${m === ch.mood ? 'selected' : ''}>${m}</option>`).join('')}</select>
+    ${j.format === 'long' ? `<input data-ci="${ci}" data-cf="title" value="${esc((ch.title || []).join(' | '))}" placeholder="no title card (cold open)" style="flex:1;min-width:200px">` : ''}</div></td></tr>
+    ${ch.lines.map((l, li) => `<tr class="scene"><td style="width:46%"><textarea data-ci="${ci}" data-li="${li}" data-lf="say" rows="2">${esc(l.say)}</textarea></td><td>${(l.shots || []).map(shotChip).join('')}</td><td style="width:34px"><button class="b r" onclick="delLine(${ci},${li})" title="remove line">✕</button></td></tr>`).join('')}`).join('');
+  const imgs = (sc.images || []).map((im, ii) => `<div class="row" style="margin:3px 0"><span class="pill">${esc(im.id)}</span><input data-ii="${ii}" data-if="want" value="${esc(im.want)}" style="flex:1"><input data-ii="${ii}" data-if="queries" value="${esc((im.queries || []).join(' | '))}" style="flex:1" title="Commons search queries, separated by |"></div>`).join('');
+  return `<div class="card" style="margin-top:14px"><h3>Video plan <span class="pill">engine v2 · ${esc((S.packs[j.pack] || {}).name || 'Auto')}</span></h3>
+   <div class="card" style="margin:10px 0;background:var(--bg)"><b>🎙 Narration voice:</b> ${j.voiceFile ? `<b>your own recording</b> (${esc(j.voiceFile)}) <button class="b r" onclick="voiceRemove()">Use the AI voice instead</button>` : `AI voice (${esc(S.settings.voice)}).`}
+   <div class="row"><a class="b" href="/api/jobs/${j.id}/narration.txt">📄 Download the script to read</a><label class="b" style="cursor:pointer">⬆ Upload my recording<input type="file" accept="audio/*,video/*" style="display:none" onchange="voiceUpload(this)"></label><span class="muted" id="vup"></span></div>
+   <div class="muted">For a real human voice: record yourself (phone or USB mic, quiet room) reading the script in order, in one file. The app finds every sentence automatically and times the whole video to your voice. Stumbles are fine: just repeat the sentence.</div></div>
+   <label class="f">Title<input id="sTitle" value="${esc(sc.title)}" maxlength="100"></label>
+   <label class="f" style="margin-top:8px">Description<textarea id="sDesc" rows="4">${esc(sc.description)}</textarea></label>
+   <label class="f" style="margin-top:8px">Tags (comma separated)<input id="sTags" value="${esc((sc.tags || []).join(', '))}"></label>
+   <div class="row"><label class="f" style="flex:1">Next-episode teaser (end card)<input id="sNext" value="${esc(sc.next || '')}"></label><label class="f" style="flex:2">News ticker facts (| separated)<input id="sTicker" value="${esc((sc.ticker || []).join(' | '))}"></label></div>
+   <div style="margin-top:10px">${(v.errs || []).map(e => `<div class="err">✖ ${esc(e)}</div>`).join('')}${(v.warns || []).slice(0, 10).map(e => `<div class="warn">⚠ ${esc(e)}</div>`).join('')}
+   <div class="muted">${v.words || 0} words · ${v.lines || 0} lines · about ${Math.round((v.estSeconds || 0) / 6) / 10} min · ${sc.chapters.length} chapters: ${sc.chapters.map(c => esc((ST[c.style] || {}).name || c.style)).join(' → ')}</div></div>
+   <div class="muted" style="margin-top:8px">Check every name, date and number. Narration numbers are written as words so the voice reads them right. Hover a shot to see all its details.</div>
+   <table style="margin-top:10px"><tr><th>Narration (what the voice says)</th><th>Shots (✂ = cut on that word)</th><th></th></tr>${chapters}</table>
+   <h3 style="margin-top:14px">Photos to find (Wikimedia Commons, free licences only)</h3>${imgs || '<div class="muted">none</div>'}
+   ${sc.places && sc.places.length ? `<div class="muted" style="margin-top:8px">Map places: ${sc.places.map(p => esc(p.name) + ` (${(+p.lat).toFixed(2)}, ${(+p.lon).toFixed(2)})`).join(' · ')}${sc.route ? ` · route: ${sc.route.points.length} points${sc.route.km ? ', ' + sc.route.km + ' km' : ''}` : ''}</div>` : ''}
+   <details style="margin-top:10px"><summary>Advanced: edit the full plan as JSON</summary><textarea id="rawPlan" rows="18" style="font:12px ui-monospace,Consolas,monospace">${esc(JSON.stringify(sc, null, 1))}</textarea><div class="row"><button class="b" onclick="applyRaw()">Apply JSON</button></div></details>
+   <div class="row"><button class="b" onclick="saveScript()">Save edits</button>
+   ${j.status === 'script_review' ? `<button class="b g" onclick="apS()">✓ Approve plan → make video</button>` : ''}
+   ${['script_review', 'failed', 'rejected'].includes(j.status) ? `<input id="notes" placeholder="Notes for Claude (optional), e.g. more maps, darker tone" style="flex:1;min-width:200px"><button class="b" onclick="regen()">↻ Rewrite with Claude</button>` : ''}
+   <button class="b r" onclick="if(confirm('Delete this job?'))jact('delete').then(()=>go('library'))">Delete</button></div></div>`;
+}
+async function voiceUpload(inp) { const file = inp.files[0]; if (!file) return; $('#vup').textContent = 'uploading ' + (file.size / 1048576).toFixed(1) + ' MB…'; try { const r = await fetch('/api/jobs/' + openJob.id + '/voice', { method: 'POST', headers: { 'x-filename': file.name }, body: file }); if (!r.ok) throw new Error((await r.json()).error); await openJ(openJob.id); } catch (e) { alert('Upload failed: ' + e.message); } }
+async function remakeThumb(btn) { btn.disabled = true; btn.textContent = 'Rendering…'; try { await api('/api/jobs/' + openJob.id + '/thumbnail', { text: $('#thText').value.trim() }); await openJ(openJob.id); toast('Thumbnail updated'); } catch (e) { alert(e.message); btn.disabled = false; } }
+async function voiceRemove() { await api('/api/jobs/' + openJob.id + '/voice-remove', {}); await openJ(openJob.id); }
+function collectV2() {
+  const sc = openJob.script; sc.title = $('#sTitle').value; sc.description = $('#sDesc').value; sc.tags = $('#sTags').value.split(',').map(s => s.trim()).filter(Boolean);
+  sc.next = $('#sNext').value; sc.ticker = $('#sTicker').value.split('|').map(s => s.trim()).filter(Boolean);
+  document.querySelectorAll('[data-cf]').forEach(e => { const ch = sc.chapters[+e.dataset.ci], f = e.dataset.cf; ch[f] = f === 'title' ? (e.value.trim() ? e.value.split('|').map(x => x.trim()) : null) : e.value; });
+  document.querySelectorAll('[data-lf]').forEach(e => { sc.chapters[+e.dataset.ci].lines[+e.dataset.li].say = e.value; });
+  document.querySelectorAll('[data-if]').forEach(e => { const im = sc.images[+e.dataset.ii]; if (e.dataset.if === 'queries') im.queries = e.value.split('|').map(x => x.trim()).filter(Boolean); else im.want = e.value; });
+  return sc;
+}
+function delLine(ci, li) { collectV2(); openJob.script.chapters[ci].lines.splice(li, 1); render(); }
+async function applyRaw() { try { const sc = JSON.parse($('#rawPlan').value); openJob = await api(`/api/jobs/${openJob.id}/script`, { script: sc }); render(); } catch (e) { alert('JSON error: ' + e.message); } }
+
+// ---------- Autoflows (one automated pipeline per channel) ----------
+ICON.flows = '<svg class="i" viewBox="0 0 24 24"><path d="M4 7h11M4 17h7"/><circle cx="18" cy="7" r="3"/><circle cx="14" cy="17" r="3"/></svg>';
+PAGES.flows = ['Autoflows', () => 'One automated pipeline per channel: research, plans, videos, thumbnails and uploads on a schedule'];
+let flowEdit = null;
+const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+const APPROVAL = { both: ['I review plans and videos', 'Claude researches and plans; you approve each plan, then each video'], video: ['I review videos only', 'Plans are approved automatically; you only watch and approve the finished videos'], none: ['Autopilot', 'Everything runs and publishes on schedule without you. Use only once you trust the channel setup'] };
+const fmtTime = ms => { const d = new Date(ms); return d.toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'short' }) + ' ' + d.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' }); };
+function viewFlows() {
+  if (flowEdit) return viewFlowEdit();
+  const F = S.flows || [];
+  const cards = F.map(f => { const sc = f.schedule, nx = f.next;
+    return `<div class="card" style="display:flex;flex-direction:column;gap:8px">
+      <div class="row" style="margin:0;justify-content:space-between"><h3 style="margin:0">${esc(f.name)}</h3><span class="st ${f.enabled ? 'published' : ''}">${f.enabled ? 'Running' : 'Paused'}</span></div>
+      <div class="muted">${esc(f.channel.niche)}</div>
+      <div class="meta" style="display:flex;gap:6px;flex-wrap:wrap"><span class="pill">${sc.days.length === 7 ? 'Every day' : sc.days.map(d => DAYS[d]).join(' ')}</span><span class="pill">${sc.longs} long + ${sc.shorts} Shorts</span><span class="pill">ready by ${esc(sc.readyBy)}</span><span class="pill">${esc((S.packs[f.pack] || {}).name || 'Auto')}</span></div>
+      <div class="muted">${APPROVAL[f.approvals][0]} · ${f.research === 'auto' ? 'Claude researches topics' : 'my topic list only'} · ${f.topics.length} topics queued · ${f.jobs} videos made</div>
+      ${f.enabled && nx ? `<div class="muted">Next: starts ${fmtTime(nx.start)} · ready ${fmtTime(nx.ready)}</div>` : ''}
+      <div class="row"><button class="b p" onclick="flowEdit='${f.id}';render()">Edit</button><button class="b" onclick="flowRun('${f.id}',this)">Run now</button><button class="b" onclick="act('/api/flows',{id:'${f.id}',enabled:${!f.enabled}})">${f.enabled ? 'Pause' : 'Start'}</button></div></div>`; }).join('');
+  return `<div class="row" style="margin:0 0 16px"><button class="b p" onclick="flowEdit='new';render()">${ICON.create} New autoflow</button><span class="muted">Each autoflow is one channel with its own YouTube + Instagram accounts, schedule and style.</span></div>
+  ${F.length ? `<div class="grid">${cards}</div>` : `<div class="card empty"><div class="big">⚙️</div><b>No autoflows yet</b><div class="muted">Create one per channel you want to run on autopilot.</div></div>`}`;
+}
+async function flowRun(id, btn) { btn.disabled = true; btn.textContent = 'Researching…'; try { const r = await api(`/api/flows/${id}/run`, {}); toast(`${r.jobs.length} videos started`); } catch (e) { alert(e.message); } await refresh(); }
+function viewFlowEdit() {
+  const isNew = flowEdit === 'new', f = isNew ? { id: '', name: '', enabled: false, channel: { name: '', niche: '', audience: '', tone: 'warm, curious storyteller', language: 'English' }, pack: 'auto', voice: S.settings.voice, longMinutes: 8, schedule: { days: [0, 1, 2, 3, 4, 5, 6], longs: 1, shorts: 2, readyBy: '09:00', leadHours: 8, publishLong: ['18:00'], publishShort: ['09:00', '15:00'] }, approvals: 'both', research: 'auto', topics: [], upload: { youtube: true, instagram: true, privacy: 'public' } } : (S.flows || []).find(x => x.id === flowEdit);
+  if (!f) { flowEdit = null; return viewFlows(); }
+  const sc = f.schedule, V = ['bf_emma', 'bf_isabella', 'bf_alice', 'bf_lily', 'af_heart', 'af_bella', 'af_nicole', 'bm_george', 'bm_lewis', 'bm_fable', 'am_michael', 'hf_alpha', 'hf_beta', 'hm_omega'];
+  const root = 'channels\\' + (f.id || '<id>');
+  return `<div class="row" style="margin:0 0 14px"><button class="b" onclick="flowEdit=null;render()">← Autoflows</button><h2 style="margin:0 8px;font-size:20px">${isNew ? 'New autoflow' : esc(f.name)}</h2></div>
+  <div class="two">
+   <div style="display:grid;gap:16px">
+    <div class="card"><h3>1 · Channel</h3><div style="display:grid;gap:12px;margin-top:10px">
+      <label class="f">Autoflow name<input id="fName" value="${esc(f.name)}" placeholder="e.g. Map & Myth (English history)"></label>
+      <label class="f">Channel name (on thumbnails and end cards)<input id="fCh" value="${esc(f.channel.name)}"></label>
+      <label class="f">What the channel is about (Claude researches topics from this)<textarea id="fNiche" rows="3" placeholder="e.g. Indian and world history explained with real archive photos and maps; pre-independence India, empires, trade routes">${esc(f.channel.niche)}</textarea></label>
+      <div class="row" style="margin:0"><label class="f" style="flex:1">Audience<input id="fAud" value="${esc(f.channel.audience)}" placeholder="e.g. students 15-30, India and worldwide"></label><label class="f" style="flex:1">Tone of voice<input id="fTone" value="${esc(f.channel.tone)}"></label></div>
+    </div></div>
+    <div class="card"><h3>2 · Content</h3><div style="display:grid;gap:12px;margin-top:10px">
+      <div class="row" style="margin:0"><label class="f" style="flex:2">Style pack<select id="fPack">${Object.entries(S.packs).map(([k, p]) => `<option value="${k}" ${f.pack === k ? 'selected' : ''}>${esc(p.name)}${p.for ? ' · ' + esc(p.for) : ''}</option>`).join('')}</select></label><label class="f" style="flex:1">Narrator voice<select id="fVoice">${V.map(v => `<option ${v === f.voice ? 'selected' : ''}>${v}</option>`).join('')}</select></label><label class="f" style="width:120px">Long video (min)<input id="fMin" type="number" min="3" max="20" value="${f.longMinutes}"></label></div>
+      <label class="f">Topic research<select id="fRes"><option value="auto" ${f.research === 'auto' ? 'selected' : ''}>Auto: Claude researches new topics when the queue runs low</option><option value="queue" ${f.research === 'queue' ? 'selected' : ''}>Only my topic list below</option></select></label>
+      <label class="f">Topic queue (one per line, top is used next)<textarea id="fTopics" rows="5">${esc(f.topics.join('\n'))}</textarea></label>
+      ${isNew ? '' : `<div class="row" style="margin:0"><button class="b" onclick="flowResearch('${f.id}',this)">✨ Research 12 topics now</button></div>`}
+    </div></div>
+   </div>
+   <div style="display:grid;gap:16px;align-content:start">
+    <div class="card"><h3>3 · Schedule</h3><div style="display:grid;gap:12px;margin-top:10px">
+      <div><div class="muted" style="margin-bottom:6px;font-weight:600">Days</div><div class="row" style="margin:0">${DAYS.map((d, i) => `<label class="pill" style="cursor:pointer"><input type="checkbox" class="fDay" value="${i}" ${sc.days.includes(i) ? 'checked' : ''}> ${d}</label>`).join('')}</div></div>
+      <div class="row" style="margin:0"><label class="f" style="flex:1">Long videos per day<input id="fLongs" type="number" min="0" max="6" value="${sc.longs}"></label><label class="f" style="flex:1">Shorts / Reels per day<input id="fShorts" type="number" min="0" max="12" value="${sc.shorts}"></label></div>
+      <div class="row" style="margin:0"><label class="f" style="flex:1">Ready for me by<input id="fReady" type="time" value="${sc.readyBy}"></label><label class="f" style="flex:1">Start this many hours before<input id="fLead" type="number" min="1" max="24" value="${sc.leadHours}"></label></div>
+      <div class="muted">Research, plans${f.approvals !== 'both' ? ', videos and thumbnails' : ''} are finished by this time, so they're waiting when you open the dashboard. Long videos take about 40 min each and Shorts about 10 min on this PC, so allow enough hours.</div>
+      <label class="f">Publish times · long videos (comma separated)<input id="fPubL" value="${esc(sc.publishLong.join(', '))}"></label>
+      <label class="f">Publish times · Shorts / Reels<input id="fPubS" value="${esc(sc.publishShort.join(', '))}"></label>
+    </div></div>
+    <div class="card"><h3>4 · Approvals</h3><div style="display:grid;gap:8px;margin-top:10px">${Object.entries(APPROVAL).map(([k, [t, d]]) => `<label style="display:flex;gap:10px;align-items:flex-start;padding:10px;border:1px solid var(--line);border-radius:10px;cursor:pointer"><input type="radio" name="fAppr" value="${k}" ${f.approvals === k ? 'checked' : ''} style="margin-top:3px"><span><b>${t}</b><br><span class="muted">${d}</span></span></label>`).join('')}</div></div>
+    <div class="card"><h3>5 · Uploads</h3><div style="display:grid;gap:10px;margin-top:10px">
+      <label style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="fYT" ${f.upload.youtube ? 'checked' : ''}> Upload to this channel's YouTube</label>
+      <label style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="fIG" ${f.upload.instagram ? 'checked' : ''}> Post Shorts as Instagram Reels</label>
+      <label class="f">YouTube privacy<select id="fPriv">${['public', 'unlisted', 'private'].map(v => `<option ${v === f.upload.privacy ? 'selected' : ''}>${v}</option>`).join('')}</select></label>
+      <div class="muted">This channel's accounts live in <code>${esc(root)}</code>: put <code>config\\youtube_client.json</code> and <code>config\\instagram.json</code> there (see uploaders\\SETUP.md), then connect YouTube once with:<br><code>set HS_UPLOADER_ROOT=${esc(root)} &amp;&amp; node uploaders\\youtube.mjs auth</code></div>
+      ${isNew ? '' : `<div class="row" style="margin:0"><button class="b" onclick="flowConn('${f.id}')">Check connections</button><span class="muted" id="fConn"></span></div>`}
+    </div></div>
+   </div>
+  </div>
+  <div class="card" style="margin-top:16px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;position:sticky;bottom:12px;box-shadow:var(--sh2)">
+    <label style="display:flex;gap:8px;align-items:center;font-weight:600"><input type="checkbox" id="fOn" ${f.enabled ? 'checked' : ''}> Run this autoflow on schedule</label><span style="flex:1"></span>
+    ${isNew ? '' : `<button class="b r" onclick="if(confirm('Delete this autoflow? Videos already made are kept.'))flowDelete('${f.id}')">Delete</button>`}
+    <button class="b p" onclick="flowSave('${f.id}')">Save autoflow</button></div>`;
+}
+function times(v) { return String(v).split(/[ ,]+/).map(x => x.trim()).filter(x => /^\d{1,2}:\d{2}$/.test(x)); }
+async function flowSave(id) {
+  const f = { name: $('#fName').value.trim() || $('#fCh').value.trim() || 'My channel', enabled: $('#fOn').checked,
+    channel: { name: $('#fCh').value.trim() || $('#fName').value.trim(), niche: $('#fNiche').value.trim(), audience: $('#fAud').value.trim(), tone: $('#fTone').value.trim(), language: 'English' },
+    pack: $('#fPack').value, voice: $('#fVoice').value, longMinutes: +$('#fMin').value || 8, research: $('#fRes').value, topics: $('#fTopics').value.split('\n').map(x => x.trim()).filter(Boolean),
+    schedule: { days: [...document.querySelectorAll('.fDay')].filter(x => x.checked).map(x => +x.value), longs: +$('#fLongs').value || 0, shorts: +$('#fShorts').value || 0, readyBy: $('#fReady').value || '09:00', leadHours: +$('#fLead').value || 8, publishLong: times($('#fPubL').value), publishShort: times($('#fPubS').value) },
+    approvals: (document.querySelector('input[name=fAppr]:checked') || {}).value || 'both', upload: { youtube: $('#fYT').checked, instagram: $('#fIG').checked, privacy: $('#fPriv').value } };
+  if (!f.channel.niche) return alert('Describe what the channel is about: Claude needs it to research topics.');
+  if (id) f.id = id;
+  try { await api('/api/flows', f); flowEdit = null; toast('Autoflow saved'); await refresh(); } catch (e) { alert(e.message); }
+}
+async function flowDelete(id) { await api(`/api/flows/${id}/delete`, {}); flowEdit = null; await refresh(); }
+async function flowResearch(id, btn) { btn.disabled = true; btn.textContent = 'Claude is researching…'; try { const r = await api(`/api/flows/${id}/research`, {}); toast(`${r.topics.length} topics added`); } catch (e) { alert(e.message); } await refresh(); }
+async function flowConn(id) { $('#fConn').textContent = 'checking…'; const r = await api(`/api/flows/${id}/connections`, {}); $('#fConn').textContent = `YouTube: ${r.youtube.connected ? '✅ ' + (r.youtube.channel || '') : '❌'} · Instagram: ${r.instagram.connected ? '✅ ' + (r.instagram.account || '') : '❌'}`; }
+
+// ---------- Create: three modes ----------
+let createMode = 'auto';
+function viewCreate() {
+  const F = S.flows || [], fsel = `<label class="f">Channel / autoflow<select id="cFlow">${F.map(f => `<option value="${f.id}">${esc(f.name)}</option>`).join('')}</select></label>`;
+  const fmt = `<label class="f">Format<select id="cFmt"><option value="short">Short / Reel (about 45 s)</option><option value="long">Long video</option></select></label>`;
+  const mode = (k, ic, t, d) => `<div class="card" onclick="createMode='${k}';render()" style="cursor:pointer;${createMode === k ? 'border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)' : ''}"><div style="font-size:26px">${ic}</div><h3 style="margin-top:6px">${t}</h3><div class="muted">${d}</div></div>`;
+  const form = createMode === 'auto' ? `<label class="f">Topic (optional: leave empty and Claude picks the next researched topic)<input id="cTopic" placeholder="e.g. The fall of Vijayanagara"></label>`
+    : createMode === 'brief' ? `<label class="f">Video title (used exactly as you write it)<input id="cTitle" maxlength="100" placeholder="e.g. The Day Salt Beat the British Empire"></label><label class="f">Your prompt / brief<textarea id="cPrompt" rows="5" placeholder="What should the video cover? Angle, key facts, people, tone, what to avoid…"></textarea></label>`
+    : `<label class="f">Video title or topic<input id="cTitle" placeholder="e.g. My trip to Hampi: the city that time forgot"></label><label class="f">What should the video say? (optional brief)<textarea id="cPrompt" rows="4" placeholder="Describe the story; Claude will build it around your photos, clips and voice"></textarea></label>
+       <label style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="cVF"> I will upload my own narration, and the video should follow my recording</label><div class="muted">Next you'll upload your photos, video clips and/or voice, then start the plan.</div>`;
+  return `<div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(240px,1fr));margin-bottom:16px">
+    ${mode('auto', '🤖', 'Full auto', 'Claude researches the topic, writes the title, script and shot plan, and finds the photos.')}
+    ${mode('brief', '✍️', 'Title + prompt', 'You give the title and a brief; Claude researches and builds the video from it.')}
+    ${mode('own', '🎬', 'My own content', 'Upload your own voice, photos and video clips; Claude plans the video around them.')}</div>
+  <div class="card" style="max-width:760px"><div style="display:grid;gap:12px">${F.length ? fsel : ''}${fmt}${form}<div class="row" style="margin:0"><button class="b p" onclick="createOne()">${createMode === 'own' ? 'Create draft & add my content' : 'Write the plan'}</button></div></div></div>`;
+}
+async function createOne() {
+  const b = { mode: createMode, flowId: $('#cFlow') ? $('#cFlow').value : null, format: $('#cFmt').value };
+  if (createMode === 'auto') b.topic = ($('#cTopic').value || '').trim();
+  else { b.title = $('#cTitle').value.trim(); b.prompt = $('#cPrompt').value.trim(); b.topic = b.title; if (!b.title) return alert('Give the video a title'); if (createMode === 'own') b.voiceFirst = $('#cVF').checked; }
+  try { const j = await api('/api/jobs', b); toast(createMode === 'own' ? 'Draft created: add your content' : 'Claude is writing the plan'); if (createMode === 'own') await openJ(j.id); else go('library'); } catch (e) { alert(e.message); }
+}
+// ---------- own content panel (draft videos) ----------
+function viewOwnContent(j) {
+  const M = j.media || [];
+  return `<div class="card" style="margin-top:14px"><h3>Your content</h3><div class="muted">Add photos and video clips (with a short description of what each shows) and, if you like, your own narration. Then start the plan: Claude builds the video around them.</div>
+   <div class="row"><label class="b" style="cursor:pointer">⬆ Add photos / video clips<input type="file" multiple accept="image/*,video/*" style="display:none" onchange="mediaUpload(this)"></label><label class="b" style="cursor:pointer">🎙 ${j.voiceFile ? 'Replace' : 'Add'} my narration<input type="file" accept="audio/*,video/*" style="display:none" onchange="voiceUpload(this)"></label><span class="muted" id="vup"></span></div>
+   ${M.length ? `<table style="margin-top:12px"><tr><th>Item</th><th>What it shows</th><th></th></tr>${M.map(m => `<tr><td style="width:180px">${m.kind === 'image' ? '🖼️' : '🎞️'} <b>${esc(m.id)}</b><div class="muted">${esc(m.name)}${m.dur ? ' · ' + m.dur.toFixed(1) + ' s' : ''}</div></td><td class="muted">${esc(m.desc)}</td><td style="width:40px"><button class="b r" onclick="mediaRemove('${m.id}')">✕</button></td></tr>`).join('')}</table>` : ''}
+   ${j.voiceFile ? `<div class="row"><span class="pill">🎙 narration: ${esc(j.voiceFile)}</span><span class="muted">${j.voiceFirst ? 'the plan will follow your recording' : 'it will be matched to the script'}</span></div>` : ''}
+   <div class="row"><button class="b p" onclick="jact('start')">✨ Write the plan from my content</button></div></div>`;
+}
+async function mediaUpload(inp) {
+  for (const file of inp.files) { const desc = prompt(`What does "${file.name}" show? (one line, helps Claude use it in the right place)`, '') || file.name; $('#vup').textContent = 'uploading ' + file.name + '…'; const r = await fetch('/api/jobs/' + openJob.id + '/media', { method: 'POST', headers: { 'x-filename': file.name, 'x-desc': encodeURIComponent(desc) }, body: file }); if (!r.ok) { alert((await r.json()).error); break; } }
+  await openJ(openJob.id);
+}
+async function mediaRemove(id) { await api('/api/jobs/' + openJob.id + '/media-remove', { id }); await openJ(openJob.id); }
+
+function render() {
+  nav(); if (!S) return;
+  const q = S.queues, busy = q.writing + q.rendering; $('#q').innerHTML = `<span class="dot ${busy ? 'busy' : ''}"></span>${busy ? `Working · ${q.writing} writing · ${q.rendering} rendering` : 'Idle'}`;
+  $('#conn').innerHTML = ['youtube', 'instagram'].map(k => `<div class="conn"><span class="dot ${S.connections?.[k]?.connected ? 'on' : ''}"></span>${k === 'youtube' ? 'YouTube' : 'Instagram'}${S.connections?.[k]?.connected ? '' : ' · not connected'}</div>`).join('');
+  $('#main').innerHTML = pageHead() + (openId ? viewJob() : ({ today: viewToday, review: viewReview, create: viewCreate, styles: viewStyles, flows: viewFlows, themes: viewThemes, library: viewLibrary, settings: viewSettings })[tab]()) + (modalSlug ? viewModal() : '');
+}
+async function refresh() {
+  S = await api('/api/state');
+  if (modalSlug || (tab === 'styles' && !openId)) return nav();
+  if (openId) { const j = S.jobs.find(x => x.id === openId); if (j && j.updatedAt !== openJob.updatedAt && !document.activeElement?.closest?.('.card')) { openJob = await api('/api/jobs/' + openId); render(); } else nav(); return; }
+  if ((['themes', 'settings', 'create'].includes(tab) && document.activeElement && document.activeElement.tagName !== 'BODY') || (tab === 'flows' && flowEdit) || (tab === 'create')) return nav();
+  render();
+}
+api('/api/styles').then(x => { STY = x; render(); }); refresh(); setInterval(refresh, 4000);
+</script></body></html>

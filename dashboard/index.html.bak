@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>History Studio</title>
+<style>
+:root{--bg:#f6f1e7;--card:#fffdf8;--ink:#2a1f16;--soft:#7a6a58;--line:#e4d9c6;--red:#9b3420;--green:#2f7d4f;--amber:#b7791f;--blue:#2b6cb0}
+@media (prefers-color-scheme:dark){:root{--bg:#1b1713;--card:#25201b;--ink:#f1e8d8;--soft:#b3a48f;--line:#3a3129;--red:#e0785f;--green:#5cc28a;--amber:#e3a94b;--blue:#79a8e0}}
+*{box-sizing:border-box}body{margin:0;font:15px/1.45 system-ui,Segoe UI,sans-serif;background:var(--bg);color:var(--ink)}
+header{display:flex;gap:16px;align-items:center;padding:14px 20px;border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--bg);z-index:5;flex-wrap:wrap}
+header h1{font:600 20px Georgia,serif;margin:0}nav{display:flex;gap:4px;flex-wrap:wrap}
+nav button{background:none;border:1px solid transparent;color:var(--soft);padding:6px 12px;border-radius:8px;cursor:pointer;font:inherit}
+nav button.on{background:var(--card);border-color:var(--line);color:var(--ink);font-weight:600}
+.pill{font-size:12px;padding:2px 8px;border-radius:99px;border:1px solid var(--line);white-space:nowrap}
+main{padding:20px;max-width:1300px;margin:auto}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px}
+.card h3{margin:0 0 4px;font:600 16px Georgia,serif}.muted{color:var(--soft);font-size:13px}
+.st{display:inline-block;font-size:12px;font-weight:600;padding:2px 8px;border-radius:6px;background:var(--line)}
+.st.script_review,.st.video_review{background:var(--amber);color:#fff}.st.published{background:var(--green);color:#fff}
+.st.failed,.st.upload_failed,.st.rejected{background:var(--red);color:#fff}.st.rendering,.st.writing,.st.uploading,.st.queued_render{background:var(--blue);color:#fff}
+.st.approved{background:var(--green);color:#fff;opacity:.75}
+button.b{font:inherit;padding:7px 12px;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer}
+button.p{background:var(--ink);color:var(--bg);border-color:var(--ink)}button.g{background:var(--green);border-color:var(--green);color:#fff}button.r{color:var(--red)}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:10px}
+input,select,textarea{font:inherit;padding:7px 9px;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--ink)}
+textarea{width:100%;min-height:60px;resize:vertical}
+table{width:100%;border-collapse:collapse}td,th{border-bottom:1px solid var(--line);padding:6px;vertical-align:top;text-align:left;font-size:14px}
+.scene td input,.scene td textarea{width:100%}.warn{color:var(--amber)}.err{color:var(--red)}
+.log{font:12px ui-monospace,Consolas,monospace;white-space:pre-wrap;max-height:260px;overflow:auto;background:var(--bg);padding:8px;border-radius:8px}
+video{width:100%;border-radius:10px;background:#000;max-height:70vh}
+.thumb{width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:8px;background:var(--line)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:16px}@media(max-width:800px){.two{grid-template-columns:1fr}}
+label.f{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--soft)}
+.steps{display:flex;gap:3px;margin:8px 0}.steps i{flex:1;height:5px;border-radius:3px;background:var(--line)}.steps i.on{background:var(--green)}
+.sg{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
+.sc{background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden;cursor:pointer;transition:transform .15s}
+.sc:hover{transform:translateY(-2px);border-color:var(--soft)}.sc .im{position:relative;aspect-ratio:16/9;background:#111}
+.sc .im img,.sc .im video{width:100%;height:100%;object-fit:cover;display:block}.sc .bd{padding:8px 10px}
+.badge{position:absolute;top:6px;left:6px;font-size:11px;font-weight:700;padding:2px 7px;border-radius:6px;background:rgba(0,0,0,.7);color:#fff}
+.badge.fast{background:#2f7d4f}.badge.ai{background:#7b3fe4}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:20;display:flex;align-items:center;justify-content:center;padding:16px}
+.modal .box{background:var(--card);border-radius:14px;max-width:1100px;width:100%;max-height:94vh;overflow:auto;padding:16px}
+</style></head><body>
+<header><h1>History Studio</h1>
+<nav id="nav"></nav><span style="flex:1"></span>
+<span id="conn"></span><span id="q" class="pill"></span></header>
+<main id="main"></main>
+<script>
+const $ = s => document.querySelector(s), esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const api = async (p, b) => { const r = await fetch(p, b === undefined ? {} : { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(b) }); const j = await r.json(); if (!r.ok) throw new Error(j.error || r.status); return j; };
+let STY = [], pickFor = null, modalSlug = null, sFilter = { q: '', cat: '', mode: '' };
+let S = null, tab = 'today', openId = null, openJob = null, dirty = false;
+const TABS = [['today', 'Today'], ['review', 'Needs review'], ['create', 'Create'], ['styles', 'Styles 🎨'], ['themes', 'Themes'], ['library', 'All videos'], ['settings', 'Settings']];
+const STEPS = ['writing', 'script_review', 'queued_render', 'rendering', 'video_review', 'approved', 'uploading', 'published'];
+const LABEL = { writing: 'Writing script', script_review: 'Check script', queued_render: 'Waiting to render', rendering: 'Rendering', video_review: 'Check video', approved: 'Approved – scheduled', uploading: 'Uploading', published: 'Published', failed: 'Failed', upload_failed: 'Upload failed', rejected: 'Rejected' };
+
+function nav() { $('#nav').innerHTML = TABS.map(([k, l]) => `<button class="${tab === k ? 'on' : ''}" onclick="go('${k}')">${l}${k === 'review' ? ` (${S ? S.jobs.filter(j => j.status === 'script_review' || j.status === 'video_review').length : 0})` : ''}</button>`).join(''); }
+function go(t) { tab = t; openId = null; render(); }
+function steps(j) { const k = STEPS.indexOf(j.status); return `<div class="steps">${STEPS.map((s, i) => `<i class="${i <= k ? 'on' : ''}"></i>`).join('')}</div>`; }
+function card(j) {
+  return `<div class="card">${j.files?.thumb ? `<img class="thumb" src="/${j.files.thumb}?${j.updatedAt}">` : ''}
+  <div class="row" style="margin-top:6px"><span class="st ${j.status}">${LABEL[j.status] || j.status}</span><span class="pill">${j.format === 'long' ? 'Long · YouTube' : 'Short · YT + IG'}</span>${j.slot ? `<span class="pill">${j.slot} · ${S.settings.publishTimes[j.slot] || ''}</span>` : ''}<span class="pill">🎨 ${j.engine === 'v2' ? esc((j.styles || []).map(x => (S.v2styles[x] || {}).name || x).join(' → ') || 'planning…') : esc(sName(j.style))}</span></div>
+  <h3 style="margin-top:8px">${esc(j.title || j.topic)}</h3><div class="muted">${esc(j.theme)} · ${esc(j.topic)}</div>${steps(j)}
+  <div class="muted" style="font-size:12px">${esc(j.logTail || '')}</div>
+  ${Object.entries(j.uploads || {}).map(([k, r]) => r.ok ? `<div><a href="${esc(r.url)}" target="_blank">${k} ↗</a></div>` : `<div class="err" style="font-size:12px">${k}: ${esc(r.error)}</div>`).join('')}
+  <div class="row"><button class="b ${['script_review', 'video_review'].includes(j.status) ? 'p' : ''}" onclick="openJ('${j.id}')">${j.status === 'script_review' ? 'Review script' : j.status === 'video_review' ? 'Review video' : 'Open'}</button></div></div>`;
+}
+async function openJ(id) { openId = id; openJob = await api('/api/jobs/' + id); dirty = false; render(); }
+
+function viewToday() {
+  const t = S.jobs.filter(j => j.date === S.today && j.slot);
+  return `<div class="row" style="justify-content:space-between;margin:0 0 14px"><div><b>Plan for ${S.today}</b> <span class="muted">· theme: ${esc(S.settings.activeTheme)} · 2 long + 4 shorts</span></div>
+  <div class="row" style="margin:0">${t.length ? '' : `<button class="b p" onclick="act('/api/run-daily',{})">Create today's 6 videos now</button>`}</div></div>
+  ${t.length ? `<div class="grid">${t.sort((a, b) => a.slot.localeCompare(b.slot)).map(card).join('')}</div>` : `<div class="card">Nothing planned yet today. ${S.settings.autoDaily ? `It will be created automatically at ${S.settings.dailyRunTime}.` : 'Automatic daily plan is off (Settings).'}</div>`}
+  <h3 style="margin-top:22px">Activity</h3><div class="log">${esc(S.activity.join('\n'))}</div>`;
+}
+function viewReview() {
+  const r = S.jobs.filter(j => j.status === 'script_review' || j.status === 'video_review' || j.status === 'failed' || j.status === 'upload_failed');
+  return r.length ? `<div class="grid">${r.map(card).join('')}</div>` : `<div class="card">Nothing waiting for you. 🎉</div>`;
+}
+function viewLibrary() { return `<div class="grid">${S.jobs.slice().reverse().map(card).join('')}</div>`; }
+function viewCreate() {
+  return `<div class="card" style="max-width:640px"><h3>Make one video now</h3>
+  <div class="row"><label class="f">Theme<select id="cTheme">${S.themes.map(t => `<option ${t.name === S.settings.activeTheme ? 'selected' : ''}>${esc(t.name)}</option>`).join('')}</select></label>
+  <label class="f">Format<select id="cFmt"><option value="short">Short / Reel (~45 s)</option><option value="long">Long-form (${S.settings.longMinutes} min)</option></select></label></div>
+  <label class="f" style="margin-top:10px">Style<select id="cStyle"><option value="">Theme default</option>${STY.map(x => `<option value="${x.slug}">${x.mode === 'fast' ? '⚡' : '🤖'} ${esc(x.name)}</option>`).join('')}</select></label><label class="f" style="margin-top:10px">Topic<input id="cTopic" list="tl" placeholder="e.g. How salt built empires"></label>
+  <datalist id="tl">${S.themes.flatMap(t => t.topics).map(t => `<option value="${esc(t)}">`).join('')}</datalist>
+  <div class="row"><button class="b p" onclick="createOne()">Write script</button></div></div>`;
+}
+async function createOne() { const topic = $('#cTopic').value.trim(); if (!topic) return alert('Type or pick a topic'); const style = $('#cStyle').value; if ($('#cFmt').value === 'long' && style && sMode(style) === 'ai') return alert('AI-built styles are for Shorts only. Pick a ⚡ style for long videos.');
+  await api('/api/jobs', { theme: $('#cTheme').value, format: $('#cFmt').value, topic, style }); go('library'); }
+function viewThemes() {
+  return `<div class="row" style="margin:0 0 14px"><input id="nt" placeholder="New theme / series name"><button class="b" onclick="addTheme()">Add theme</button></div>
+  <div class="grid">${S.themes.map((t, i) => `<div class="card"><h3>${esc(t.name)} ${t.name === S.settings.activeTheme ? '<span class="pill">daily theme</span>' : ''}</h3>
+  ${S.settings.engine === 'v1' ? `<div class="row" style="margin:4px 0 8px"><span class="pill">Long: 🎨 ${esc(sName(t.longStyle || 'archive-lighttable'))}</span><button class="b" onclick="pick(${i},'longStyle')">Change</button><span class="pill">Shorts: 🎨 ${esc(sName(t.shortStyle || 'archive-lighttable'))}</span><button class="b" onclick="pick(${i},'shortStyle')">Change</button></div>` : ''}<div class="row" style="margin:0 0 8px"><label class="f" style="flex:1;min-width:0">Style pack<select style="width:100%" onchange="act('/api/themes',{name:S.themes[${i}].name,pack:this.value})">${Object.entries(S.packs || {}).map(([k, p]) => `<option value="${k}" ${(t.pack || 'auto') === k ? 'selected' : ''}>${esc(p.name)}${p.for ? ' · ' + esc(p.for) : ''}</option>`).join('')}</select></label></div><div class="muted">Topic queue (one per line, top is used next)</div><textarea id="tq${i}" rows="7">${esc(t.topics.join('\n'))}</textarea>
+  <div class="row"><button class="b" onclick="saveTopics(${i})">Save topics</button><button class="b" onclick="suggest(${i},this)">✨ Suggest 12 topics</button>
+  ${t.name !== S.settings.activeTheme ? `<button class="b p" onclick="act('/api/settings',{activeTheme:S.themes[${i}].name})">Use for daily plan</button>` : ''}<button class="b r" onclick="if(confirm('Delete theme?'))act('/api/themes/delete',{name:S.themes[${i}].name})">Delete</button></div></div>`).join('')}</div>`;
+}
+async function addTheme() { const n = $('#nt').value.trim(); if (n) await act('/api/themes', { name: n, topics: [] }); }
+async function saveTopics(i) { await act('/api/themes', { name: S.themes[i].name, topics: $('#tq' + i).value.split('\n').map(s => s.trim()).filter(Boolean) }); }
+async function suggest(i, btn) { btn.disabled = true; btn.textContent = 'Claude is thinking…'; try { await api('/api/topics/suggest', { theme: S.themes[i].name }); } catch (e) { alert(e.message); } await refresh(); }
+function viewSettings() {
+  const s = S.settings, f = (k, l, type = 'text') => `<label class="f">${l}<input data-k="${k}" type="${type}" value="${esc(s[k])}"></label>`, c = (k, l) => `<label style="display:flex;gap:8px;align-items:center"><input type="checkbox" data-k="${k}" ${s[k] ? 'checked' : ''}>${l}</label>`;
+  return `<div class="two"><div class="card"><h3>Channel & production</h3><div style="display:grid;gap:10px;margin-top:10px">
+  ${f('channelName', 'Channel name')}${f('longMinutes', 'Long video length (minutes)', 'number')}
+  <label class="f">Narrator voice<select data-k="voice">${['bf_emma', 'bf_isabella', 'bf_alice', 'bf_lily', 'af_bella', 'af_heart', 'af_nicole', 'bm_george', 'bm_lewis', 'am_michael', 'bm_fable', 'hf_alpha', 'hf_beta', 'hm_omega'].map(v => `<option ${v === s.voice ? 'selected' : ''}>${v}</option>`).join('')}</select></label>
+  ${f('voiceSpeed', 'Voice speed', 'number')}${f('claudeModel', 'Claude model (blank = default, e.g. claude-opus-4-5)')}
+  <label class="f">Video engine<select data-k="engine"><option value="v2" ${s.engine !== 'v1' ? 'selected' : ''}>v2: multi-style documentary (photos, maps, boards, countdowns)</option><option value="v1" ${s.engine === 'v1' ? 'selected' : ''}>v1: simple text-card template</option></select></label>${c('claudePicksImages', 'Let Claude choose between photo candidates (slower, better matches)')}${c('burnCaptions', 'Burn captions into the video')}${f('renderWorkers', 'Render workers (CPU threads)', 'number')}</div></div>
+  <div class="card"><h3>Automation & publishing</h3><div style="display:grid;gap:10px;margin-top:10px">
+  ${c('autoDaily', 'Create 2 long + 4 shorts automatically every day')}${f('dailyRunTime', 'Daily plan time', 'time')}
+  ${Object.keys(s.publishTimes).map(k => `<label class="f">Publish time · ${k}<input data-pt="${k}" type="time" value="${s.publishTimes[k]}"></label>`).join('')}
+  ${c('youtube', 'Upload to YouTube')}${c('instagram', 'Upload shorts to Instagram Reels')}
+  <label class="f">YouTube privacy<select data-k="youtubePrivacy">${['public', 'unlisted', 'private'].map(v => `<option ${v === s.youtubePrivacy ? 'selected' : ''}>${v}</option>`).join('')}</select></label>
+  <div><b>Connections</b> <button class="b" onclick="checkConn(this)">Check</button><div class="muted" id="cd">${connText()}</div>
+  <div class="muted">Setup guide: <code>uploaders\\SETUP.md</code> in the project folder.</div></div></div></div></div>
+  <div class="row"><button class="b p" onclick="saveSettings()">Save settings</button></div>`;
+}
+function connText() { const c = S.connections || {}; return `YouTube: ${c.youtube ? (c.youtube.connected ? '✅ ' + esc(c.youtube.channel || '') : '❌ not connected') : '…'} · Instagram: ${c.instagram ? (c.instagram.connected ? '✅ ' + esc(c.instagram.account || '') : '❌ not connected') : '…'}`; }
+async function checkConn(b) { b.disabled = true; await api('/api/connections'); await refresh(); }
+async function saveSettings() {
+  const p = { publishTimes: { ...S.settings.publishTimes } };
+  document.querySelectorAll('[data-k]').forEach(e => { const k = e.dataset.k; p[k] = e.type === 'checkbox' ? e.checked : e.type === 'number' ? +e.value : e.value; });
+  document.querySelectorAll('[data-pt]').forEach(e => p.publishTimes[e.dataset.pt] = e.value);
+  await act('/api/settings', p); alert('Saved');
+}
+
+// ---------- job detail ----------
+function viewJob() {
+  const j = openJob, sc = j.script, v = j.validation || {};
+  const v2 = j.engine === 'v2';
+  const sceneRows = sc && !v2 ? sc.scenes.map((s, i) => `<tr class="scene"><td style="width:110px"><select data-i="${i}" data-f="kind">${['title', 'chapter', 'date', 'place', 'fact', 'quote', 'list', 'text', 'outro'].map(k => `<option ${k === s.kind ? 'selected' : ''}>${k}</option>`).join('')}</select></td>
+    <td style="width:30%"><input data-i="${i}" data-f="heading" value="${esc(s.heading)}" placeholder="heading"><input data-i="${i}" data-f="${s.kind === 'date' || s.kind === 'fact' ? 'big' : 'sub'}" value="${esc(s.kind === 'date' || s.kind === 'fact' ? s.big : s.sub)}" placeholder="${s.kind === 'date' || s.kind === 'fact' ? 'big text / year' : 'sub'}" style="margin-top:4px">${s.kind === 'list' ? `<input data-i="${i}" data-f="items" value="${esc((s.items || []).join(' | '))}" placeholder="items separated by |" style="margin-top:4px">` : ''}</td>
+    <td><textarea data-i="${i}" data-f="narration">${esc(s.narration)}</textarea></td><td style="width:34px"><button class="b r" onclick="delScene(${i})" title="remove">✕</button></td></tr>`).join('') : '';
+  return `<div class="row" style="margin:0 0 12px"><button class="b" onclick="openId=null;render()">← Back</button><span class="st ${j.status}">${LABEL[j.status] || j.status}</span><span class="pill">${j.format}</span><span class="muted">${esc(j.theme)} · ${esc(j.topic)}${j.angle ? ' · angle: ' + esc(j.angle) : ''}</span></div>
+  ${j.status === 'video_review' || j.files?.video ? `<div class="two"><div><video controls src="/${j.files.video}?${j.updatedAt}" ${j.format === 'short' ? 'style="max-height:72vh;width:auto;display:block;margin:auto"' : ''}></video></div>
+   <div class="card"><h3>Video check</h3><div class="muted">Watch it fully. Check names, dates and spelling on screen, and that the voice says names correctly.</div>
+   <div class="muted" style="margin-top:6px">Length: ${Math.round(j.files.duration || 0)} s ·${j.files.shots ? ` ${j.files.shots} shots (one every ${j.files.avgShot} s) · ${j.files.photos} photos ·` : ''} <a href="/${j.files.srt}" target="_blank">subtitles</a> · <a href="/${j.files.thumb}" target="_blank">thumbnail</a></div>
+   ${j.status === 'video_review' ? `<div style="margin-top:10px;display:grid;gap:6px"><label><input type="checkbox" id="toYT" ${S.settings.youtube ? 'checked' : ''}> YouTube${j.format === 'short' ? ' Shorts' : ''}</label>
+   <label><input type="checkbox" id="toIG" ${S.settings.instagram && j.format === 'short' ? 'checked' : ''}> Instagram Reels</label></div>
+   <div class="row"><button class="b g" onclick="apV(false)">✓ Approve – publish at ${S.settings.publishTimes[j.slot] || 'next slot'}</button><button class="b" onclick="apV(true)">Approve & publish now</button></div>
+   <div class="row"><button class="b" onclick="jact('rerender')">Re-render</button><button class="b r" onclick="rej()">Reject</button></div>` : ''}
+   ${['upload_failed'].includes(j.status) ? `<div class="row"><button class="b p" onclick="jact('retry-upload')">Retry upload</button></div>` : ''}</div></div>` : ''}
+  ${v2 ? '' : `<div class="card" style="margin-top:14px"><h3>Visual style</h3><div class="row"><select id="jStyle">${STY.filter(x => j.format === 'short' || x.mode === 'fast').map(x => `<option value="${x.slug}" ${x.slug === (j.style || 'archive-lighttable') ? 'selected' : ''}>${x.mode === 'fast' ? '⚡' : '🤖'} ${esc(x.name)}</option>`).join('')}</select><button class="b" onclick="setStyle(false)">Save style</button>${j.files?.video ? `<button class="b" onclick="setStyle(true)">Save & re-render</button>` : ''}<button class="b" onclick="modalSlug=$('#jStyle').value;render()">Preview</button></div><div class="muted">⚡ fast template (minutes) · 🤖 AI-built by Claude, Shorts only (20-60 min per video)</div></div>`}
+  ${sc && v2 ? viewPlanV2(j) : sc ? `<div class="card" style="margin-top:14px"><h3>Script</h3>
+   <label class="f">Title<input id="sTitle" value="${esc(sc.title)}" maxlength="100"></label>
+   <label class="f" style="margin-top:8px">Description<textarea id="sDesc" rows="4">${esc(sc.description)}</textarea></label>
+   <label class="f" style="margin-top:8px">Tags (comma separated)<input id="sTags" value="${esc((sc.tags || []).join(', '))}"></label>
+   <div style="margin-top:10px">${(v.errs || []).map(e => `<div class="err">✖ ${esc(e)}</div>`).join('')}${(v.warns || []).slice(0, 8).map(e => `<div class="warn">⚠ ${esc(e)}</div>`).join('')}
+   <div class="muted">${v.words || 0} words · about ${Math.round((v.estSeconds || 0) / 6) / 10} min</div></div>
+   <table style="margin-top:10px"><tr><th>Kind</th><th>On screen</th><th>Narration</th><th></th></tr>${sceneRows}</table>
+   <div class="row"><button class="b" onclick="saveScript()">Save edits</button>
+   ${j.status === 'script_review' ? `<button class="b g" onclick="apS()">✓ Approve script → make video</button>` : ''}
+   ${['script_review', 'failed', 'rejected'].includes(j.status) ? `<input id="notes" placeholder="Notes for Claude (optional)" style="flex:1;min-width:200px"><button class="b" onclick="regen()">↻ Rewrite with Claude</button>` : ''}
+   <button class="b r" onclick="if(confirm('Delete this job?'))jact('delete').then(()=>go('library'))">Delete</button></div></div>` : `<div class="card">${j.status === 'failed' ? `<div class="row"><button class="b" onclick="regen()">↻ Try again</button></div>` : 'Script is being written…'}</div>`}
+  <div class="card" style="margin-top:14px"><h3>Log</h3><div class="log">${esc((j.log || []).slice(-80).join('\n'))}</div></div>`;
+}
+function collect() {
+  if (openJob.engine === 'v2') return collectV2();
+  const sc = openJob.script; sc.title = $('#sTitle').value; sc.description = $('#sDesc').value; sc.tags = $('#sTags').value.split(',').map(s => s.trim()).filter(Boolean);
+  document.querySelectorAll('[data-i]').forEach(e => { const s = sc.scenes[+e.dataset.i], f = e.dataset.f; s[f] = f === 'items' ? e.value.split('|').map(x => x.trim()).filter(Boolean) : e.value; });
+  return sc;
+}
+async function saveScript() { openJob = await api(`/api/jobs/${openJob.id}/script`, { script: collect() }); render(); }
+function delScene(i) { collect(); openJob.script.scenes.splice(i, 1); render(); }
+async function apS() { try { await api(`/api/jobs/${openJob.id}/script`, { script: collect() }); await api(`/api/jobs/${openJob.id}/approve-script`, {}); openId = null; await refresh(); } catch (e) { alert(e.message); } }
+async function apV(now) { await api(`/api/jobs/${openJob.id}/approve-video`, { youtube: $('#toYT').checked, instagram: $('#toIG').checked, now }); openId = null; await refresh(); }
+async function rej() { const r = prompt('Reason (optional)') ?? ''; await jact('reject', { reason: r }); }
+async function regen() { await jact('regenerate', { notes: $('#notes')?.value || '' }); }
+async function jact(a, b = {}) { await api(`/api/jobs/${openJob.id}/${a}`, b); await openJ(openJob.id); await refresh(); }
+async function act(p, b) { try { await api(p, b); } catch (e) { alert(e.message); } await refresh(); }
+
+const sName = slug => (STY.find(x => x.slug === slug) || {}).name || slug || 'Archive Light Table';
+const sMode = slug => (STY.find(x => x.slug === slug) || {}).mode;
+async function setStyle(rr) { try { await api(`/api/jobs/${openJob.id}/style`, { style: $('#jStyle').value }); if (rr) await api(`/api/jobs/${openJob.id}/rerender`, {}); await openJ(openJob.id); } catch (e) { alert(e.message); } }
+function pick(i, which) { pickFor = { theme: S.themes[i].name, which }; tab = 'styles'; render(); }
+async function useStyle(slug, themeName, which) {
+  try { await api('/api/themes', { name: themeName, [which]: slug }); modalSlug = null; const back = !!pickFor; pickFor = null; if (back) tab = 'themes'; await refresh(); render(); alert(`${sName(slug)} is now the ${which === 'longStyle' ? 'long-video' : 'Shorts'} style for "${themeName}"`); } catch (e) { alert(e.message); }
+}
+function pickForJob(slug) { modalSlug = null; render(); const s = $('#jStyle'); if (s) s.value = slug; }
+function viewStyles() {
+  const cats = [...new Set(STY.map(x => x.category))].sort();
+  const q = sFilter.q.toLowerCase();
+  const list = STY.filter(x => (!q || (x.name + ' ' + x.line + ' ' + x.uses.join(' ') + ' ' + x.category).toLowerCase().includes(q)) && (!sFilter.cat || x.category === sFilter.cat) && (!sFilter.mode || x.mode === sFilter.mode));
+  return `${pickFor ? `<div class="card" style="margin-bottom:12px;border-color:var(--green)">Choosing the <b>${pickFor.which === 'longStyle' ? 'long-video' : 'Shorts'}</b> style for <b>${esc(pickFor.theme)}</b>. Click a style, then "Use this style". ${pickFor.which === 'longStyle' ? 'Long videos can only use ⚡ fast styles.' : ''} <button class="b" onclick="pickFor=null;render()">Cancel</button></div>` : ''}
+  <div class="row" style="margin:0 0 12px"><input id="sq" placeholder="Search styles…" value="${esc(sFilter.q)}" oninput="sFilter.q=this.value;clearTimeout(window._st);window._st=setTimeout(()=>{render();const e=$('#sq');e.focus();e.setSelectionRange(e.value.length,e.value.length)},300)" style="min-width:220px">
+  <select onchange="sFilter.cat=this.value;render()"><option value="">All categories</option>${cats.map(c => `<option ${c === sFilter.cat ? 'selected' : ''}>${esc(c)}</option>`).join('')}</select>
+  <select onchange="sFilter.mode=this.value;render()"><option value="">⚡ Fast + 🤖 AI-built</option><option value="fast" ${sFilter.mode === 'fast' ? 'selected' : ''}>⚡ Fast templates (long + shorts)</option><option value="ai" ${sFilter.mode === 'ai' ? 'selected' : ''}>🤖 AI-built (Shorts)</option></select>
+  <span class="muted">${list.length} of ${STY.length} styles · hover a card to play it, click to open</span></div>
+  <div class="sg">${list.map(x => `<div class="sc" onclick="modalSlug='${x.slug}';render()" onmouseenter="const v=this.querySelector('video');if(v){v.play().catch(()=>{})}" onmouseleave="const v=this.querySelector('video');if(v){v.pause()}">
+    <div class="im">${x.previewUrl ? `<video muted loop playsinline preload="none" poster="${x.posterUrl || ''}" src="${x.previewUrl}"></video>` : `<img src="${x.posterUrl || (x.presetImg && x.presetImg.h) || ''}">`}<span class="badge ${x.mode}">${x.mode === 'fast' ? '⚡ FAST' : '🤖 AI-BUILT'}</span></div>
+    <div class="bd"><b>${esc(x.name)}</b><div class="muted">${esc(x.category)}${x.uses.length ? ' · ' + esc(x.uses.slice(0, 2).join(', ')) : ''}</div></div></div>`).join('')}</div>`;
+}
+function viewModal() {
+  const x = STY.find(y => y.slug === modalSlug); if (!x) return '';
+  const themesSel = S.themes.map(t => `<option ${(pickFor ? pickFor.theme : S.settings.activeTheme) === t.name ? 'selected' : ''}>${esc(t.name)}</option>`).join('');
+  return `<div class="modal" onclick="if(event.target===this){modalSlug=null;render()}"><div class="box">
+  <div class="row" style="margin:0 0 10px;justify-content:space-between"><h3 style="margin:0;font:600 20px Georgia,serif">${esc(x.name)} <span class="badge ${x.mode}" style="position:static">${x.mode === 'fast' ? '⚡ FAST TEMPLATE' : '🤖 AI-BUILT'}</span></h3><button class="b" onclick="modalSlug=null;render()">✕ Close</button></div>
+  <div class="two"><div>${x.previewUrl ? `<video controls autoplay src="${x.previewUrl}" poster="${x.posterUrl || ''}"></video><div class="muted">Sample film made in this style (about a different topic).</div>` : x.posterUrl ? `<img class="thumb" src="${x.posterUrl}"><div class="muted">No sample video for this style yet: poster only.</div>` : ''}</div>
+  <div><div class="muted">${esc(x.category)}</div><p>${esc(x.line)}</p>${x.uses.length ? `<p class="muted">Good for: ${esc(x.uses.join(', '))}</p>` : ''}
+  ${x.mode === 'fast' ? `<p><b>Your videos in this style</b> use the fast template look below: long videos and Shorts, built in minutes.</p><div class="row" style="align-items:flex-start"><img src="${x.presetImg.h}" style="width:62%;border-radius:8px"><img src="${x.presetImg.v}" style="width:30%;border-radius:8px"></div>`
+   : `<p><b>AI-built:</b> for each Short, Claude Code designs a custom animated film in this style from the library's style guide, so it looks like the sample and is never the same twice. Shorts only. It takes 20-60 minutes per video and uses a lot of your Claude usage. If it fails, the video falls back to the template.</p>`}
+  <div class="card" style="margin-top:10px"><b>Use this style</b><div class="row"><select id="mTheme">${themesSel}</select>
+  ${(!pickFor || pickFor.which === 'shortStyle') ? `<button class="b g" onclick="useStyle('${x.slug}',$('#mTheme').value,'shortStyle')">For Shorts</button>` : ''}
+  ${(!pickFor || pickFor.which === 'longStyle') ? `<button class="b ${x.mode === 'fast' ? 'g' : ''}" ${x.mode === 'fast' ? '' : 'disabled title="Long videos need a fast style"'} onclick="useStyle('${x.slug}',$('#mTheme').value,'longStyle')">For long videos</button>` : ''}</div>
+  ${openId ? `<div class="row"><button class="b p" onclick="pickForJob('${x.slug}')">Pick for this video</button><span class="muted">then press Save style</span></div>` : ''}</div></div></div></div></div>`;
+}
+
+// ---------- engine v2 plan editor ----------
+const MOODS = ['tense', 'curious', 'suspense', 'march', 'drama', 'rise', 'outro'];
+function shotChip(s) {
+  const txt = s.head ? [].concat(s.head).join(' / ') : s.text || (s.lines || []).join(' / ') || s.quote || s.label || s.big || (s.value ? (s.prefix || '') + s.value + (s.suffix || '') + ' ' + (s.label || '') : '') || (s.items || []).map(x => x[0] || x).join(', ') || (s.pins ? 'pins: ' + s.pins.join(',') : '') || (s.n ? '#' + s.n : '');
+  return `<span class="pill" title="${esc(JSON.stringify(s))}" style="margin:2px 4px 2px 0;display:inline-block">${s.at ? '✂ ' + esc(s.at) + ' → ' : ''}<b>${esc(s.type)}</b>${s.img ? ' 🖼' + esc(s.img) : ''}${txt ? ': ' + esc(String(txt).slice(0, 60)) : ''}</span>`;
+}
+function viewPlanV2(j) {
+  const sc = j.script, v = j.validation || {}, ST = S.v2styles || {};
+  const chapters = sc.chapters.map((ch, ci) => `<tr><td colspan="3" style="background:var(--bg)"><div class="row" style="margin:4px 0">
+    <b>${ci === 0 && !ch.title ? 'Cold open' : 'Chapter ' + ci}</b>
+    <select data-ci="${ci}" data-cf="style">${Object.entries(ST).map(([k, x]) => `<option value="${k}" ${k === ch.style ? 'selected' : ''}>${esc(x.name)}</option>`).join('')}</select>
+    <select data-ci="${ci}" data-cf="mood">${MOODS.map(m => `<option ${m === ch.mood ? 'selected' : ''}>${m}</option>`).join('')}</select>
+    ${j.format === 'long' ? `<input data-ci="${ci}" data-cf="title" value="${esc((ch.title || []).join(' | '))}" placeholder="no title card (cold open)" style="flex:1;min-width:200px">` : ''}</div></td></tr>
+    ${ch.lines.map((l, li) => `<tr class="scene"><td style="width:46%"><textarea data-ci="${ci}" data-li="${li}" data-lf="say" rows="2">${esc(l.say)}</textarea></td><td>${(l.shots || []).map(shotChip).join('')}</td><td style="width:34px"><button class="b r" onclick="delLine(${ci},${li})" title="remove line">✕</button></td></tr>`).join('')}`).join('');
+  const imgs = (sc.images || []).map((im, ii) => `<div class="row" style="margin:3px 0"><span class="pill">${esc(im.id)}</span><input data-ii="${ii}" data-if="want" value="${esc(im.want)}" style="flex:1"><input data-ii="${ii}" data-if="queries" value="${esc((im.queries || []).join(' | '))}" style="flex:1" title="Commons search queries, separated by |"></div>`).join('');
+  return `<div class="card" style="margin-top:14px"><h3>Video plan <span class="pill">engine v2 · ${esc((S.packs[j.pack] || {}).name || 'Auto')}</span></h3>
+   <div class="card" style="margin:10px 0;background:var(--bg)"><b>🎙 Narration voice:</b> ${j.voiceFile ? `<b>your own recording</b> (${esc(j.voiceFile)}) <button class="b r" onclick="voiceRemove()">Use the AI voice instead</button>` : `AI voice (${esc(S.settings.voice)}).`}
+   <div class="row"><a class="b" href="/api/jobs/${j.id}/narration.txt">📄 Download the script to read</a><label class="b" style="cursor:pointer">⬆ Upload my recording<input type="file" accept="audio/*,video/*" style="display:none" onchange="voiceUpload(this)"></label><span class="muted" id="vup"></span></div>
+   <div class="muted">For a real human voice: record yourself (phone or USB mic, quiet room) reading the script in order, in one file. The app finds every sentence automatically and times the whole video to your voice. Stumbles are fine: just repeat the sentence.</div></div>
+   <label class="f">Title<input id="sTitle" value="${esc(sc.title)}" maxlength="100"></label>
+   <label class="f" style="margin-top:8px">Description<textarea id="sDesc" rows="4">${esc(sc.description)}</textarea></label>
+   <label class="f" style="margin-top:8px">Tags (comma separated)<input id="sTags" value="${esc((sc.tags || []).join(', '))}"></label>
+   <div class="row"><label class="f" style="flex:1">Next-episode teaser (end card)<input id="sNext" value="${esc(sc.next || '')}"></label><label class="f" style="flex:2">News ticker facts (| separated)<input id="sTicker" value="${esc((sc.ticker || []).join(' | '))}"></label></div>
+   <div style="margin-top:10px">${(v.errs || []).map(e => `<div class="err">✖ ${esc(e)}</div>`).join('')}${(v.warns || []).slice(0, 10).map(e => `<div class="warn">⚠ ${esc(e)}</div>`).join('')}
+   <div class="muted">${v.words || 0} words · ${v.lines || 0} lines · about ${Math.round((v.estSeconds || 0) / 6) / 10} min · ${sc.chapters.length} chapters: ${sc.chapters.map(c => esc((ST[c.style] || {}).name || c.style)).join(' → ')}</div></div>
+   <div class="muted" style="margin-top:8px">Check every name, date and number. Narration numbers are written as words so the voice reads them right. Hover a shot to see all its details.</div>
+   <table style="margin-top:10px"><tr><th>Narration (what the voice says)</th><th>Shots (✂ = cut on that word)</th><th></th></tr>${chapters}</table>
+   <h3 style="margin-top:14px">Photos to find (Wikimedia Commons, free licences only)</h3>${imgs || '<div class="muted">none</div>'}
+   ${sc.places && sc.places.length ? `<div class="muted" style="margin-top:8px">Map places: ${sc.places.map(p => esc(p.name) + ` (${(+p.lat).toFixed(2)}, ${(+p.lon).toFixed(2)})`).join(' · ')}${sc.route ? ` · route: ${sc.route.points.length} points${sc.route.km ? ', ' + sc.route.km + ' km' : ''}` : ''}</div>` : ''}
+   <details style="margin-top:10px"><summary>Advanced: edit the full plan as JSON</summary><textarea id="rawPlan" rows="18" style="font:12px ui-monospace,Consolas,monospace">${esc(JSON.stringify(sc, null, 1))}</textarea><div class="row"><button class="b" onclick="applyRaw()">Apply JSON</button></div></details>
+   <div class="row"><button class="b" onclick="saveScript()">Save edits</button>
+   ${j.status === 'script_review' ? `<button class="b g" onclick="apS()">✓ Approve plan → make video</button>` : ''}
+   ${['script_review', 'failed', 'rejected'].includes(j.status) ? `<input id="notes" placeholder="Notes for Claude (optional), e.g. more maps, darker tone" style="flex:1;min-width:200px"><button class="b" onclick="regen()">↻ Rewrite with Claude</button>` : ''}
+   <button class="b r" onclick="if(confirm('Delete this job?'))jact('delete').then(()=>go('library'))">Delete</button></div></div>`;
+}
+async function voiceUpload(inp) { const file = inp.files[0]; if (!file) return; $('#vup').textContent = 'uploading ' + (file.size / 1048576).toFixed(1) + ' MB…'; try { const r = await fetch('/api/jobs/' + openJob.id + '/voice', { method: 'POST', headers: { 'x-filename': file.name }, body: file }); if (!r.ok) throw new Error((await r.json()).error); await openJ(openJob.id); } catch (e) { alert('Upload failed: ' + e.message); } }
+async function voiceRemove() { await api('/api/jobs/' + openJob.id + '/voice-remove', {}); await openJ(openJob.id); }
+function collectV2() {
+  const sc = openJob.script; sc.title = $('#sTitle').value; sc.description = $('#sDesc').value; sc.tags = $('#sTags').value.split(',').map(s => s.trim()).filter(Boolean);
+  sc.next = $('#sNext').value; sc.ticker = $('#sTicker').value.split('|').map(s => s.trim()).filter(Boolean);
+  document.querySelectorAll('[data-cf]').forEach(e => { const ch = sc.chapters[+e.dataset.ci], f = e.dataset.cf; ch[f] = f === 'title' ? (e.value.trim() ? e.value.split('|').map(x => x.trim()) : null) : e.value; });
+  document.querySelectorAll('[data-lf]').forEach(e => { sc.chapters[+e.dataset.ci].lines[+e.dataset.li].say = e.value; });
+  document.querySelectorAll('[data-if]').forEach(e => { const im = sc.images[+e.dataset.ii]; if (e.dataset.if === 'queries') im.queries = e.value.split('|').map(x => x.trim()).filter(Boolean); else im.want = e.value; });
+  return sc;
+}
+function delLine(ci, li) { collectV2(); openJob.script.chapters[ci].lines.splice(li, 1); render(); }
+async function applyRaw() { try { const sc = JSON.parse($('#rawPlan').value); openJob = await api(`/api/jobs/${openJob.id}/script`, { script: sc }); render(); } catch (e) { alert('JSON error: ' + e.message); } }
+
+function render() {
+  nav(); if (!S) return;
+  const q = S.queues; $('#q').textContent = `writing ${q.writing} · rendering ${q.rendering}`;
+  $('#conn').innerHTML = `<span class="pill">${S.connections?.youtube?.connected ? '✅' : '⚪'} YouTube</span> <span class="pill">${S.connections?.instagram?.connected ? '✅' : '⚪'} Instagram</span>`;
+  $('#main').innerHTML = (openId ? viewJob() : ({ today: viewToday, review: viewReview, create: viewCreate, styles: viewStyles, themes: viewThemes, library: viewLibrary, settings: viewSettings })[tab]()) + (modalSlug ? viewModal() : '');
+}
+async function refresh() {
+  S = await api('/api/state');
+  if (modalSlug || (tab === 'styles' && !openId)) return nav();
+  if (openId) { const j = S.jobs.find(x => x.id === openId); if (j && j.updatedAt !== openJob.updatedAt && !document.activeElement?.closest?.('.card')) { openJob = await api('/api/jobs/' + openId); render(); } else nav(); return; }
+  if (['themes', 'settings', 'create'].includes(tab) && document.activeElement && document.activeElement.tagName !== 'BODY') return nav();
+  render();
+}
+api('/api/styles').then(x => { STY = x; render(); }); refresh(); setInterval(refresh, 4000);
+</script></body></html>

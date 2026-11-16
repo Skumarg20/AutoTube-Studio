@@ -1,0 +1,44 @@
+# --- Secrets: never upload ---
+config/.env
+config/elevenlabs.json
+config/settings.json
+config/youtube_client.json
+config/instagram.json
+**/youtube_token.json
+**/youtube_client.json
+!config/youtube_client.example.json
+*.pem
+*.key
+
+# --- Channel data, stats and backups (contain tokens and private numbers) ---
+channels/
+data/
+
+# --- Made videos and big media ---
+jobs/
+preview5min/out/
+preview5min/tts/
+preview5min/voices/
+*.mp4
+*.m4a
+*.wav
+*.mp3
+
+# --- Installed packages and downloaded tools (reinstalled on setup) ---
+node_modules/
+vendor/
+tools/bin/
+tools/rhubarb_dl/
+.venv/
+__pycache__/
+
+# --- Logs and junk ---
+*.log
+data-server.log
+check_err.txt
+.DS_Store
+Thumbs.db
+
+# --- Local AI assistant notes (kept on this PC only) ---
+CLAUDE.md
+.claude/

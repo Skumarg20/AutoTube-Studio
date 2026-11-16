@@ -1,0 +1,492 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>History Studio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Big+Shoulders+Display:wght@600;800&family=Courier+Prime:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bench:#e6e7e3; --sheet:#fdfdfb; --ink:#24272b; --lead:#5f6469; --faint:#9a9e9f; --rule:#cfd2cc; --rule2:#b9bdb6;
+  --pencil:#1f5bb8; --pencil-tint:#dfe8f6; --hl:#f5d547; --hl-tint:#fbf1bd; --red:#c23b2e; --red-tint:#f6dedb; --green:#2e7a4a; --green-tint:#dcefe2;
+  --film:#1c1d1f; --display:"Big Shoulders Display","Arial Narrow",sans-serif; --ui:"Atkinson Hyperlegible","Segoe UI",system-ui,sans-serif; --script:"Courier Prime","Courier New",monospace;
+  color-scheme:light;
+}
+:root[data-theme="dark"]{
+  --bench:#17191b; --sheet:#202326; --ink:#e7e8e3; --lead:#a4a8a6; --faint:#6f7372; --rule:#33373a; --rule2:#44494c;
+  --pencil:#7ea8ec; --pencil-tint:#22324d; --hl:#e6c43c; --hl-tint:#3d3619; --red:#ec7a6c; --red-tint:#40221f; --green:#6cc28d; --green-tint:#1c3527; --film:#0b0c0d; color-scheme:dark;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bench:#17191b; --sheet:#202326; --ink:#e7e8e3; --lead:#a4a8a6; --faint:#6f7372; --rule:#33373a; --rule2:#44494c;
+  --pencil:#7ea8ec; --pencil-tint:#22324d; --hl:#e6c43c; --hl-tint:#3d3619; --red:#ec7a6c; --red-tint:#40221f; --green:#6cc28d; --green-tint:#1c3527; --film:#0b0c0d; color-scheme:dark;}}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bench);color:var(--ink);font:16px/1.55 var(--ui);-webkit-font-smoothing:antialiased}
+a{color:var(--pencil)}
+::selection{background:var(--hl);color:#222}
+:focus-visible{outline:2px solid var(--pencil);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+code{font:14px var(--script);background:var(--bench);padding:1px 5px;border-radius:2px}
+
+/* ---------- masthead ---------- */
+.mast{display:flex;align-items:center;gap:28px;padding:14px 36px;border-bottom:1px solid var(--rule2);background:var(--sheet);position:sticky;top:0;z-index:10;flex-wrap:wrap}
+.word{font:800 28px/1 var(--display);letter-spacing:.01em;margin:0;white-space:nowrap}
+#nav{display:flex;gap:4px;flex-wrap:wrap}
+#nav button{font:700 15px var(--ui);color:var(--lead);background:none;border:0;padding:8px 12px;cursor:pointer;border-radius:3px;position:relative}
+#nav button:hover{color:var(--ink)}
+#nav button.on{color:var(--ink)}
+#nav button.on::after{content:"";position:absolute;left:10px;right:10px;bottom:2px;height:3px;background:var(--pencil);border-radius:2px;transform:rotate(-1deg)}
+#nav .n{display:inline-block;margin-left:6px;min-width:20px;padding:0 6px;border-radius:10px;background:var(--hl);color:#2a2410;font-size:12.5px;line-height:20px;text-align:center}
+.mast .right{margin-left:auto;display:flex;gap:16px;align-items:center;font-size:14px;color:var(--lead)}
+.lamp{display:inline-flex;align-items:center;gap:7px}.lamp i{width:9px;height:9px;border-radius:50%;background:var(--faint);display:inline-block}.lamp i.busy{background:var(--pencil);animation:blink 1.2s infinite}
+@keyframes blink{50%{opacity:.35}}
+.ghost{font:700 14px var(--ui);background:none;border:1px solid var(--rule2);color:var(--lead);border-radius:4px;padding:6px 10px;cursor:pointer}
+
+main{max-width:1320px;margin:0 auto;padding:34px 36px 90px}
+@media(max-width:760px){.mast{padding:12px 16px;gap:10px;position:static}main{padding:22px 16px 70px}.mast .right{display:none}}
+
+/* ---------- page head ---------- */
+.head{margin:0 0 26px;max-width:880px}
+.head h1{font:800 clamp(40px,6vw,64px)/.95 var(--display);margin:0;letter-spacing:.005em}
+.head p{margin:10px 0 0;font-size:18px;color:var(--lead);max-width:62ch}
+.back{font:700 15px var(--ui);background:none;border:0;color:var(--pencil);padding:0;cursor:pointer;margin-bottom:14px}
+
+/* ---------- buttons & fields ---------- */
+.btn{display:inline-flex;align-items:center;gap:8px;font:700 15px var(--ui);padding:10px 16px;border-radius:4px;border:1.5px solid var(--ink);background:transparent;color:var(--ink);cursor:pointer;text-decoration:none;transition:background .12s}
+.btn:hover{background:var(--bench)}
+.btn.go{background:var(--pencil);border-color:var(--pencil);color:#fff}.btn.go:hover{filter:brightness(1.07)}
+.btn.ok{background:var(--green);border-color:var(--green);color:#fff}
+:root[data-theme="dark"] .btn.go,:root[data-theme="dark"] .btn.ok{color:#111}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .btn.go,:root:not([data-theme="light"]) .btn.ok{color:#111}}
+.btn.quiet{border-color:var(--rule2);color:var(--lead)}
+.btn.bad{border-color:var(--rule2);color:var(--red)}
+.btn:disabled{opacity:.5;cursor:wait}
+.acts{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+label.f{display:grid;gap:6px;font-weight:700;font-size:14.5px}
+label.f small{font-weight:400;color:var(--lead);font-size:13.5px}
+input,select,textarea{font:16px var(--ui);color:var(--ink);background:var(--sheet);border:1.5px solid var(--rule2);border-radius:4px;padding:10px 12px;width:100%;max-width:100%}
+input:focus,select:focus,textarea:focus{border-color:var(--pencil);outline:none;box-shadow:0 0 0 3px var(--pencil-tint)}
+input[type=checkbox],input[type=radio]{width:18px;height:18px;accent-color:var(--pencil);padding:0;margin:3px 0 0;flex:none}
+.check{display:flex;gap:10px;align-items:flex-start;font-weight:400;cursor:pointer}
+textarea{resize:vertical;min-height:70px;line-height:1.5}
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:18px}
+.sheet{background:var(--sheet);border:1px solid var(--rule);border-radius:2px;padding:26px 28px}
+.sheet h2{font:800 30px/1 var(--display);margin:0 0 6px}
+.sheet h3{font:700 17px var(--ui);margin:0 0 4px}
+.note{color:var(--lead);font-size:14.5px;max-width:70ch}
+.err{color:var(--red);font-size:14.5px}.warn{color:#7a5f00;font-size:14.5px}
+:root[data-theme="dark"] .warn{color:var(--hl)}
+hr.rule{border:0;border-top:1px solid var(--rule);margin:24px 0}
+@media(max-width:600px){.sheet{padding:20px 18px}}
+
+/* ---------- the contact sheet (signature element) ---------- */
+.strip-head{display:flex;align-items:baseline;gap:14px;margin:34px 0 10px;flex-wrap:wrap}
+.strip-head h2{font:800 34px/1 var(--display);margin:0}
+.strip-head span{color:var(--lead)}
+.strip{background:var(--film);border-radius:3px;padding:34px 26px;display:flex;gap:30px;overflow-x:auto;position:relative;scrollbar-color:#555 var(--film)}
+.strip::before,.strip::after{content:"";position:absolute;left:0;right:0;height:8px;background:repeating-linear-gradient(90deg,transparent 0 12px,#d9d5c8 12px 24px,transparent 24px 30px);opacity:.55;border-radius:1px}
+.strip::before{top:11px}.strip::after{bottom:11px}
+.frame{flex:none;width:300px;color:#ece9e0;cursor:pointer;position:relative;background:none;border:0;padding:0;text-align:left;font:inherit}
+.frame .pic{aspect-ratio:16/9;background:#2b2d30;border:2px solid #3a3c3f;overflow:hidden;position:relative;display:grid;place-items:center}
+.frame .pic img{width:100%;height:100%;object-fit:cover;display:block}
+.frame .pic.v img{object-fit:contain}
+.frame .pic .none{font:800 34px var(--display);color:#56595d}
+.frame .num{font:600 15px var(--script);color:#b9b5a8;display:flex;justify-content:space-between;gap:10px;margin:8px 2px 4px}
+.frame b{display:block;font:700 16px/1.3 var(--ui);color:#f4f1e8}
+.frame .st{display:block;font-size:14px;margin-top:4px;color:#b9b5a8}
+.frame .st.need{color:var(--hl)}.frame .st.bad{color:#ff8a7a}.frame .st.done{color:#8fd6a8}.frame .st.work{color:#9cbcf2}
+.frame:hover .pic{border-color:#77797c}
+.frame .ring{position:absolute;left:-14px;top:-12px;width:328px;height:194px;pointer-events:none;overflow:visible}
+.frame .ring path{fill:none;stroke:var(--hl);stroke-width:4;stroke-linecap:round;opacity:.95;stroke-dasharray:1300;stroke-dashoffset:0}
+.develop .frame .pic img{animation:develop 1.8s ease-out both}
+.develop .frame:nth-child(2) .pic img{animation-delay:.15s}.develop .frame:nth-child(3) .pic img{animation-delay:.3s}.develop .frame:nth-child(4) .pic img{animation-delay:.45s}.develop .frame:nth-child(5) .pic img{animation-delay:.6s}.develop .frame:nth-child(n+6) .pic img{animation-delay:.75s}
+@keyframes develop{from{filter:sepia(1) brightness(.15) contrast(1.6)}to{filter:none}}
+.develop .frame .ring path{animation:draw 1.1s .9s ease-out both}
+@keyframes draw{from{stroke-dashoffset:1300}to{stroke-dashoffset:0}}
+.emptystrip{color:#b9b5a8;padding:26px 6px;font-size:17px}
+.head p.summary{font:800 clamp(26px,3.4vw,38px)/1.1 var(--display);margin:4px 0 0;max-width:24ch;color:var(--ink)!important}
+
+/* ---------- logbook (all videos) ---------- */
+.tablewrap{overflow-x:auto}
+table.log{width:100%;border-collapse:collapse;background:var(--sheet);border:1px solid var(--rule)}
+table.log th{text-align:left;font:700 14px var(--ui);color:var(--lead);padding:12px 14px;border-bottom:1.5px solid var(--rule2)}
+table.log td{padding:10px 14px;border-bottom:1px solid var(--rule);vertical-align:middle}
+table.log tbody tr.go:hover td{background:var(--bench)}
+table.log tr.go{cursor:pointer}
+table.log .t{width:112px}table.log .t img{width:96px;aspect-ratio:16/9;object-fit:cover;display:block;background:var(--rule);border-radius:1px}
+table.log .t img.v{object-fit:contain;background:#111}
+table.log .ti{font-weight:700;max-width:46ch}
+.tag{display:inline-block;font-size:13.5px;padding:2px 9px;border-radius:3px;background:var(--bench);color:var(--lead);white-space:nowrap}
+.tag.need{background:var(--hl-tint);color:#5e4a00}:root[data-theme="dark"] .tag.need{color:var(--hl)}
+.tag.bad{background:var(--red-tint);color:var(--red)}.tag.done{background:var(--green-tint);color:var(--green)}.tag.work{background:var(--pencil-tint);color:var(--pencil)}
+.filters{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.filters button{font:700 14px var(--ui);border:1.5px solid var(--rule2);background:var(--sheet);color:var(--lead);border-radius:20px;padding:6px 13px;cursor:pointer}
+.filters button.on{border-color:var(--ink);color:var(--ink)}
+
+/* ---------- screenplay plan editor ---------- */
+.script{background:var(--sheet);border:1px solid var(--rule);padding:34px 0 40px;margin-top:20px}
+.script .slug{display:flex;gap:12px;align-items:center;flex-wrap:wrap;padding:22px 48px 8px;border-top:1px solid var(--rule)}
+.script .slug:first-child{border-top:0;padding-top:0}
+.script .slug strong{font:700 16px var(--script);letter-spacing:.02em;margin-right:6px}
+.script .slug select{width:auto;font:15px var(--ui);padding:6px 8px}
+.script .slug input{width:auto;min-width:260px;flex:1;max-width:420px;font:15px var(--script);padding:6px 8px}
+.line{display:grid;grid-template-columns:minmax(0,62ch) minmax(220px,1fr) 34px;gap:22px;padding:10px 48px;align-items:start}
+.line:hover{background:color-mix(in srgb,var(--bench) 50%,transparent)}
+.line textarea{font:16.5px/1.6 var(--script);border:0;background:transparent;padding:4px 0;min-height:52px;border-radius:0;resize:none;field-sizing:content}
+.line textarea:focus{box-shadow:none;background:var(--hl-tint)}
+.margin{font:italic 400 14.5px/1.45 var(--ui);color:var(--pencil);border-left:2px solid var(--pencil-tint);padding:4px 0 4px 12px}
+.margin div{margin-bottom:4px}
+.margin em{font-style:normal;font-weight:700}
+.x{border:0;background:none;color:var(--faint);font-size:20px;cursor:pointer;padding:2px 6px;line-height:1}.x:hover{color:var(--red)}
+@media(max-width:900px){.line{grid-template-columns:1fr 34px;padding:10px 18px;gap:8px}.margin{grid-column:1}.script .slug{padding:16px 18px 6px}}
+.dock{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:22px;position:sticky;bottom:14px;background:var(--sheet);border:1px solid var(--rule2);padding:14px 16px;border-radius:3px;box-shadow:0 6px 18px rgba(0,0,0,.08)}
+.photos{display:grid;grid-template-columns:70px 1fr 1fr;gap:12px;margin-top:10px;align-items:center}
+@media(max-width:700px){.photos{grid-template-columns:1fr}}
+
+/* ---------- review / release sheet ---------- */
+.review{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(300px,1fr);gap:26px;align-items:start}
+@media(max-width:1000px){.review{grid-template-columns:1fr}}
+video{width:100%;background:#000;border-radius:2px;display:block;max-height:74vh}
+.thumbimg{width:100%;max-height:420px;object-fit:contain;background:var(--film);border:1px solid var(--rule);display:block;margin:6px 0 10px}
+details summary{cursor:pointer;font-weight:700;color:var(--lead)}
+pre.log{font:13.5px/1.6 var(--script);white-space:pre-wrap;max-height:320px;overflow:auto;background:var(--sheet);border:1px solid var(--rule);padding:14px 16px;margin:10px 0 0;color:var(--lead);border-radius:2px}
+
+/* ---------- channels (autoflows) ---------- */
+.chan{display:grid;grid-template-columns:minmax(0,1.2fr) auto auto;gap:26px;align-items:center;padding:24px 0;border-top:1px solid var(--rule2)}
+.chan:last-child{border-bottom:1px solid var(--rule2)}
+.chan h3{font:800 34px/1 var(--display);margin:0 0 6px}
+.week{display:flex;gap:4px}
+.week span{width:34px;height:34px;display:grid;place-items:center;font:700 13px var(--ui);border:1.5px solid var(--rule2);border-radius:3px;color:var(--faint)}
+.week span.on{background:var(--ink);border-color:var(--ink);color:var(--sheet)}
+.when{font:600 15px var(--script);color:var(--ink);margin:10px 0 0}
+@media(max-width:900px){.chan{grid-template-columns:1fr;gap:14px}}
+.modes{display:grid;border:1px solid var(--rule);background:var(--sheet);max-width:820px}
+.modes label{display:grid;grid-template-columns:24px 1fr;gap:14px;padding:18px 22px;border-top:1px solid var(--rule);cursor:pointer}
+.modes label:first-child{border-top:0}
+.modes label:has(input:checked){background:var(--pencil-tint)}
+.modes b{font-size:17px}
+.toast{position:fixed;left:50%;bottom:26px;transform:translate(-50%,10px);background:var(--ink);color:var(--sheet);padding:11px 18px;border-radius:4px;font-weight:700;opacity:0;transition:.2s;z-index:40;pointer-events:none}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+.gal{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:22px 18px}
+.gal button{background:none;border:0;padding:0;text-align:left;cursor:pointer;font:inherit;color:inherit}
+.gal img{width:100%;aspect-ratio:16/9;object-fit:cover;display:block;background:var(--rule);border:1px solid var(--rule)}
+.gal b{display:block;margin-top:8px}.gal span{color:var(--lead);font-size:14px}
+.modal{position:fixed;inset:0;background:rgba(15,16,17,.72);display:grid;place-items:center;padding:20px;z-index:30}
+.modal .sheet{max-width:980px;width:100%;max-height:92vh;overflow:auto}
+</style></head>
+<body>
+<header class="mast">
+  <p class="word">History Studio</p>
+  <nav id="nav" aria-label="Sections"></nav>
+  <div class="right"><span id="lamps"></span><button class="ghost" onclick="toggleTheme()">Light or dark</button></div>
+</header>
+<main id="main"></main>
+<div class="toast" id="toast" role="status"></div>
+<script>
+// ================= state & helpers =================
+const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const api = async (p, b) => { const r = await fetch(p, b === undefined ? {} : { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(b) }); const j = await r.json().catch(() => ({})); if (!r.ok) throw new Error(j.error || ('Request failed (' + r.status + ')')); return j; };
+let S = null, tab = 'desk', openId = null, openJob = null, flowEdit = null, logFilter = 'all', createMode = 'auto', STY = [], gal = null, firstDesk = true;
+const toast = m => { const t = $('#toast'); t.textContent = m; t.classList.add('on'); clearTimeout(window._t); window._t = setTimeout(() => t.classList.remove('on'), 2600); };
+function toggleTheme() { const r = document.documentElement, dark = (r.dataset.theme || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')) === 'dark'; r.dataset.theme = dark ? 'light' : 'dark'; try { localStorage.setItem('hs-theme', r.dataset.theme); } catch {} }
+try { const t = localStorage.getItem('hs-theme'); if (t) document.documentElement.dataset.theme = t; } catch {}
+
+const STATUS = { draft: ['Add your material', 'need'], writing: ['Claude is writing the plan', 'work'], script_review: ['Plan ready for you', 'need'], queued_render: ['Waiting to be made', 'work'], rendering: ['Being made', 'work'], video_review: ['Video ready for you', 'need'], approved: ['Approved, waiting to publish', 'done'], uploading: ['Uploading', 'work'], published: ['Published', 'done'], failed: ['Something went wrong', 'bad'], upload_failed: ['Upload failed', 'bad'], rejected: ['Rejected', 'bad'] };
+const st = j => STATUS[j.status] || [j.status, ''];
+const needsYou = j => ['script_review', 'video_review', 'draft'].includes(j.status);
+const flowName = id => ((S.flows || []).find(f => f.id === id) || {}).name;
+const dur = s => s ? Math.floor(s / 60) + ':' + String(Math.round(s % 60)).padStart(2, '0') : '';
+const fmtDay = ds => new Date(ds + 'T12:00').toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'long' });
+const fmtWhen = ms => new Date(ms).toLocaleString(undefined, { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+const VOICES = ['bf_emma', 'bf_isabella', 'bf_alice', 'bf_lily', 'af_heart', 'af_bella', 'af_nicole', 'bm_george', 'bm_lewis', 'bm_fable', 'am_michael', 'hf_alpha', 'hf_beta', 'hm_omega'];
+
+// ================= navigation =================
+const TABS = [['desk', 'Today'], ['review', 'Needs you'], ['make', 'Make a video'], ['log', 'All videos'], ['channels', 'Channels'], ['looks', 'Looks'], ['settings', 'Settings']];
+function nav() {
+  const n = S ? S.jobs.filter(needsYou).length : 0;
+  $('#nav').innerHTML = TABS.map(([k, l]) => `<button class="${tab === k && !openId ? 'on' : ''}" onclick="go('${k}')">${l}${k === 'review' && n ? `<span class="n" aria-label="${n} waiting">${n}</span>` : ''}</button>`).join('');
+  if (!S) return;
+  const busy = S.queues.writing + S.queues.rendering;
+  $('#lamps').innerHTML = `<span class="lamp"><i class="${busy ? 'busy' : ''}"></i>${busy ? `Working on ${busy}` : 'Idle'}</span>`;
+}
+function go(t) { tab = t; openId = null; flowEdit = null; render(); scrollTo(0, 0); }
+async function openJ(id) { openId = id; openJob = await api('/api/jobs/' + id); render(); scrollTo(0, 0); }
+function head(title, sub) { return `<div class="head"><h1>${title}</h1>${sub ? `<p>${sub}</p>` : ''}</div>`; }
+
+// ================= contact sheet =================
+// a hand-drawn highlighter loop around frames that need you; each one wobbles differently
+const ringPath = k => { const j = (a, b) => +(Math.sin(k * 7.3 + a) * b).toFixed(1); return `<svg class="ring" viewBox="0 0 328 194" aria-hidden="true"><path d="M${34 + j(1, 8)} ${20 + j(2, 5)} C 120 ${2 + j(3, 4)}, 250 ${4 + j(4, 5)}, ${310 + j(5, 6)} ${42 + j(6, 6)} S ${322} ${160 + j(7, 6)}, 200 ${188 + j(8, 3)} S 6 ${180 + j(9, 4)}, ${8 + j(10, 4)} ${96 + j(11, 8)} S 74 ${8 + j(12, 4)}, 160 ${12 + j(13, 4)}"/></svg>`; };
+function frame(j, k) {
+  const [label, kind] = st(j), v = j.format === 'short';
+  const img = j.files?.thumb ? `<img src="/${j.files.thumb}?${j.updatedAt}" alt="">` : `<span class="none">${v ? 'Short' : 'Long'}</span>`;
+  const right = [j.publishAt ? 'out ' + esc(j.publishAt) : '', j.files?.duration ? dur(j.files.duration) : ''].filter(Boolean).join('  ');
+  return `<button class="frame ${needsYou(j) ? 'need' : ''}" onclick="openJ('${j.id}')">${needsYou(j) ? ringPath(k + 1) : ''}
+    <div class="pic ${v ? 'v' : ''}">${img}</div>
+    <div class="num"><span>${esc(j.slot || (v ? 'Short' : 'Long'))}</span><span>${right}</span></div>
+    <b>${esc(j.title || j.topic)}</b><span class="st ${kind}">${label}</span></button>`;
+}
+function strip(list) { return `<div class="strip ${firstDesk ? 'develop' : ''}">${list.length ? list.map(frame).join('') : `<div class="emptystrip">Nothing on this strip yet.</div>`}</div>`; }
+
+// ================= Today =================
+function viewDesk() {
+  const today = S.jobs.filter(j => j.date === S.today), need = S.jobs.filter(needsYou);
+  const plans = need.filter(j => j.status === 'script_review').length, vids = need.filter(j => j.status === 'video_review').length, drafts = need.filter(j => j.status === 'draft').length;
+  const parts = [plans && `${plans} plan${plans > 1 ? 's' : ''}`, vids && `${vids} video${vids > 1 ? 's' : ''}`, drafts && `${drafts} draft${drafts > 1 ? 's' : ''}`].filter(Boolean);
+  const line = parts.length ? `${parts.length > 1 ? parts.slice(0, -1).join(', ') + ' and ' + parts.slice(-1) : parts[0]} waiting for you.` : 'Nothing is waiting for you.';
+  let out = `<div class="head"><h1>${fmtDay(S.today)}</h1><p class="summary">${line}</p></div>`;
+  for (const f of S.flows || []) {
+    const js = today.filter(j => j.flowId === f.id).sort((a, b) => String(a.slot).localeCompare(String(b.slot)));
+    out += `<div class="strip-head"><h2>${esc(f.name)}</h2><span>${f.enabled ? (f.next ? `Next batch starts ${fmtWhen(f.next.start)}, ready ${fmtWhen(f.next.ready)}` : '') : 'Paused'}</span></div>${strip(js)}`;
+  }
+  const loose = today.filter(j => !j.flowId);
+  if (loose.length) out += `<div class="strip-head"><h2>Other videos today</h2></div>${strip(loose)}`;
+  const old = need.filter(j => j.date !== S.today);
+  if (old.length) out += `<div class="strip-head"><h2>Still waiting from earlier</h2></div>${strip(old)}`;
+  out += `<hr class="rule"><details><summary>What the studio did recently</summary><pre class="log">${(S.activity || []).length ? esc(S.activity.slice(0, 30).join('\n')) : 'Nothing yet.'}</pre></details>`;
+  firstDesk = false; return out;
+}
+function viewReview() {
+  const groups = [['Plans to read', j => j.status === 'script_review'], ['Videos to watch', j => j.status === 'video_review'], ['Drafts that need your material', j => j.status === 'draft'], ['Problems', j => ['failed', 'upload_failed'].includes(j.status)]];
+  let out = head('Needs you', 'Read the plan, watch the video, then approve. Everything else is automatic.'), any = false;
+  for (const [t, fn] of groups) { const l = S.jobs.filter(fn); if (!l.length) continue; any = true; out += `<div class="strip-head"><h2>${t}</h2><span>${l.length}</span></div>${strip(l)}`; }
+  return any ? out : out + `<div class="sheet"><h3>You're all caught up</h3><p class="note">New plans and videos show up here as soon as they're ready.</p></div>`;
+}
+
+// ================= All videos (logbook) =================
+function viewLog() {
+  const F = { all: () => true, need: needsYou, work: j => ['writing', 'queued_render', 'rendering', 'uploading'].includes(j.status), done: j => ['approved', 'published'].includes(j.status), bad: j => ['failed', 'upload_failed', 'rejected'].includes(j.status) };
+  const rows = S.jobs.slice().reverse().filter(F[logFilter]);
+  const fb = [['all', 'All'], ['need', 'Needs you'], ['work', 'In progress'], ['done', 'Approved or published'], ['bad', 'Problems']].map(([k, l]) => `<button class="${logFilter === k ? 'on' : ''}" onclick="logFilter='${k}';render()">${l}</button>`).join('');
+  return head('All videos', `${S.jobs.length} videos so far.`) + `<div class="filters">${fb}</div><div class="tablewrap">
+  <table class="log"><thead><tr><th class="t"><span hidden>Thumbnail</span></th><th>Video</th><th>Channel</th><th>Kind</th><th>Status</th><th>Made</th></tr></thead><tbody>
+  ${rows.map(j => { const [l, k] = st(j); return `<tr class="go" onclick="openJ('${j.id}')"><td class="t">${j.files?.thumb ? `<img class="${j.format === 'short' ? 'v' : ''}" src="/${j.files.thumb}?${j.updatedAt}" alt="">` : ''}</td><td class="ti">${esc(j.title || j.topic)}</td><td>${esc(flowName(j.flowId) || j.theme || '')}</td><td>${j.format === 'long' ? 'Long' : 'Short'}${j.files?.duration ? ', ' + dur(j.files.duration) : ''}</td><td><span class="tag ${k}">${l}</span></td><td>${esc(j.date)}</td></tr>`; }).join('') || `<tr><td colspan="6" class="note" style="padding:22px">Nothing here.</td></tr>`}</tbody></table></div>`;
+}
+
+// ================= one video =================
+function viewJob() {
+  const j = openJob, [label, kind] = st(j), sc = j.script, v2 = j.engine === 'v2';
+  let out = `<button class="back" onclick="openId=null;render()">Back</button><div class="head" style="max-width:none"><h1 style="font-size:clamp(34px,4.6vw,52px)">${esc((sc && sc.title) || j.title || j.topic)}</h1><p><span class="tag ${kind}">${label}</span>&nbsp; ${j.format === 'long' ? 'Long video' : 'Short and Reel'}${flowName(j.flowId) ? ' for ' + esc(flowName(j.flowId)) : ''}${j.publishAt ? ', goes out at ' + esc(j.publishAt) : ''}</p></div>`;
+  if (j.status === 'draft') out += viewDraft(j);
+  if (j.files && j.files.video) out += viewRelease(j);
+  if (sc && v2 && j.status !== 'draft') out += j.files && j.files.video ? `<details style="margin-top:26px"><summary>The plan this video was made from</summary>${viewPlan(j).replace('class="dock"','class="dock" style="position:static"')}</details>` : viewPlan(j);
+  else if (sc && !v2) out += `<div class="sheet" style="margin-top:20px"><h2>Script</h2>${(sc.scenes || []).map(s => `<p style="font:16px/1.6 var(--script);max-width:62ch">${esc(s.narration)}</p>`).join('')}</div>`;
+  else if (j.status === 'writing') out += `<div class="sheet"><h3>Claude is writing the plan</h3><p class="note">This takes a few minutes. The page updates by itself.</p></div>`;
+  if (j.status === 'failed') out += `<div class="sheet" style="margin-top:20px"><h3>This one failed</h3><p class="err">${esc((j.log || []).slice(-1)[0] || '')}</p><div class="acts">${sc ? `<button class="btn go" onclick="jact('rerender')">Make it again</button>` : ''}<button class="btn ${sc ? 'quiet' : 'go'}" onclick="jact('regenerate')">Rewrite the plan</button></div></div>`;
+  out += `<hr class="rule"><details><summary>Production log</summary><pre class="log">${esc((j.log || []).slice(-120).join('\n'))}</pre></details>`;
+  return out;
+}
+function viewRelease(j) {
+  const F = j.files, sc = j.script || {};
+  return `<div class="review"><div><video controls preload="metadata" src="/${F.video}?${j.updatedAt}" ${j.format === 'short' ? 'style="max-height:78vh;width:auto;max-width:100%;margin:auto"' : ''}></video>
+    <p class="note">${dur(F.duration)} long${F.shots ? `, ${F.shots} shots (a new picture every ${F.avgShot} s)` : ''}${F.photos ? `, ${F.photos} archive photos` : ''}.${F.srt ? ` <a href="/${F.srt}" target="_blank">Subtitles</a>` : ''}</p></div>
+   <div class="sheet"><h2>Release</h2><p class="note">Watch it all the way through. Check names, dates and spellings on screen, and that the voice says names correctly.</p>
+    ${F.thumb ? `<img class="thumbimg" src="/${F.thumb}?${j.updatedAt}" alt="Thumbnail"><div class="acts" style="margin-bottom:18px"><input id="thText" aria-label="Thumbnail headline" placeholder="Thumbnail headline, 2 to 4 words" value="${esc(sc.thumbText || '')}" style="flex:1;min-width:180px"><button class="btn quiet" onclick="remakeThumb(this)">Redo thumbnail</button></div>` : ''}
+    ${j.status === 'video_review' ? `<div style="display:grid;gap:10px;margin:6px 0 18px"><label class="check"><input type="checkbox" id="toYT" checked> Upload to YouTube${j.format === 'short' ? ' as a Short' : ''}</label>${j.format === 'short' ? `<label class="check"><input type="checkbox" id="toIG" checked> Post as an Instagram Reel</label>` : '<input type="checkbox" id="toIG" hidden>'}</div>
+      <div class="acts"><button class="btn ok" onclick="apV(false)">Approve${j.publishAt ? ' for ' + esc(j.publishAt) : ''}</button><button class="btn" onclick="apV(true)">Approve and publish now</button></div>
+      <div class="acts" style="margin-top:12px"><button class="btn quiet" onclick="jact('rerender')">Make it again</button><button class="btn bad" onclick="rej()">Reject</button></div>` : ''}
+    ${j.status === 'upload_failed' ? `<p class="err">${Object.entries(j.uploads || {}).filter(([, r]) => !r.ok).map(([k, r]) => k + ': ' + esc(r.error)).join('<br>')}</p><button class="btn go" onclick="jact('retry-upload')">Try the upload again</button>` : ''}
+    ${Object.entries(j.uploads || {}).filter(([, r]) => r.ok && r.url).map(([k, r]) => `<p><a href="${esc(r.url)}" target="_blank">See it on ${k === 'youtube' ? 'YouTube' : 'Instagram'}</a></p>`).join('')}
+   </div></div>`;
+}
+// ---- the plan as a screenplay ----
+const SHOT = { headline: 'headline', punch: 'slam card', photo: 'photo', text: 'card', quote: 'quote', stat: 'counter', list: 'list', split: 'side by side', black: 'silent beat', map: 'map', board: 'evidence board', num: 'number', countintro: 'countdown', tease: 'teaser', end: 'end card', spin: 'newspaper spin', globe: 'world map', draw: 'drawn scene', clip: 'your clip' };
+function marginNote(s) {
+  const t = s.head ? [].concat(s.head).join(' / ') : s.text || (s.lines || []).join(' / ') || s.quote || s.big || (s.value ? (s.prefix || '') + s.value + (s.suffix || '') + ' ' + (s.label || '') : '') || s.label || (s.items || []).map(x => x[0] || x).join(', ') || (s.els ? s.els.map(e => e.costume || e.icon || e.text).filter(Boolean).slice(0, 4).join(', ') : '');
+  return `<div>${s.at ? `On "${esc(s.at)}": ` : ''}<em>${SHOT[s.type] || esc(s.type)}</em>${t ? ', ' + esc(String(t).slice(0, 70)) : ''}${s.img ? ` (${esc(s.img)})` : ''}${s.gfx && s.gfx.length ? `, with ${esc(s.gfx.map(g => g.k).join(' and '))}` : ''}</div>`;
+}
+function viewPlan(j) {
+  const sc = j.script, v = j.validation || {}, ST = S.v2styles || {}, MOODS = ['tense', 'curious', 'suspense', 'march', 'drama', 'rise', 'outro', 'bouncy'];
+  const chapters = sc.chapters.map((ch, ci) => `<div class="slug"><strong>${ch.title ? esc(ch.title.join(': ')).toUpperCase() : 'COLD OPEN'}</strong>
+      <select data-ci="${ci}" data-cf="style" aria-label="Look">${Object.entries(ST).map(([k, x]) => `<option value="${k}" ${k === ch.style ? 'selected' : ''}>${esc(x.name)}</option>`).join('')}</select>
+      <select data-ci="${ci}" data-cf="mood" aria-label="Music">${MOODS.map(m => `<option value="${m}" ${m === ch.mood ? 'selected' : ''}>${m} music</option>`).join('')}</select>
+      ${j.format === 'long' ? `<input data-ci="${ci}" data-cf="title" value="${esc((ch.title || []).join(' | '))}" placeholder="Chapter title (leave empty for none)" aria-label="Chapter title">` : ''}</div>
+    ${ch.lines.map((l, li) => `<div class="line"><textarea data-ci="${ci}" data-li="${li}" rows="2" aria-label="Narration">${esc(l.say)}</textarea><div class="margin">${(l.shots || []).map(marginNote).join('')}</div><button class="x" title="Remove this line" aria-label="Remove this line" onclick="delLine(${ci},${li})">&times;</button></div>`).join('')}`).join('');
+  return `<div class="sheet" style="margin-top:24px"><h2>The plan</h2><p class="note">The narration is what the voice will read. Claude's shot plan is in blue in the margin. Fix anything that's wrong, then approve.</p>
+    ${(v.errs || []).map(e => `<p class="err">${esc(e)}</p>`).join('')}${(v.warns || []).slice(0, 6).map(e => `<p class="warn">${esc(e)}</p>`).join('')}
+    <p class="note">About ${Math.max(1, Math.round((v.estSeconds || 0) / 60))} minutes, ${v.lines || 0} lines, ${sc.chapters.length} chapters${sc.era ? `, set around ${esc(sc.era)}` : ''}.</p>
+    <div class="cols" style="margin-top:16px"><label class="f">YouTube title<input id="sTitle" value="${esc(sc.title)}" maxlength="100"></label><label class="f">Tags <small>Separate them with commas.</small><input id="sTags" value="${esc((sc.tags || []).join(', '))}"></label></div>
+    <label class="f" style="margin-top:14px">Description<textarea id="sDesc" rows="4">${esc(sc.description)}</textarea></label>
+    <div class="cols" style="margin-top:14px"><label class="f">Thumbnail headline<input id="sThumb" value="${esc(sc.thumbText || '')}"></label><label class="f">Next-episode teaser<input id="sNext" value="${esc(sc.next || '')}"></label></div>
+    <hr class="rule"><h3>Voice</h3><p class="note">${j.voiceFile ? `Using your recording (${esc(j.voiceFile)}).` : `Using the AI voice ${esc(j.voice || S.settings.voice)}. For a real human voice, read the script into your phone in one go and upload it. The app finds every sentence by itself.`}</p>
+    <div class="acts"><a class="btn quiet" href="/api/jobs/${j.id}/narration.txt">Download the script to read</a><label class="btn quiet" style="cursor:pointer">Upload my recording<input type="file" accept="audio/*,video/*" hidden onchange="voiceUpload(this)"></label>${j.voiceFile ? `<button class="btn bad" onclick="voiceRemove()">Use the AI voice instead</button>` : ''}<span class="note" id="vup"></span></div>
+    </div>
+    <div class="script">${chapters}</div>
+    <div class="sheet" style="margin-top:20px"><h3>Archive photos to find</h3><p class="note">Free-licence photos from Wikimedia Commons. Change the description or search words if a search needs help.</p>
+      ${(sc.images || []).map((im, ii) => `<div class="photos"><span style="font:600 15px var(--script)">${esc(im.id)}</span><input data-ii="${ii}" data-if="want" value="${esc(im.want)}" aria-label="What the photo shows"><input data-ii="${ii}" data-if="queries" value="${esc((im.queries || []).join(' | '))}" aria-label="Search words"></div>`).join('') || '<p class="note">No photos requested.</p>'}
+      <details style="margin-top:18px"><summary>Edit the whole plan as JSON</summary><textarea id="rawPlan" rows="16" style="font:13.5px var(--script);margin-top:10px">${esc(JSON.stringify(sc, null, 1))}</textarea><div class="acts" style="margin-top:10px"><button class="btn quiet" onclick="applyRaw()">Use this JSON</button></div></details>
+    </div>
+    <div class="dock">
+      ${j.status === 'script_review' ? `<button class="btn ok" onclick="apS(this)">Approve the plan and make the video</button>` : ''}<button class="btn" onclick="saveScript()">Save changes</button>
+      ${['script_review', 'failed', 'rejected'].includes(j.status) ? `<input id="notes" aria-label="What should Claude change" placeholder="What should Claude change?" style="flex:1;min-width:220px"><button class="btn quiet" onclick="jact('regenerate',{notes:$('#notes').value})">Rewrite it</button>` : ''}
+      <button class="btn bad" onclick="if(confirm('Delete this video for good?'))jact('delete',{},true)">Delete</button></div>`;
+}
+function collectPlan() {
+  const sc = openJob.script; sc.title = $('#sTitle').value; sc.description = $('#sDesc').value; sc.tags = $('#sTags').value.split(',').map(x => x.trim()).filter(Boolean); sc.thumbText = $('#sThumb').value.trim(); sc.next = $('#sNext').value;
+  $$('[data-cf]').forEach(e => { const ch = sc.chapters[+e.dataset.ci], f = e.dataset.cf; ch[f] = f === 'title' ? (e.value.trim() ? e.value.split('|').map(x => x.trim()) : null) : e.value; });
+  $$('textarea[data-li]').forEach(e => { sc.chapters[+e.dataset.ci].lines[+e.dataset.li].say = e.value; });
+  $$('[data-if]').forEach(e => { const im = sc.images[+e.dataset.ii]; if (e.dataset.if === 'queries') im.queries = e.value.split('|').map(x => x.trim()).filter(Boolean); else im.want = e.value; });
+  return sc;
+}
+async function saveScript() { try { openJob = await api(`/api/jobs/${openJob.id}/script`, { script: collectPlan() }); toast('Changes saved'); render(); } catch (e) { alert(e.message); } }
+async function apS(btn) { btn.disabled = true; try { await api(`/api/jobs/${openJob.id}/script`, { script: collectPlan() }); await api(`/api/jobs/${openJob.id}/approve-script`, {}); toast('Plan approved. The video is being made.'); openId = null; await refresh(); } catch (e) { alert(e.message); btn.disabled = false; } }
+function delLine(ci, li) { collectPlan(); openJob.script.chapters[ci].lines.splice(li, 1); render(); }
+async function applyRaw() { try { openJob = await api(`/api/jobs/${openJob.id}/script`, { script: JSON.parse($('#rawPlan').value) }); toast('Plan updated'); render(); } catch (e) { alert('That JSON has a problem: ' + e.message); } }
+async function apV(now) { try { await api(`/api/jobs/${openJob.id}/approve-video`, { youtube: $('#toYT').checked, instagram: $('#toIG').checked, now }); toast(now ? 'Approved. Publishing now.' : 'Approved'); openId = null; await refresh(); } catch (e) { alert(e.message); } }
+async function rej() { const r = prompt('Why are you rejecting it? (optional)'); if (r === null) return; await jact('reject', { reason: r }); }
+async function jact(a, b = {}, leave = false) { try { await api(`/api/jobs/${openJob.id}/${a}`, b); } catch (e) { alert(e.message); } if (leave) { openId = null; tab = 'log'; await refresh(); return; } await openJ(openJob.id); await refresh(); }
+async function remakeThumb(btn) { btn.disabled = true; btn.textContent = 'Making it'; try { await api('/api/jobs/' + openJob.id + '/thumbnail', { text: $('#thText').value.trim() }); toast('Thumbnail updated'); await openJ(openJob.id); } catch (e) { alert(e.message); btn.disabled = false; btn.textContent = 'Redo thumbnail'; } }
+async function voiceUpload(inp) { const f = inp.files[0]; if (!f) return; $('#vup').textContent = 'Uploading ' + (f.size / 1048576).toFixed(1) + ' MB'; try { const r = await fetch('/api/jobs/' + openJob.id + '/voice', { method: 'POST', headers: { 'x-filename': encodeURIComponent(f.name) }, body: f }); if (!r.ok) throw new Error((await r.json()).error); toast('Your recording will be used'); await openJ(openJob.id); } catch (e) { alert('Upload failed: ' + e.message); $('#vup').textContent = ''; } }
+async function voiceRemove() { await api('/api/jobs/' + openJob.id + '/voice-remove', {}); await openJ(openJob.id); }
+// ---- own material draft ----
+function viewDraft(j) {
+  const M = j.media || [];
+  return `<div class="sheet"><h2>Your material</h2><p class="note">Add photos and video clips with a line about what each one shows, and your narration if you recorded one. Claude then plans the video around them.</p>
+   <div class="acts" style="margin:16px 0"><label class="btn" style="cursor:pointer">Add photos or clips<input type="file" multiple accept="image/*,video/*" hidden onchange="mediaUpload(this)"></label><label class="btn quiet" style="cursor:pointer">${j.voiceFile ? 'Replace' : 'Add'} my narration<input type="file" accept="audio/*,video/*" hidden onchange="voiceUpload(this)"></label><span class="note" id="vup"></span></div>
+   ${M.length ? `<div class="tablewrap"><table class="log" style="margin-bottom:16px"><thead><tr><th>Item</th><th>What it shows</th><th><span hidden>Remove</span></th></tr></thead><tbody>${M.map(m => `<tr><td style="width:220px"><span style="font:600 15px var(--script)">${esc(m.id)}</span> ${m.kind === 'image' ? 'photo' : 'clip, ' + (+m.dur || 0).toFixed(1) + ' s'}<br><span class="note">${esc(m.name)}</span></td><td>${esc(m.desc)}</td><td style="width:50px"><button class="x" title="Remove" aria-label="Remove ${esc(m.id)}" onclick="mediaRemove('${m.id}')">&times;</button></td></tr>`).join('')}</tbody></table></div>` : ''}
+   ${j.voiceFile ? `<p class="note">Narration: ${esc(j.voiceFile)}. ${j.voiceFirst ? 'The video will follow your recording word for word.' : 'It will be matched to the script Claude writes.'}</p>` : ''}
+   <button class="btn go" onclick="jact('start')">Plan the video from my material</button></div>`;
+}
+async function mediaUpload(inp) {
+  for (const f of inp.files) { const d = prompt(`What does "${f.name}" show? One line helps Claude use it in the right place.`, '') ?? ''; $('#vup').textContent = 'Uploading ' + f.name; const r = await fetch('/api/jobs/' + openJob.id + '/media', { method: 'POST', headers: { 'x-filename': encodeURIComponent(f.name), 'x-desc': encodeURIComponent(d || f.name) }, body: f }); if (!r.ok) { alert((await r.json().catch(() => ({}))).error || 'Upload failed'); break; } }
+  await openJ(openJob.id);
+}
+async function mediaRemove(id) { await api('/api/jobs/' + openJob.id + '/media-remove', { id }); await openJ(openJob.id); }
+
+// ================= Make a video =================
+function viewMake() {
+  const F = S.flows || [];
+  const form = createMode === 'auto' ? `<label class="f">Topic <small>Leave it empty and Claude takes the next topic it researched for this channel.</small><input id="cTopic" placeholder="For example: the fall of Vijayanagara"></label>`
+    : createMode === 'brief' ? `<label class="f">Title <small>Used exactly as you write it.</small><input id="cTitle" maxlength="100" placeholder="For example: The day salt beat the British Empire"></label><label class="f">Brief <small>What to cover, the angle, people and facts to include, anything to avoid.</small><textarea id="cPrompt" rows="5"></textarea></label>`
+    : `<label class="f">Title or topic<input id="cTitle" placeholder="For example: My trip to Hampi"></label><label class="f">What should it say? <small>Optional. Claude builds the story around your photos, clips and voice.</small><textarea id="cPrompt" rows="4"></textarea></label><label class="check"><input type="checkbox" id="cVF"> I'll upload my own narration and the video should follow it word for word</label>`;
+  const opt = (k, t, d) => `<label><input type="radio" name="m" ${createMode === k ? 'checked' : ''} onchange="createMode='${k}';render()"><span><b>${t}</b><br><span class="note">${d}</span></span></label>`;
+  return head('Make a video', 'One video outside the daily schedule.') + `
+  <div class="modes">${opt('auto', 'Claude does everything', 'Researches the topic, writes the title and script, plans the shots and finds the photos.')}${opt('brief', 'I give the title and a brief', 'Claude researches and builds the video from your direction.')}${opt('own', 'I have my own material', 'Your voice, photos or video clips, with Claude planning the video around them.')}</div>
+  <div class="sheet" style="max-width:820px;margin-top:18px;display:grid;gap:16px">
+    <div class="cols">${F.length ? `<label class="f">Channel<select id="cFlow">${F.map(f => `<option value="${f.id}">${esc(f.name)}</option>`).join('')}</select></label>` : ''}<label class="f">Length<select id="cFmt"><option value="short">Short and Reel, about 45 seconds</option><option value="long">Long video</option></select></label></div>
+    ${form}<div class="acts"><button class="btn go" onclick="createOne(this)">${createMode === 'own' ? 'Continue to my material' : 'Write the plan'}</button></div></div>`;
+}
+async function createOne(btn) {
+  const b = { mode: createMode, flowId: $('#cFlow') ? $('#cFlow').value : null, format: $('#cFmt').value };
+  if (createMode === 'auto') b.topic = $('#cTopic').value.trim();
+  else { b.title = $('#cTitle').value.trim(); b.prompt = $('#cPrompt').value.trim(); b.topic = b.title; if (!b.title) return alert('Give the video a title first.'); if (createMode === 'own') b.voiceFirst = $('#cVF').checked; }
+  btn.disabled = true; btn.textContent = createMode === 'auto' && !b.topic ? 'Picking a topic' : 'Starting';
+  try { const j = await api('/api/jobs', b); if (createMode === 'own') { await openJ(j.id); toast('Draft made. Add your material.'); } else { toast('Claude is writing the plan'); go('log'); } } catch (e) { alert(e.message); btn.disabled = false; }
+}
+
+// ================= Channels (autoflows) =================
+const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+const APPROVAL = { both: ['I check plans and videos', 'Claude researches and writes. You approve each plan, then each finished video.'], video: ['I only check finished videos', 'Plans are approved automatically. You watch and approve each video.'], none: ['Autopilot', 'Everything is made and published on schedule without you. Turn this on once you trust the channel.'] };
+function viewChannels() {
+  if (flowEdit) return viewChannelEdit();
+  const F = S.flows || [];
+  return head('Channels', 'Each channel runs by itself. It researches topics, writes plans, makes the videos and thumbnails, and uploads on its schedule.') +
+   `<div class="acts" style="margin-bottom:12px"><button class="btn go" onclick="flowEdit='new';render()">Add a channel</button></div>
+   ${F.map(f => { const s = f.schedule; return `<div class="chan"><div><h3>${esc(f.name)}</h3><p class="note" style="margin:0">${esc(f.channel.niche)}</p>
+      <p class="when">${s.longs} long and ${s.shorts} Shorts a day, ready by ${esc(s.readyBy)}</p>
+      <p class="note" style="margin:6px 0 0">${esc(APPROVAL[f.approvals][0])}. ${f.enabled ? (f.next ? `Next batch starts ${fmtWhen(f.next.start)}.` : '') : 'Paused.'} ${f.topics.length} topics queued, ${f.jobs} videos made.</p></div>
+      <div class="week" aria-label="Runs on ${s.days.map(i => DAYS[i]).join(', ')}">${DAYS.map((d, i) => `<span class="${s.days.includes(i) ? 'on' : ''}" title="${d}">${d[0]}</span>`).join('')}</div>
+      <div class="acts"><button class="btn" onclick="flowEdit='${f.id}';render()">Edit</button><button class="btn quiet" onclick="flowRun('${f.id}',this)">Make today's videos now</button><button class="btn quiet" onclick="flowToggle('${f.id}',${!f.enabled})">${f.enabled ? 'Pause' : 'Start'}</button></div></div>`; }).join('') || `<div class="sheet"><h3>No channels yet</h3><p class="note">Add one for each YouTube and Instagram account you want to run.</p></div>`}`;
+}
+async function flowToggle(id, on) { try { await api('/api/flows', { id, enabled: on }); toast(on ? 'Channel started' : 'Channel paused'); } catch (e) { alert(e.message); } await refresh(); }
+async function flowRun(id, btn) { btn.disabled = true; btn.textContent = 'Researching topics'; try { const r = await api(`/api/flows/${id}/run`, {}); toast(`${(r.jobs || []).length} videos started`); } catch (e) { alert(e.message); } await refresh(); }
+function viewChannelEdit() {
+  const isNew = flowEdit === 'new', f = isNew ? { id: '', name: '', enabled: false, channel: { name: '', niche: '', audience: '', tone: 'warm, curious storyteller' }, pack: 'auto', voice: S.settings.voice, longMinutes: 8, schedule: { days: [0, 1, 2, 3, 4, 5, 6], longs: 1, shorts: 2, readyBy: '09:00', leadHours: 8, publishLong: ['18:00'], publishShort: ['09:00', '15:00'] }, approvals: 'both', research: 'auto', topics: [], upload: { youtube: true, instagram: true, privacy: 'public' } } : (S.flows || []).find(x => x.id === flowEdit);
+  if (!f) { flowEdit = null; return viewChannels(); }
+  const s = f.schedule, root = 'channels\\' + (f.id || 'the-channel-id');
+  return `<button class="back" onclick="flowEdit=null;render()">Channels</button>` + head(isNew ? 'Add a channel' : esc(f.name), 'Set it up once. It then runs on its own schedule.') + `
+  <div class="cols" style="grid-template-columns:repeat(auto-fit,minmax(min(100%,460px),1fr));align-items:start">
+   <div class="sheet" style="display:grid;gap:16px"><h2>The channel</h2>
+     <label class="f">Name in History Studio<input id="fName" value="${esc(f.name)}" placeholder="For example: Map and Myth"></label>
+     <label class="f">Name on thumbnails and end cards<input id="fCh" value="${esc(f.channel.name)}"></label>
+     <label class="f">What the channel is about <small>Claude researches every topic from this, so be specific.</small><textarea id="fNiche" rows="3" placeholder="For example: pre-independence India told through archive photos and maps">${esc(f.channel.niche)}</textarea></label>
+     <div class="cols"><label class="f">Who watches<input id="fAud" value="${esc(f.channel.audience)}"></label><label class="f">Tone of voice<input id="fTone" value="${esc(f.channel.tone)}"></label></div>
+     <div class="cols"><label class="f">Look<select id="fPack">${Object.entries(S.packs).map(([k, p]) => `<option value="${k}" ${f.pack === k ? 'selected' : ''}>${esc(p.name)}</option>`).join('')}</select></label><label class="f">Narrator<select id="fVoice">${VOICES.map(v => `<option ${v === f.voice ? 'selected' : ''}>${v}</option>`).join('')}</select></label></div>
+     <label class="f">Long video length in minutes<input id="fMin" type="number" min="3" max="20" value="${f.longMinutes}" style="max-width:140px"></label>
+     <label class="f">Topics<select id="fRes"><option value="auto" ${f.research === 'auto' ? 'selected' : ''}>Claude researches new ones when the list runs low</option><option value="queue" ${f.research === 'queue' ? 'selected' : ''}>Only use my list</option></select></label>
+     <label class="f">Topic list <small>One per line. The top one is used next.</small><textarea id="fTopics" rows="7">${esc(f.topics.join('\n'))}</textarea></label>
+     ${isNew ? '' : `<div class="acts"><button class="btn quiet" onclick="flowResearch('${f.id}',this)">Research 12 topics now</button></div>`}
+   </div>
+   <div style="display:grid;gap:18px">
+    <div class="sheet" style="display:grid;gap:16px"><h2>Schedule</h2>
+     <fieldset style="border:0;padding:0;margin:0"><legend style="font-weight:700;margin-bottom:8px;font-size:14.5px">Days</legend><div class="week">${DAYS.map((d, i) => `<label title="${d}" style="cursor:pointer"><input type="checkbox" class="fDay" value="${i}" ${s.days.includes(i) ? 'checked' : ''} aria-label="${d}" style="position:absolute;opacity:0;width:1px;height:1px" onchange="this.nextElementSibling.classList.toggle('on',this.checked)"><span class="${s.days.includes(i) ? 'on' : ''}">${d[0]}</span></label>`).join('')}</div></fieldset>
+     <div class="cols"><label class="f">Long videos a day<input id="fLongs" type="number" min="0" max="6" value="${s.longs}"></label><label class="f">Shorts a day<input id="fShorts" type="number" min="0" max="12" value="${s.shorts}"></label></div>
+     <div class="cols"><label class="f">Ready for me by<input id="fReady" type="time" value="${s.readyBy}"></label><label class="f">Start this many hours earlier<input id="fLead" type="number" min="1" max="24" value="${s.leadHours}"></label></div>
+     <p class="note" style="margin:0">A long video takes about 40 minutes to make on this PC and a Short about 10, so leave enough hours.</p>
+     <div class="cols"><label class="f">Long videos go out at <small>Separate times with commas.</small><input id="fPubL" value="${esc(s.publishLong.join(', '))}"></label><label class="f">Shorts go out at <small>Separate times with commas.</small><input id="fPubS" value="${esc(s.publishShort.join(', '))}"></label></div>
+    </div>
+    <div class="sheet"><h2>Who checks what</h2><div class="modes" style="margin-top:12px">${Object.entries(APPROVAL).map(([k, [t, d]]) => `<label><input type="radio" name="fAppr" value="${k}" ${f.approvals === k ? 'checked' : ''}><span><b>${t}</b><br><span class="note">${d}</span></span></label>`).join('')}</div></div>
+    <div class="sheet" style="display:grid;gap:12px"><h2>Uploads</h2>
+     <label class="check"><input type="checkbox" id="fYT" ${f.upload.youtube ? 'checked' : ''}> Upload to this channel's YouTube</label>
+     <label class="check"><input type="checkbox" id="fIG" ${f.upload.instagram ? 'checked' : ''}> Post Shorts as Instagram Reels</label>
+     <label class="f">YouTube visibility<select id="fPriv" style="max-width:220px">${['public', 'unlisted', 'private'].map(v => `<option ${v === f.upload.privacy ? 'selected' : ''}>${v}</option>`).join('')}</select></label>
+     <p class="note" style="margin:0">This channel's logins live in <code>${esc(root)}</code>. Put <code>config\\youtube_client.json</code> and <code>config\\instagram.json</code> there (uploaders\\SETUP.md explains how to get them), then connect YouTube once with <code>set HS_UPLOADER_ROOT=${esc(root)} &amp;&amp; node uploaders\\youtube.mjs auth</code></p>
+     ${isNew ? '' : `<div class="acts"><button class="btn quiet" onclick="flowConn('${f.id}')">Check the connections</button><span class="note" id="fConn"></span></div>`}
+    </div>
+   </div>
+  </div>
+  <div class="dock">
+    <label class="check" style="font-weight:700"><input type="checkbox" id="fOn" ${f.enabled ? 'checked' : ''}> Run on schedule</label><span style="flex:1"></span>
+    ${isNew ? '' : `<button class="btn bad" onclick="if(confirm('Delete this channel? Videos already made stay in All videos.'))flowDelete('${f.id}')">Delete channel</button>`}
+    <button class="btn go" onclick="flowSave('${f.id}')">Save channel</button></div>`;
+}
+const times = v => String(v).split(/[ ,]+/).map(x => x.trim()).filter(x => /^\d{1,2}:\d{2}$/.test(x));
+async function flowSave(id) {
+  const f = { name: $('#fName').value.trim() || $('#fCh').value.trim(), enabled: $('#fOn').checked,
+    channel: { name: $('#fCh').value.trim() || $('#fName').value.trim(), niche: $('#fNiche').value.trim(), audience: $('#fAud').value.trim(), tone: $('#fTone').value.trim(), language: 'English' },
+    pack: $('#fPack').value, voice: $('#fVoice').value, longMinutes: +$('#fMin').value || 8, research: $('#fRes').value, topics: $('#fTopics').value.split('\n').map(x => x.trim()).filter(Boolean),
+    schedule: { days: $$('.fDay').filter(x => x.checked).map(x => +x.value), longs: +$('#fLongs').value || 0, shorts: +$('#fShorts').value || 0, readyBy: $('#fReady').value || '09:00', leadHours: +$('#fLead').value || 8, publishLong: times($('#fPubL').value), publishShort: times($('#fPubS').value) },
+    approvals: ($('input[name=fAppr]:checked') || {}).value || 'both', upload: { youtube: $('#fYT').checked, instagram: $('#fIG').checked, privacy: $('#fPriv').value } };
+  if (!f.name) return alert('Give the channel a name.'); if (!f.channel.niche) return alert('Describe what the channel is about. Claude researches topics from it.');
+  if (id) f.id = id;
+  try { await api('/api/flows', f); flowEdit = null; toast('Channel saved'); await refresh(); } catch (e) { alert(e.message); }
+}
+async function flowDelete(id) { await api(`/api/flows/${id}/delete`, {}); flowEdit = null; toast('Channel deleted'); await refresh(); }
+async function flowResearch(id, btn) { btn.disabled = true; btn.textContent = 'Claude is researching'; try { const r = await api(`/api/flows/${id}/research`, {}); toast(`${(r.topics || []).length} topics added`); flowEdit = id; } catch (e) { alert(e.message); } S = await api('/api/state'); render(); }
+async function flowConn(id) { $('#fConn').textContent = 'Checking'; try { const r = await api(`/api/flows/${id}/connections`, {}); $('#fConn').textContent = `YouTube ${r.youtube.connected ? 'connected' + (r.youtube.channel ? ' (' + r.youtube.channel + ')' : '') : 'not connected'}. Instagram ${r.instagram.connected ? 'connected' : 'not connected'}.`; } catch (e) { $('#fConn').textContent = e.message; } }
+
+// ================= Looks (library styles) =================
+function viewLooks() {
+  if (!STY.length) { api('/api/styles').then(x => { STY = x; render(); }).catch(() => {}); return head('Looks', 'Loading the style library.'); }
+  return head('Looks', `${Object.keys(S.v2styles).length} looks are used in your videos. These ${STY.length} sample films from the style library show where they come from.`) +
+    `<div class="gal">${STY.map(x => `<button onclick="gal='${x.slug}';render()"><img loading="lazy" src="${x.posterUrl || (x.presetImg && x.presetImg.h) || ''}" alt=""><b>${esc(x.name)}</b><span>${esc(x.category)}</span></button>`).join('')}</div>` +
+    (gal ? (() => { const x = STY.find(y => y.slug === gal); return x ? `<div class="modal" onclick="if(event.target===this){gal=null;render()}"><div class="sheet"><div class="acts" style="justify-content:space-between"><h2 style="margin:0">${esc(x.name)}</h2><button class="btn quiet" onclick="gal=null;render()">Close</button></div><p class="note">${esc(x.line)}</p>${x.previewUrl ? `<video controls autoplay src="${x.previewUrl}"></video>` : `<img src="${x.posterUrl}" style="width:100%" alt="">`}</div></div>` : ''; })() : '');
+}
+
+// ================= Settings =================
+function viewSettings() {
+  const s = S.settings;
+  return head('Settings', 'Studio-wide defaults. Each channel has its own schedule, look and accounts.') + `<div class="cols" style="grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));align-items:start">
+   <div class="sheet" style="display:grid;gap:16px"><h2>Production</h2>
+     <label class="f">Default narrator<select data-k="voice">${VOICES.map(v => `<option ${v === s.voice ? 'selected' : ''}>${v}</option>`).join('')}</select></label>
+     <label class="f">Speaking speed <small>1 is normal. Slightly under 1 sounds calmer.</small><input data-k="voiceSpeed" type="number" step="0.01" min="0.8" max="1.2" value="${s.voiceSpeed}" style="max-width:140px"></label>
+     <label class="check"><input type="checkbox" data-k="burnCaptions" ${s.burnCaptions ? 'checked' : ''}> Show word-by-word captions in the video</label>
+     <label class="check"><input type="checkbox" data-k="claudePicksImages" ${s.claudePicksImages ? 'checked' : ''}> Let Claude choose the best of the photos it finds (slower, better)</label>
+     <label class="f">Render workers <small>How many browser windows draw frames at once. 3 suits this PC.</small><input data-k="renderWorkers" type="number" min="1" max="8" value="${s.renderWorkers}" style="max-width:140px"></label>
+   </div>
+   <div class="sheet" style="display:grid;gap:16px"><h2>Claude</h2>
+     <label class="f">Model <small>Leave it empty for Claude Code's default, or give a model id.</small><input data-k="claudeModel" value="${esc(s.claudeModel)}"></label>
+     <p class="note" style="margin:0">Claude runs through the Claude Code login on this PC. No API key is stored here.</p>
+     <label class="f">Style library folder<input data-k="libraryPath" value="${esc(s.libraryPath)}"></label>
+   </div></div>
+   <div class="acts" style="margin-top:20px"><button class="btn go" onclick="saveSettings()">Save settings</button></div>`;
+}
+async function saveSettings() { const p = {}; $$('[data-k]').forEach(e => { p[e.dataset.k] = e.type === 'checkbox' ? e.checked : e.type === 'number' ? +e.value : e.value; }); try { await api('/api/settings', p); toast('Settings saved'); await refresh(true); } catch (e) { alert(e.message); } }
+
+// ================= render loop =================
+function render() {
+  nav(); if (!S) return;
+  const V = { desk: viewDesk, review: viewReview, make: viewMake, log: viewLog, channels: viewChannels, looks: viewLooks, settings: viewSettings };
+  $('#main').innerHTML = openId ? viewJob() : V[tab]();
+}
+// polls every 4 s; never redraws a page while you're typing or editing a form
+async function refresh(force) {
+  try { S = await api('/api/state'); } catch { return; }
+  const typing = document.activeElement && ['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement.tagName);
+  if (openId) {
+    const j = S.jobs.find(x => x.id === openId);
+    if (j && openJob && j.updatedAt !== openJob.updatedAt && !typing && !['script_review', 'draft'].includes(openJob.status) && !$$('video').some(v => !v.paused)) { openJob = await api('/api/jobs/' + openId); render(); } else nav();
+    return;
+  }
+  if (!force && (typing || (tab === 'channels' && flowEdit) || ['make', 'settings'].includes(tab) || gal)) return nav();
+  render();
+}
+refresh(true); setInterval(refresh, 4000);
+</script></body></html>

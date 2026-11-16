@@ -73,7 +73,7 @@ Or let the **schedule** do it: the month planner fills every day with titles, an
 
 ## 🎬 Videos made with AutoTube Studio
 
-Every video below was researched, written, animated, voiced and uploaded by AutoTube Studio. **Click any thumbnail to watch it on YouTube.**
+Every video below was researched, written, animated and voiced by AutoTube Studio: exam lessons, history documentaries and marketing ads. **Click any thumbnail to watch it.**
 
 ### 🧮 Exam channel: *Elevate with Sanjeev [IITK]* (JEE / NEET, Hinglish)
 
@@ -135,6 +135,49 @@ Documentaries and Shorts on the hidden stories behind everyday things, mixing ma
 </table>
 
 ➡️ **Watch more:** [Little Big Histories on YouTube](https://www.youtube.com/@LittleBigHistories)
+
+### 📣 Marketing channel: *MargBooks* (product ads for shop owners)
+
+Story-led ad Shorts for accounting software: a real shop problem, then the fix. Same studio, same approval flow.
+
+<table>
+<tr>
+<td align="center" width="25%" valign="top"><a href="showcase/1l7h.mp4"><img src="showcase/1l7h.jpg" width="200" alt=""/></a><br/><sub><b>📱 Short · ▶️ watch</b></sub><br/><a href="showcase/1l7h.mp4">11 PM, Passbook in Hand, Ticking Entries One by One</a><br/><sub>🎨 woodcut · spy-titles · swiss-motion · risograph</sub></td>
+<td align="center" width="25%" valign="top"><a href="showcase/nkpd.mp4"><img src="showcase/nkpd.jpg" width="200" alt=""/></a><br/><sub><b>📱 Short · ▶️ watch</b></sub><br/><a href="showcase/nkpd.mp4">One Wrong MRP on a Bill Can Cost You a Customer</a><br/><sub>🎨 risograph · one-line · pictogram-motion · midcentury-toon</sub></td>
+<td align="center" width="25%" valign="top"><a href="showcase/ohj5.mp4"><img src="showcase/ohj5.jpg" width="200" alt=""/></a><br/><sub><b>📱 Short · ▶️ watch</b></sub><br/><a href="showcase/ohj5.mp4">Selling on Amazon, Flipkart and Meesho? Stop Typing Orders</a><br/><sub>🎨 cel-anime-80s · news-package · iso-infographic · pixel-rpg</sub></td>
+<td align="center" width="25%" valign="top"><a href="showcase/tg9q.mp4"><img src="showcase/tg9q.jpg" width="200" alt=""/></a><br/><sub><b>📱 Short · ▶️ watch</b></sub><br/><a href="showcase/tg9q.mp4">Your Shop Computer Crashed. Did Your Whole Year's Books Go Too?</a><br/><sub>🎨 cel-anime-80s · living-screencast · city-symphony · halftone-dossier</sub></td>
+</tr>
+</table>
+
+### 🎞️ More videos made with the studio (watch right here on GitHub)
+
+These are finished videos not yet published on YouTube. Click a thumbnail to play it on GitHub (small web copy).
+
+**🏛️ History**
+
+<table>
+<tr>
+<td align="center" width="25%" valign="top"><a href="showcase/3r0t.mp4"><img src="showcase/3r0t.jpg" width="200" alt=""/></a><br/><sub><b>📱 Short · ▶️ watch</b></sub><br/><a href="showcase/3r0t.mp4">Halifax 1917: The Dispatcher Who Stayed at His Telegraph Key</a><br/><sub>🎨 satellite-briefing · cel-anime-80s · archive-lighttable · woodcut</sub></td>
+<td align="center" width="25%" valign="top"><a href="showcase/rd28.mp4"><img src="showcase/rd28.jpg" width="200" alt=""/></a><br/><sub><b>📱 Short · ▶️ watch</b></sub><br/><a href="showcase/rd28.mp4">Jahangir's Golden Chain: Anyone Could Ring the Emperor's Bells</a><br/><sub>🎨 shadow-puppet · engraving · visual-investigation · paper-lantern</sub></td>
+<td align="center" width="25%" valign="top"><a href="showcase/u4s8.mp4"><img src="showcase/u4s8.jpg" width="200" alt=""/></a><br/><sub><b>📱 Short · ▶️ watch</b></sub><br/><a href="showcase/u4s8.mp4">The Pirate Who Beat China's Navy, Then Retired Rich and Pardoned</a><br/><sub>🎨 halftone-dossier · ink-wash · cel-anime-80s · papercut-red</sub></td>
+<td align="center" width="25%" valign="top"><a href="showcase/uuuc.mp4"><img src="showcase/uuuc.jpg" width="200" alt=""/></a><br/><sub><b>📱 Short · ▶️ watch</b></sub><br/><a href="showcase/uuuc.mp4">Emperor Akbar Never Learned to Read. He Built a Giant Library Anyway</a><br/><sub>🎨 engraving · shadow-puppet · archive-lighttable · visual-investigation</sub></td>
+</tr>
+<tr>
+<td align="center" width="25%" valign="top"><a href="showcase/rcgn.mp4"><img src="showcase/rcgn.jpg" width="200" alt=""/></a><br/><sub><b>📱 Short · ▶️ watch</b></sub><br/><a href="showcase/rcgn.mp4">The story of sugar</a><br/><sub>🎨 cel-anime-80s · archive-lighttable · transit-map · watercolor</sub></td>
+</tr>
+</table>
+
+**🧮 Exam (JEE / NEET)**
+
+<table>
+<tr>
+<td align="center" width="25%" valign="top"><a href="showcase/zgu7.mp4"><img src="showcase/zgu7.jpg" width="200" alt=""/></a><br/><sub><b>📱 Short · ▶️ watch</b></sub><br/><a href="showcase/zgu7.mp4">Raat Ko Padho, Phir So Jao: Neend Mein Hi Yaad Pakki Hoti Hai? 😴</a><br/><sub>🎨 paper-lantern · whiteboard · cel-anime-80s · risograph</sub></td>
+<td align="center" width="25%" valign="top"><a href="showcase/b5o5.mp4"><img src="showcase/b5o5.jpg" width="200" alt=""/></a><br/><sub><b>📱 Short · ▶️ watch</b></sub><br/><a href="showcase/b5o5.mp4">Barf Pighli Toh Glass Ka Paani Girega? 90% Galat Bolte Hain 🧊</a><br/><sub>🎨 pixel-rpg · engraving · watercolor · risograph</sub></td>
+<td align="center" width="25%" valign="top"><a href="showcase/3hhn.mp4"><img src="showcase/3hhn.jpg" width="200" alt=""/></a><br/><sub><b>📱 Short · ▶️ watch</b></sub><br/><a href="showcase/3hhn.mp4">Kambal jhaadne se dhool kyun nikalti hai? Inertia quiz</a></td>
+<td align="center" width="25%" valign="top"><a href="showcase/7dsh.mp4"><img src="showcase/7dsh.jpg" width="200" alt=""/></a><br/><sub><b>📱 Short · ▶️ watch</b></sub><br/><a href="showcase/7dsh.mp4">One ball is dropped and another is thrown horizontally from the same height at the same time: which lands first?</a></td>
+</tr>
+</table>
+
 
 ---
 

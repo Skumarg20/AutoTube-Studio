@@ -42,3 +42,6 @@ Thumbs.db
 # --- Local AI assistant notes (kept on this PC only) ---
 CLAUDE.md
 .claude/
+
+# --- Showcase clips shown in the README ---
+!showcase/*.mp4

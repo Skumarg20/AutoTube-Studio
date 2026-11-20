@@ -1,4 +1,4 @@
-# AutoTube Studio supervisor: keeps server.mjs running and restarts it if it stops.
+# AutoTube Studio supervisor: keeps server.js running and restarts it if it stops.
 # Started by the scheduled task "AutoTubeStudio" (deploy\install-autostart.ps1). You can also run it by hand:
 #   powershell -ExecutionPolicy Bypass -File deploy\run-studio.ps1
 $root = Split-Path -Parent $PSScriptRoot
@@ -23,11 +23,11 @@ while ($true) {
     for ($i = 4; $i -ge 1; $i--) { $a = Join-Path $root "data\server.$i.log"; if (Test-Path $a) { Move-Item -Force $a (Join-Path $root "data\server.$($i + 1).log") } }
     Move-Item -Force $log (Join-Path $root 'data\server.1.log')
   }
-  Say "checking the machine (node tools/doctor.mjs)"
-  cmd /c "node tools\doctor.mjs >> `"$log`" 2>&1"
+  Say "checking the machine (node tools/doctor.js)"
+  cmd /c "node tools\doctor.js >> `"$log`" 2>&1"
   Say "starting AutoTube Studio"
   $t0 = Get-Date
-  cmd /c "node server.mjs >> `"$log`" 2>&1"
+  cmd /c "node server.js >> `"$log`" 2>&1"
   $code = $LASTEXITCODE
   # crash loop protection: wait longer each time it dies within 2 minutes
   if (((Get-Date) - $t0).TotalSeconds -lt 120) { $fast++ } else { $fast = 0 }

@@ -11,5 +11,5 @@ if %errorlevel%==0 (
 )
 start "" /min powershell -NoProfile -WindowStyle Hidden -Command "Start-Sleep 5; Start-Process http://localhost:%PORT%"
 title AutoTube Studio - keep this window open
-node server.mjs
+node server.js
 pause

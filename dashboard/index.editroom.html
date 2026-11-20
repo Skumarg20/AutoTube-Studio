@@ -417,7 +417,7 @@ function viewChannelEdit() {
      <label class="check"><input type="checkbox" id="fYT" ${f.upload.youtube ? 'checked' : ''}> Upload to this channel's YouTube</label>
      <label class="check"><input type="checkbox" id="fIG" ${f.upload.instagram ? 'checked' : ''}> Post Shorts as Instagram Reels</label>
      <label class="f">YouTube visibility<select id="fPriv" style="max-width:220px">${['public', 'unlisted', 'private'].map(v => `<option ${v === f.upload.privacy ? 'selected' : ''}>${v}</option>`).join('')}</select></label>
-     <p class="note" style="margin:0">This channel's logins live in <code>${esc(root)}</code>. Put <code>config\\youtube_client.json</code> and <code>config\\instagram.json</code> there (uploaders\\SETUP.md explains how to get them), then connect YouTube once with <code>set HS_UPLOADER_ROOT=${esc(root)} &amp;&amp; node uploaders\\youtube.mjs auth</code></p>
+     <p class="note" style="margin:0">This channel's logins live in <code>${esc(root)}</code>. Put <code>config\\youtube_client.json</code> and <code>config\\instagram.json</code> there (uploaders\\SETUP.md explains how to get them), then connect YouTube once with <code>set HS_UPLOADER_ROOT=${esc(root)} &amp;&amp; node uploaders\\youtube.js auth</code></p>
      ${isNew ? '' : `<div class="acts"><button class="btn quiet" onclick="flowConn('${f.id}')">Check the connections</button><span class="note" id="fConn"></span></div>`}
     </div>
    </div>

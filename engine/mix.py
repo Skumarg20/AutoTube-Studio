@@ -132,7 +132,7 @@ voice = voice / (np.abs(voice).max() or 1) * .9
 from scipy.signal import fftconvolve
 voice = hp(voice, 70)
 voice = voice + .14 * lp(voice, 260) + .18 * hp(voice, 2800)
-NATURAL = TL.get('voiceKind') in ('eleven', 'own')   # a real (cloned or recorded) human voice: keep it close and punchy, no room
+NATURAL = TL.get('voiceKind') in ('eleven', 'own', 'character')   # a real-sounding voice (cloned, recorded, or the presenter's clip): keep it close and punchy, no room
 if NATURAL:
     # "YouTube teacher" chain: clear presence, firmer 3:1 compression for steady loudness, no reverb (reverb made it distant and dull)
     voice = voice + .22 * hp(voice, 3200) + .06 * lp(voice, 180)

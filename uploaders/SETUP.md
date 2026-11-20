@@ -42,7 +42,7 @@ Commands below are run from the `autotube-studio` folder in PowerShell or Git Ba
 
 ### 5. Connect your channel
 ```
-node uploaders/youtube.mjs auth
+node uploaders/youtube.js auth
 ```
 A browser tab opens (if not, copy the long link printed in the terminal).
 Choose your channel's Google account. You will see **"Google hasn't verified this app"** -
@@ -52,7 +52,7 @@ to `data/youtube_token.json` (also private).
 
 Check it worked:
 ```
-node uploaders/youtube.mjs status
+node uploaders/youtube.js status
 ```
 It should print `"connected":true` and your channel name.
 
@@ -69,7 +69,7 @@ It should print `"connected":true` and your channel name.
   Until then, plan to check each upload in YouTube Studio; scheduling/public may not take effect.
 - **Login expires every 7 days in Testing mode:** while the consent screen is in "Testing", Google
   expires the saved login after 7 days. When uploads start failing with "Refresh token rejected",
-  just run `node uploaders/youtube.mjs auth` again. (Publishing the app to "In production" removes
+  just run `node uploaders/youtube.js auth` again. (Publishing the app to "In production" removes
   the 7-day limit but Google may then ask for verification.)
 - **Custom thumbnails** need a verified channel (phone verification at https://www.youtube.com/verify).
   If not verified, the upload still succeeds; only the thumbnail is skipped with a warning.
@@ -110,7 +110,7 @@ Instagram app -> Profile -> menu (three lines) -> **Settings and privacy** -> **
 5. Make the token long-lived: open https://developers.facebook.com/tools/debug/accesstoken/ ,
    paste the token, click **Debug**, then **Extend Access Token** at the bottom. Copy the new token.
    A long-lived user token lasts about **60 days**; repeat this step when it expires
-   (`node uploaders/instagram.mjs status` will show `"connected":false`).
+   (`node uploaders/instagram.js status` will show `"connected":false`).
 
 ### 5. Fill in the config
 Copy `config/instagram.example.json` to `config/instagram.json` and fill it in:
@@ -123,7 +123,7 @@ Copy `config/instagram.example.json` to `config/instagram.json` and fill it in:
 ```
 Keep this file private. Check it:
 ```
-node uploaders/instagram.mjs status
+node uploaders/instagram.js status
 ```
 It should print `"connected":true` and your Instagram username.
 
@@ -137,11 +137,11 @@ It should print `"connected":true` and your Instagram username.
 
 ## Command reference
 ```
-node uploaders/youtube.mjs auth
-node uploaders/youtube.mjs status
-node uploaders/youtube.mjs upload <video.mp4> <meta.json>
-node uploaders/instagram.mjs status
-node uploaders/instagram.mjs upload <video.mp4> <meta.json>
+node uploaders/youtube.js auth
+node uploaders/youtube.js status
+node uploaders/youtube.js upload <video.mp4> <meta.json>
+node uploaders/instagram.js status
+node uploaders/instagram.js upload <video.mp4> <meta.json>
 ```
 Each command prints one JSON line at the end, e.g. `{"ok":true,"platform":"youtube","id":"...","url":"https://youtu.be/..."}`
 or `{"ok":false,...,"error":"..."}`. Set `HS_DEBUG=1` to see full error details on stderr.

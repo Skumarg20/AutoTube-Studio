@@ -11,7 +11,7 @@ Source of truth: the Lemo Opuscar library at `<libraryPath>\styles\<slug>\` (lib
 4. **Nothing new without the owner.** A new theme, skill or custom style is added only when the owner says so; then it gets a row here.
 5. If no theme fits a video, **stop and ask** instead of inventing one.
 6. Lemo Opuscar is the base for picture and render. Voice (ElevenLabs), timing, quizzes, formulas, uploads stay AutoTube Studio's job, but they must be drawn *in the chosen theme's look*.
-7. The owner dislikes 3D looks: themes marked **3D** are used only if the owner asks.
+7. All themes are on, the 3D ones too (owner 2026-11-16: "band kyu hai on kro sab"). 3D themes are drawn with three.js (the page maps "three"). The studio also has its own themes in `studio-themes/<slug>` (STYLE.md, DEMO.md, demo/ kit): **comic-book** and **clay-3d** (owner 2026-11-16: "jo nhi hai wo add kro").
 
 Default picks:
 - **IIT JEE / NEET channels:** `chalkboard` (solved questions, traps, one-idea lessons) and `whiteboard` (concepts, "how does X work"). Optional: `dataviz` (graphs), `blueprint` (mechanics / devices), `midcentury-toon` (step-by-step how-to: notes, timetables), `isometric-picture-book` (exam-day rules, strategy).
@@ -99,7 +99,7 @@ Columns: **Theme** (slug) · **What it looks like** · **Use it for** · **Why /
 | `teardown` | Real product exploded from its CAD files | Hardware | Not for our channels | — (3D) |
 | `white-model` | White massing model with data projected on it | Urban planning | City history with data | — (3D) |
 
-### Materials & 3D (3D = only if the owner asks)
+### Materials & 3D (on since 2026-11-16)
 | Theme | What it looks like | Use it for | Fit |
 |---|---|---|---|
 | `brick-toy` | Toy-brick stop motion on a desk | Toys, kids | — (3D) |
@@ -144,26 +144,26 @@ That is now forbidden. The engine must be rebuilt on the library themes before t
 - **What Claude makes:** only the content: narration, board notes, formulas, diagram line drawings, quiz questions, and the choice of theme per chapter (with a reason shown in the plan). No looks, characters, backgrounds, thumbnail designs or effects of its own.
 - **Thumbnails** are a frame from the video itself (the anime title frame or a boxed formula), not a separate design.
 - **Sound:** your ElevenLabs voice, the whiteboard theme's marker/eraser foley, and the score.
-- **Hard blocks in code:** approving a plan that is not a library-theme plan is refused; rendering anything that is not a built library theme for that format is refused (`lib/v2/build.mjs`, `LIB_BUILT`); channels without built themes (history) are refused at planning; the old template engine is retired.
-- **Adding a theme:** only when the owner asks. Build its director over the library engine, add it to `LIB_BUILT`, `LIB_STYLES` (plan.mjs), the planner prompt, and this file.
+- **Hard blocks in code:** approving a plan that is not a library-theme plan is refused; rendering anything that is not a built library theme for that format is refused (`lib/v2/build.js`, `LIB_BUILT`); channels without built themes (history) are refused at planning; the old template engine is retired.
+- **Adding a theme:** only when the owner asks. Build its director over the library engine, add it to `LIB_BUILT`, `LIB_STYLES` (plan.js), the planner prompt, and this file.
 
-## Theme rules for planning (lib/v2/themes.mjs)
+## Theme rules for planning (lib/v2/themes.js)
 
-Theme mixing is decided in PLANNING, not in the engines. `lib/v2/themes.mjs` lists every usable theme with its look, what it is
+Theme mixing is decided in PLANNING, not in the engines. `lib/v2/themes.js` lists every usable theme with its look, what it is
 USED FOR, what it is NEVER FOR, the shots it accepts and its length, plus the mixing rules. The planner prompt
-(`lib/v2/boardprompt.mjs`) is built from it, and every plan is checked against it (`checkThemes`, called from `lib/v2/plan.mjs`):
+(`lib/v2/boardprompt.js`) is built from it, and every plan is checked against it (`checkThemes`, called from `lib/v2/plan.js`):
 - every available theme is used at least once (twice each in long videos); a single-theme video is rejected;
 - themes alternate by content type (drama/hook/reveal vs teaching); never two chapters of the same theme in a row;
 - theme changes every 5-15 s in Shorts, every 1-2 min in long videos; 3-5 chapters (Shorts), 6-10 (long);
 - each chapter uses only its theme's shots; every chapter carries a "why" (shown in the plan review);
 - a plan that breaks a rule cannot be approved.
-To add a theme: add one row to THEMES in `lib/v2/themes.mjs` (once it can be rendered). The rules then include it automatically.
+To add a theme: add one row to THEMES in `lib/v2/themes.js` (once it can be rendered). The rules then include it automatically.
 
 ## Per-video scene direction (owner decision, 2026-11-13) — replaces "nothing built by Claude"
 
 Videos are made the way the Lemo Opuscar library makes its films (like `films/s-*` and the theme demos):
 1. **Plan**: content + theme per chapter (theme rules above). Every anime shot carries an **action**: what happens on screen.
-2. **Direct** (`lib/v2/director.mjs`, during the build): Claude reads the theme's `STYLE.md`, `DEMO.md`, the demo source and the finished
+2. **Direct** (`lib/v2/director.js`, during the build): Claude reads the theme's `STYLE.md`, `DEMO.md`, the demo source and the finished
    film `films/s-cel-anime-80s`, then writes **this video's** anime scenes (`jobs/<id>/anime_scenes.js`) — only with the theme's own
    modules (`/styles/cel-anime-80s/demo/cel.js, head80.js, pal.js, fx.js, bg.js, hands.js`), deterministic, no network — renders test
    frames with the library's `still.mjs`, looks at them and fixes until they match STYLE.md.
@@ -175,16 +175,26 @@ Allowed: Claude writing scenes/objects/characters for a video **with the theme's
 
 - **Every channel can use every non-3D library theme (55 of the 66).** The planner picks a theme for each chapter from what that part is about, varies them between videos (it is told the channel's recent themes), and gives a reason. 3D themes stay out unless the owner asks.
 - **JEE/NEET:** `whiteboard` (engine) carries everything that is WRITTEN: formulas, derivations, quizzes, sims, solutions. Every other part uses the best-fitting theme (chalkboard, microscope, circuit-board, dataviz, blueprint, cel-anime-80s, countdown, game-show...).
-- The list is built in `lib/v2/themes.mjs` from the hand-written rows there plus `lib/v2/catalog.mjs` (generated from the table above).
+- The list is built in `lib/v2/themes.js` from the hand-written rows there plus `lib/v2/catalog.js` (generated from the table above).
 
 ## All channels (2026-11-13, replaced by the section above)
 
-- **JEE/NEET (exam)**: `whiteboard` (engine) + `cel-anime-80s` (directed). Planner: `lib/v2/boardprompt.mjs`.
+- **JEE/NEET (exam)**: `whiteboard` (engine) + `cel-anime-80s` (directed). Planner: `lib/v2/boardprompt.js`.
 - **History and any-topic channels**: 16 documentary themes from the library — newsreel,
   silent-film, archive-lighttable, visual-investigation, kino-montage, transit-map, satellite-briefing, shadow-puppet, ink-wash,
   ukiyoe, woodcut, engraving, stained-glass, paper-lantern, papercut-red, watercolor — plus cel-anime-80s for action/drama.
-  Planner: `lib/v2/histprompt.mjs` (shot type `scene` with an `action`, optional `text` and archive `img`).
+  Planner: `lib/v2/histprompt.js` (shot type `scene` with an `action`, optional `text` and archive `img`).
   At least 2 themes per Short and 3 per long video (4-6 best), alternating, each with a "why".
-- **Directed themes** are animated per video by `directScenes` in `lib/v2/director.mjs` → `jobs/<id>/scenes.js` (imports only
+- **Directed themes** are animated per video by `directScenes` in `lib/v2/director.js` → `jobs/<id>/scenes.js` (imports only
   `/styles/<theme>/demo/*.js` of the themes used, or `/core/lib.js`; exports one function per shot + each theme's subtitle style).
-- The theme list and rules for every channel live in `lib/v2/themes.mjs`; the build refuses any style not in that list.
+- The theme list and rules for every channel live in `lib/v2/themes.js`; the build refuses any style not in that list.
+
+
+## Studio themes (made in AutoTube Studio, not in the library)
+
+| Theme | What it looks like | Use it for | Fit |
+|---|---|---|---|
+| `comic-book` | Printed comic page: ink panels, Ben-Day dots, balloons, captions, sound-effect words | Stories with drama, myths, exam tricks as hero vs villain, ads | H J S |
+| `clay-3d` | Plasticine stop-motion on a tabletop set, fingerprinted clay, soft light | Friendly explainers, folk tales, everyday science, cute ads | H J S |
+
+Kits: `studio-themes/<slug>/demo/*.js` (copied into each job as `stheme/<slug>/`). Rules: `studio-themes/<slug>/STYLE.md`.

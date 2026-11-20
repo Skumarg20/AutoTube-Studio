@@ -70,7 +70,7 @@ if (-not (Have claude)) { throw 'Claude Code did not install. Install it from ht
 Write-Host "   $(claude --version)"
 
 Step 'Unpacking AutoTube Studio and the Lemo Opuscar library'
-if (Test-Path "$app\server.mjs") {
+if (Test-Path "$app\server.js") {
   Write-Host "   $app already exists: keeping it (rename it first to unpack a fresh copy)"
 } else {
   if (-not (Test-Path "$pkg\autotube-studio.zip")) { throw "autotube-studio.zip not found next to this script ($pkg)" }
@@ -91,7 +91,7 @@ $req = @('requirements.txt', 'requirements-voice.txt', 'requirements-music.txt')
 Pop-Location
 Push-Location $app
 npm install --no-audit --no-fund
-node -e "import('./lib/store.mjs').then(m=>{m.saveSettings({libraryPath: process.argv[1]});console.log('   libraryPath = '+process.argv[1])})" $lib
+node -e "import('./lib/store.js').then(m=>{m.saveSettings({libraryPath: process.argv[1]});console.log('   libraryPath = '+process.argv[1])})" $lib
 if (-not (Test-Path 'config\.env')) { Copy-Item 'config\.env.example' 'config\.env'; Write-Host '   created config\.env (optional keys and settings; edit it any time)' }
 if ($Server) {
   SetEnvLine 'config\.env' 'HS_TUNNEL' 'quick'
@@ -114,11 +114,11 @@ if (-not (Test-Path $cred) -and -not $env:ANTHROPIC_API_KEY) {
 Push-Location $app
 if ($Server) {
   Step 'Dashboard password (protects the public link)'
-  $hasPw = node -e "import('./lib/ops.mjs').then(m=>console.log(m.loginOn()))"
-  if ($hasPw.Trim() -ne 'true') { node tools\set-password.mjs } else { Write-Host '   already set (change it with: node tools\set-password.mjs)' }
+  $hasPw = node -e "import('./lib/ops.js').then(m=>console.log(m.loginOn()))"
+  if ($hasPw.Trim() -ne 'true') { node tools\set-password.js } else { Write-Host '   already set (change it with: node tools\set-password.js)' }
 }
 Step 'Checking this computer'
-node tools\doctor.mjs
+node tools\doctor.js
 Pop-Location
 
 # a desktop shortcut that starts the studio (or just opens it when it already runs)

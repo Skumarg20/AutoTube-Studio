@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>AutoTube Studio</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Geist:wght@400..700&family=Geist+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Geist:wght@400..700&family=Geist+Mono:wght@400;600&family=Barlow+Semi+Condensed:wght@700&display=swap" rel="stylesheet">
 <style>
 :root{
   --bg:#0b0c10; --bg2:#111319; --raise:#171a22; --glass:rgba(23,26,34,.72); --line:rgba(255,255,255,.08); --line2:rgba(255,255,255,.16);
@@ -65,7 +65,8 @@ main{padding:84px 28px 130px;max-width:1500px;margin:0 auto}
 .h3{font:650 19px/1.2 var(--display);margin:0}
 .sub{color:var(--dim);font-size:17px;max-width:60ch;margin:14px 0 0}
 .note{color:var(--dim);font-size:14px;max-width:72ch}
-.err{color:var(--tally);font-size:14px}.warnt{color:var(--warn);font-size:14px}
+.err{color:var(--tally);font-size:14px}
+#alerts{max-width:1240px;margin:0 auto;padding:0 24px}#alerts:empty{display:none}.alert{border-radius:14px;padding:14px 18px;margin:14px 0 0;font-size:14px;line-height:1.5}.alert b{font-weight:650}.alert.limit{background:var(--warn-soft);color:var(--warn);border:1px solid var(--warn)}.alert.bad{background:var(--tally-soft);border:1px solid var(--tally);color:var(--text)}.alert.bad h3{margin:0 0 8px;color:var(--tally);font-size:15px}.alert ul{margin:0;padding:0;list-style:none;max-height:220px;overflow:auto}.alert li{display:flex;gap:10px;align-items:baseline;padding:5px 0;border-top:1px solid var(--tally-soft)}.alert li:first-child{border-top:0}.alert li small{color:var(--mute);white-space:nowrap}.alert li span{flex:1;overflow-wrap:anywhere}.alert .acts{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}@media (max-width:640px){#alerts{padding:0 16px}.alert li{flex-wrap:wrap}}.warnt{color:var(--warn);font-size:14px}
 .pagehead{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;flex-wrap:wrap;margin:18px 0 34px}
 .sec{display:flex;align-items:baseline;gap:14px;margin:56px 0 18px;flex-wrap:wrap}
 .sec .count{font:500 13px var(--mono);color:var(--mute)}
@@ -273,6 +274,18 @@ pre.log{font:12.5px/1.65 var(--mono);white-space:pre-wrap;max-height:340px;overf
 .gal .t{padding:12px 14px 14px}.gal .t b{font:650 16px var(--display)}.gal .t span{display:block;color:var(--dim);font-size:12.5px}
 
 /* ---------- overlays ---------- */
+#dlg .modal{z-index:70;place-items:center;padding:16px}
+.dlg{width:min(460px,100%);background:var(--raise);border:1px solid var(--line2);border-radius:20px;box-shadow:var(--shadow);padding:24px 24px 20px;display:grid;gap:14px;animation:pop .22s cubic-bezier(.2,.9,.3,1.2)}
+.dlg .dh{display:flex;gap:14px;align-items:flex-start}
+.dlg .di{flex:none;width:40px;height:40px;border-radius:12px;display:grid;place-items:center;background:var(--work-soft);color:var(--work)}
+.dlg .di svg{width:20px;height:20px}
+.dlg.danger .di{background:var(--tally-soft);color:var(--tally)}.dlg.warn .di{background:var(--warn-soft);color:var(--warn)}
+.dlg h2{margin:0;font:650 18px/1.3 var(--display);color:var(--text)}
+.dlg p{margin:4px 0 0;color:var(--dim);font-size:14.5px;line-height:1.55;white-space:pre-line;overflow-wrap:anywhere}
+.dlg input{width:100%}
+.dlg .acts{display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;margin-top:4px}
+.dlg .acts .btn{min-width:96px;justify-content:center}
+@media (max-width:520px){.dlg .acts{flex-direction:column-reverse}.dlg .acts .btn{width:100%}}
 .modal{position:fixed;inset:0;z-index:50;background:rgba(5,6,8,.7);backdrop-filter:blur(10px);display:grid;place-items:start center;padding:12vh 16px 20px;animation:fade .18s;overflow:auto}
 @keyframes fade{from{opacity:0}}
 .modal .box{width:min(980px,100%);background:var(--raise);border:1px solid var(--line2);border-radius:24px;box-shadow:var(--shadow);overflow:hidden;animation:pop .22s cubic-bezier(.2,.9,.3,1.2)}
@@ -331,6 +344,39 @@ pre.log{font:12.5px/1.65 var(--mono);white-space:pre-wrap;max-height:340px;overf
 .acct code{font:12.5px var(--mono);background:var(--raise);padding:2px 6px;border-radius:6px;word-break:break-all}
 .acct .arow{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.acct .arow input{flex:1;min-width:150px}
 .acct .res{font-size:14px;padding:10px 12px;border-radius:12px;background:var(--raise)}
+
+.sb .sbhead{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap}
+.sbch{margin-top:14px}.sbchh{font-size:14px;margin:0 0 8px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}.sbwhy{opacity:.65;font-size:12px}
+.sbdot{width:12px;height:12px;border-radius:4px;background:hsl(var(--h) 55% 42%)}
+.sbgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px}
+.sbcard{background:var(--raise);border:1px solid var(--line2);border-radius:12px;padding:8px;display:flex;flex-direction:column;gap:6px;font-size:12.5px}
+.sbtop{display:flex;justify-content:space-between;align-items:center;opacity:.75;font-size:11px}.sbn{background:#127a6e;color:#fff;border-radius:6px;padding:1px 7px;font-weight:700;font-size:12px}
+.sbpic{position:relative;aspect-ratio:9/16;border-radius:8px;overflow:hidden;background:#eef1f4}.sbpic canvas{width:100%;height:100%;display:block}
+.sbz{position:absolute;left:6px;top:6px;background:#e5322d;color:#fff;font-size:10px;font-weight:700;padding:2px 6px;border-radius:5px;text-transform:uppercase}.sbz.sbreal{background:#127a6e}
+.sbscene{height:100%;padding:10px;display:flex;flex-direction:column;justify-content:center;gap:8px;color:#fff;background:linear-gradient(160deg,hsl(var(--h) 55% 40%),hsl(calc(var(--h) + 35) 50% 22%))}
+.sbscene small{position:absolute;top:8px;left:10px;font-size:10px;opacity:.85;text-transform:uppercase;letter-spacing:.04em}
+.sbscene b{font-size:19px;line-height:1.15;text-transform:uppercase;background:#ffd400;color:#111;padding:3px 6px;border-radius:4px;align-self:flex-start}
+.sbscene p{margin:0;font-size:11.5px;line-height:1.35;opacity:.95}
+.sbsay{font-weight:600;line-height:1.35}.sbcont{opacity:.6;font-weight:400}.sbtxt{font-weight:800;text-transform:uppercase;font-size:12px}.sbact{opacity:.7;font-size:11.5px;line-height:1.35}
+.sbnote{width:100%;font-size:12px;resize:vertical;min-height:38px}
+.sb{grid-column:1/-1}
+.sbwrap{display:grid;grid-template-columns:minmax(0,1fr) minmax(280px,360px);gap:18px;align-items:start}
+.sbscript{position:sticky;top:80px;display:flex;flex-direction:column;gap:10px;background:var(--raise);border:1px solid var(--line2);border-radius:12px;padding:14px;max-height:calc(100vh - 290px);min-height:420px}
+.sbsh{display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap}
+.sbstext{overflow:auto;min-height:120px;padding-right:4px}
+.sbsp{margin-bottom:14px}.sbsph{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;opacity:.6;margin-bottom:6px}
+.sbstext p{margin:0 0 10px;font-size:16px;line-height:1.6;display:flex;gap:10px}.sbsn{flex:none;font-size:11px;font-weight:700;opacity:.5;padding-top:5px;min-width:18px}
+@media (max-width:900px){.sbwrap{grid-template-columns:1fr}.sbscript{position:static;max-height:none}}
+.sbfoot{margin-top:16px;display:flex;flex-direction:column;gap:10px}.sbfoot textarea{width:100%}
+.castgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,380px),1fr));gap:16px}.castm{display:flex;gap:14px;align-items:flex-start}.castm img,.castph{width:120px;height:120px;object-fit:cover;border-radius:12px;border:1px solid var(--line2);flex:none}.castph{display:grid;place-items:center;text-align:center;font-size:12px;opacity:.7;padding:8px}
+.scn{margin-top:14px;display:flex;flex-direction:column;gap:12px}.scfaces{display:inline-flex;gap:4px;margin-left:6px}.scfaces img{width:28px;height:28px;border-radius:50%;object-fit:cover;border:1px solid var(--line2)}
+.scrow{display:grid;grid-template-columns:150px minmax(0,1fr);gap:14px;background:var(--raise);border:1px solid var(--line2);border-radius:12px;padding:10px}.scgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}
+@media (max-width:600px){.scrow{grid-template-columns:1fr}.scrow .sbpic{max-width:220px}}
+.caplook{display:flex;gap:18px;align-items:flex-start;flex-wrap:wrap}.cappv{position:relative;width:200px;flex:none;aspect-ratio:9/16;background:#1a1a1a center/cover no-repeat;border-radius:12px;overflow:hidden;container-type:size}
+.capl{position:absolute;left:3%;right:3%;top:calc(var(--y,.78) * 100%);transform:translateY(-100%);text-align:center;font:700 calc(4.4cqh * var(--sz,1))/1.1 "Barlow Semi Condensed","Barlow SC",Inter,sans-serif;color:#fff;-webkit-text-stroke:.2em #000;paint-order:stroke fill;text-shadow:0 0 .35em rgba(0,0,0,.45)}
+.capl span{display:inline-block;transition:transform .08s}.capl span.on{color:#FFD400;transform:scale(1.14)}
+.vetable{overflow-x:auto}.vetable table{width:100%;border-collapse:collapse;font-size:13px}.vetable th{text-align:left;font-weight:600;padding:6px;border-bottom:1px solid var(--line2);white-space:nowrap}.vetable td{padding:6px;border-bottom:1px solid var(--line2);vertical-align:top}.vetable td:nth-child(3){min-width:240px}.vetable textarea{width:100%}.vetable input[type=number]{width:72px}
+.scprompt summary{cursor:pointer;font-size:12.5px;font-weight:600;opacity:.8}.scprompt b{display:block;font-size:12px;margin-top:8px}.scprompt pre{white-space:pre-wrap;word-break:break-word;font:12px/1.5 var(--mono);background:var(--bg);border:1px solid var(--line2);border-radius:8px;padding:8px 10px;margin:4px 0 0}
 </style></head>
 <body>
 <header class="top">
@@ -341,10 +387,12 @@ pre.log{font:12.5px/1.65 var(--mono);white-space:pre-wrap;max-height:340px;overf
   <button class="kbtn" onclick="palette()"><span>Jump to anything</span><kbd>Ctrl K</kbd></button>
   <button class="ibtn" onclick="toggleTheme()" title="Light or dark" aria-label="Switch light or dark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg></button>
 </header>
+<div id="alerts" aria-live="polite"></div>
 <main id="main"></main>
 <nav class="dock" id="dock" aria-label="Sections"></nav>
 <div class="toast" id="toast" role="status"></div>
 <div id="overlay"></div>
+<div id="dlg"></div>
 <script>
 // ================= helpers =================
 const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
@@ -391,7 +439,19 @@ function chrome() {
   const q = S.queues, busy = q.writing + q.rendering;
   $('#status').innerHTML = busy ? `<span class="spin"></span>${[q.rendering && `Making ${q.rendering}`, q.writing && `writing ${q.writing}`].filter(Boolean).join(', ')}` : `<i style="width:8px;height:8px;border-radius:50%;background:var(--ok);display:inline-block"></i>Studio idle`;
   $('#tdot').classList.toggle('live', n > 0 || busy > 0);
+  alerts();
 }
+// red box at the top: what went wrong (failed videos, failed uploads, studio errors) + the Claude usage-limit wait
+function alerts() {
+  const el = $('#alerts'); if (!el || !S) return;
+  let h = '';
+  if (S.testMode) h += `<div class="alert limit" role="status"><b>Test server.</b> Make and check videos here; nothing is uploaded and channel autopilot is off (HS_TEST_MODE=1).</div>`;
+  if (S.limitUntil && S.limitUntil > Date.now()) h += `<div class="alert limit" role="status"><b>Claude usage limit reached.</b> Plans and scenes are paused until <b>${esc(new Date(S.limitUntil).toLocaleString(undefined, { weekday: 'short', hour: '2-digit', minute: '2-digit' }))}</b>, then everything continues by itself. Nothing is lost.</div>`;
+  const P = S.problems || [];
+  if (P.length) h += `<div class="alert bad" role="alert"><h3>${P.length} problem${P.length > 1 ? 's' : ''} need${P.length > 1 ? '' : 's'} a look</h3><ul>${P.slice(0, 12).map(p => `<li><small>${esc(new Date(p.at).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' }))}</small><span>${esc(p.msg)}</span>${p.jobId && S.jobs.some(j => j.id === p.jobId) ? `<button class="btn" onclick="openId='${p.jobId}';render()">Open</button>` : ''}</li>`).join('')}</ul><div class="acts"><button class="btn" onclick="clearProblems()">Clear this list</button></div></div>`;
+  if (el.dataset.sig !== h) { el.innerHTML = h; el.dataset.sig = h; }
+}
+async function clearProblems() { try { await api('/api/problems/clear', {}); S.problems = []; alerts(); } catch (e) { uiAlert(e.message); } }
 function tickClock() { $('#clock').textContent = new Date().toLocaleString(undefined, { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }); const nw = $('.rs-now'); if (nw) placeNow(nw); }
 function go(t) { swap(() => { tab = t; openId = null; flowEdit = null; calFlow = null; closeOv(); render(true); scrollTo(0, 0); }); }
 async function openJ(id) { const j = await api('/api/jobs/' + id); swap(() => { openId = id; openJob = j; render(true); scrollTo(0, 0); }); }
@@ -503,20 +563,20 @@ const rowMenu = j => `<select class="act" aria-label="What to do with this video
 async function rowDo(id, sel) {
   const a = sel.value, j = S.jobs.find(x => x.id === id); sel.value = ''; if (!a || !j) return;
   const v = j.format === 'short', fb = !!(S.flows || []).find(x => x.id === j.flowId)?.upload?.facebook;
-  const go2 = async (path, body, msg) => { try { await api(`/api/jobs/${id}/${path}`, body); toast(msg); } catch (e) { alert(e.message); } await refresh(true); };
+  const go2 = async (path, body, msg) => { try { await api(`/api/jobs/${id}/${path}`, body); toast(msg); } catch (e) { uiAlert(e.message); } await refresh(true); };
   if (a === 'open') return openJ(id);
   if (a === 'watch') return window.open(Object.values(j.uploads || {}).find(r => r.ok && r.url).url, '_blank', 'noopener');
   if (a === 'delete') return delJob(j);
   if (a === 'approve-plan') return go2('approve-script', {}, 'Approved. The video is being made.');
-  if (a === 'rewrite') { const n = prompt('What should Claude change in the plan? (optional)'); if (n === null) return; return go2('regenerate', { notes: n }, 'Claude is rewriting the plan.'); }
+  if (a === 'rewrite') { const n = await uiPrompt('Rewrite the plan', '', 'What should Claude change? (optional)', 'Rewrite'); if (n === null) return; return go2('regenerate', { notes: n }, 'Claude is rewriting the plan.'); }
   if (a === 'rerender') return go2('rerender', {}, 'The video is being made again.');
   if (a === 'hold') return go2('hold', {}, 'On hold. Press Resume when you want it made.');
   if (a === 'resume') return go2('resume', {}, 'Back in the queue.');
   if (a === 'retry-upload') return go2('retry-upload', {}, 'Uploading again.');
-  if (a === 'reject') { const r = prompt('Why are you rejecting it? (optional)'); if (r === null) return; return go2('reject', { reason: r }, 'Rejected'); }
+  if (a === 'reject') { const r = await uiPrompt('Reject this video?', '', 'Why are you rejecting it? (optional)', 'Reject'); if (r === null) return; return go2('reject', { reason: r }, 'Rejected'); }
   if (a === 'approve' || a === 'publish-now') {
     const now = a === 'publish-now';
-    if (now && !confirm('Publish "' + (j.title || j.topic) + '" now?')) return;
+    if (now && !(await uiConfirm('Publish now?', '"' + (j.title || j.topic) + '" goes live on its channel right away.', 'Publish now'))) return;
     if (j.status === 'approved') return go2('approve-video', { ...(j.targets || { youtube: true, instagram: v, facebook: fb }), now: true }, 'Publishing now.');
     return go2('approve-video', { youtube: true, instagram: v, facebook: fb, now }, now ? 'Approved. Publishing now.' : 'Approved');
   }
@@ -543,11 +603,81 @@ function viewRelease(j) {
     <div class="facts"><span><b>${dur(F.duration)}</b> long</span>${F.shots ? `<span><b>${F.shots}</b> shots</span><span>new picture every <b>${F.avgShot} s</b></span>` : ''}${F.photos ? `<span><b>${F.photos}</b> archive photos</span>` : ''}${F.srt ? `<a href="/${F.srt}" target="_blank">Subtitles</a>` : ''}</div></div>
    <div class="glass"><h2 class="h2">Release</h2><p class="note">Watch it all the way through. Check names, dates and spellings on screen, and that names are said correctly.</p>
     ${F.thumb ? `<img class="thumbimg" src="${thumb(j)}" alt="Thumbnail"><div class="acts" style="margin-bottom:20px"><input id="thText" aria-label="Thumbnail headline" placeholder="Thumbnail headline, 2 to 4 words" value="${esc(sc.thumbText || '')}" style="flex:1;min-width:170px"><button class="btn" onclick="remakeThumb(this)">Redo thumbnail</button></div>` : ''}
+    ${j.status === 'video_review' ? `<div class="stack" style="gap:8px;margin-bottom:20px"><h3 class="h3" style="margin:0">Fix something</h3><textarea id="vidNotes" rows="3" placeholder="Tell Claude what to change, e.g. scene 3: the screen comes in late; cut the end of Raju's last line; show the GST report longer"></textarea><div><button class="btn" onclick="fixVideo(this)">Fix it with Claude</button> <span class="note">The video is made again; only lines whose words or picture change cost Gemini money.</span></div></div>` : ''}
     ${j.status === 'video_review' ? `<div class="stack" style="gap:12px;margin-bottom:20px"><label class="check"><input type="checkbox" class="sw" id="toYT" checked> YouTube${v ? ' Short' : ''}</label>${v ? `<label class="check"><input type="checkbox" class="sw" id="toIG" checked> Instagram Reel</label>` : '<input type="checkbox" id="toIG" hidden>'}<label class="check"><input type="checkbox" class="sw" id="toFB" ${(S.flows || []).find(x => x.id === j.flowId)?.upload?.facebook ? 'checked' : ''}> Facebook Page</label></div>
       <div class="stack" style="gap:10px"><button class="btn ok big" onclick="apV(false)">Approve${j.publishAt ? ' for ' + esc(j.publishAt) : ''}</button><button class="btn big" onclick="apV(true)">Approve and publish now</button><div class="acts" style="margin-top:4px"><button class="btn ghost" onclick="jact('rerender')">Make it again</button><button class="btn danger" onclick="rej()">Reject</button></div></div>` : ''}
     ${j.status === 'upload_failed' ? `<p class="err">${Object.entries(j.uploads || {}).filter(([, r]) => !r.ok).map(([k, r]) => k + ': ' + esc(r.error)).join('<br>')}</p><button class="btn cta" onclick="jact('retry-upload')">Try the upload again</button>` : ''}
     ${Object.entries(j.uploads || {}).filter(([, r]) => r.ok && r.url).map(([k, r]) => `<p><a href="${esc(r.url)}" target="_blank">See it on ${{ youtube: 'YouTube', instagram: 'Instagram', facebook: 'Facebook' }[k] || k}</a></p>`).join('')}
-   </div></div>`;
+   </div></div>${videoEditor(j)}`;
+}
+// ---------- video editor (POST /api/jobs/:id/edit): per line trim / speed / pause / subtitle text, and the subtitle look.
+// Nothing is generated again: the video is made again from its saved clips and voices, at no Gemini cost. ----------
+const EDIT_LIMITS = { trim: [0, 1.5, 0.1], speed: [0.85, 1.3, 0.05], gap: [0, 1.5, 0.05] };
+const CAP_LOOK = { style: [['word', 'Word by word (yellow word)'], ['phrase', 'Whole phrase, no highlight'], ['off', 'No subtitles']], position: [['low', 'Low'], ['middle', 'Middle'], ['high', 'Top']], size: [['m', 'Normal'], ['l', 'Big'], ['xl', 'Very big']] };
+const CAP_Y = { low: .78, middle: .6, high: .22 }, CAP_SIZE = { m: 1, l: 1.2, xl: 1.4 };
+function paceSummary(p) {
+  if (!p) return '';
+  const bad = [p.overLimit && `<b>${p.seconds} s</b>: over the 59 s Short limit`, (p.gaps || []).length && `gaps: ${p.gaps.map(g => `${g.seconds} s after ${esc(g.after)}${g.betweenScenes ? ' (scene change)' : ''}`).join(', ')}`,
+    (p.slowLines || []).length && `slow lines: ${p.slowLines.map(esc).join(', ')}`, (p.pausesInLines || []).length && `pauses inside: ${p.pausesInLines.map(x => esc(x.id) + ' ' + x.pauses.join('+') + ' s').join(', ')}`].filter(Boolean);
+  const fixed = (p.fixed || []).length ? `<details><summary class="note">Fixed automatically before the render (${p.fixed.length})</summary><ul class="note" style="margin:6px 0 0">${p.fixed.map(x => `<li>${esc(x)}</li>`).join('')}</ul></details>` : '';
+  return `<p class="${bad.length ? 'warnt' : 'note'}" style="margin:0"><b>Pace check</b>: voice ${p.seconds} s, ${p.wordsPerSecond} words a second (people talk at about 2.6). ${bad.length ? 'Still left for you: ' + bad.join('; ') : 'No gaps, no slow lines.'}</p>${fixed}`;
+}
+// the subtitle look: three selects that change openJob.script.captions and the live preview beside them
+function captionLook(j) {
+  const c = (j.script && j.script.captions) || {}, sel = (k, cur) => `<label class="f">${{ style: 'Subtitles', position: 'Where', size: 'Size' }[k]}<select data-cap="${k}" onchange="capSet(this)">${CAP_LOOK[k].map(([v, t]) => `<option value="${v}" ${v === (cur || CAP_LOOK[k][0][0]) ? 'selected' : ''}>${t}</option>`).join('')}</select></label>`;
+  const line = j.script.chapters.flatMap(ch => ch.lines).find(l => l.camera === 'on') || j.script.chapters[0].lines[0];
+  const bg = line && line.camera === 'on' ? `/jobs/${esc(j.id)}/char/${esc(line.id)}.png?v=${j.castAt || 0}` : thumb(j);
+  return `<div class="caplook"><div class="cappv" style="background-image:url('${bg}')"><div class="capl" data-text="${esc(line ? (line.caption || line.say) : 'Your subtitle here')}"></div></div>
+    <div class="stack" style="gap:10px;min-width:0;flex:1"><div class="scgrid">${sel('style', c.style)}${sel('position', c.position)}${sel('size', c.size)}</div>
+    <p class="note" style="margin:0">This is how the subtitles sit on the video: same font, size, place and yellow word as the render.</p></div></div>`;
+}
+function capSet(el) { const sc = openJob.script; sc.captions = { ...(sc.captions || {}), [el.dataset.cap]: el.value }; capDraw(); }
+// animates every subtitle preview on the page: 3 words at a time, the word being said in yellow
+let capTick = 0;
+function capDraw() {
+  const c = (openJob && openJob.script && openJob.script.captions) || {};
+  $$('.capl').forEach(el => {
+    const words = String(el.dataset.text).toUpperCase().split(/\s+/).filter(Boolean), group = Math.floor(capTick / 3) % Math.max(1, Math.ceil(words.length / 3)), on = capTick % 3;
+    el.style.setProperty('--y', CAP_Y[c.position] || CAP_Y.low); el.style.setProperty('--sz', CAP_SIZE[c.size] || 1); el.hidden = c.style === 'off';
+    el.innerHTML = words.slice(group * 3, group * 3 + 3).map((w, k) => `<span class="${c.style !== 'phrase' && k === on ? 'on' : ''}">${esc(w)}</span>`).join(' ');
+  });
+}
+setInterval(() => { if ($('.capl')) { capTick++; capDraw(); } }, 380);
+function videoEditor(j) {
+  if (!j.script || !j.script.chapters || !['video_review', 'failed'].includes(j.status)) return '';
+  const cast = Object.fromEntries((j.script.cast || []).map(m => [m.id, m.name])), pace = (j.files && j.files.pace) || {}, at = Object.fromEntries((pace.lines || []).map(l => [l.id, l]));
+  const num = (id, k, v, extra = '') => { const [lo, hi, step] = EDIT_LIMITS[k]; return `<input type="number" min="${lo}" max="${hi}" step="${step}" value="${v}" data-ed="${id}" data-k="${k}"${extra} oninput="this.dataset.dirty=1" aria-label="${k} ${id}">`; };
+  let n = 0;
+  const rows = j.script.chapters.map((ch, c) => ch.lines.map(l => {
+    const p = at[l.id] || {}, who = cast[l.speaker] || 'Narrator', flag = [p.slow && `slow, ${p.wps} words/s`, (p.pauses || []).length && `pause ${p.pauses.join('+')} s inside`].filter(Boolean).join('; ');
+    return `<tr><td>${String(++n).padStart(2, '0')}<br><small>Scene ${c + 1}</small></td><td><b>${esc(who)}</b>${l.camera === 'on' ? '' : '<br><small>voice only</small>'}${p.at != null ? `<br><button class="btn ghost sm" onclick="playLine(${p.at},${p.seconds})" title="Play this line">▶ ${p.at.toFixed(1)} s</button>` : ''}</td>
+      <td><textarea rows="2" data-ed="${l.id}" data-k="caption" oninput="this.dataset.dirty=1" aria-label="Subtitle of line ${n}">${esc(l.caption || l.say)}</textarea>${flag ? `<small class="warnt">${esc(flag)}</small>` : ''}</td>
+      <td>${num(l.id, 'trimStart', (l.trim && l.trim.start) || 0)}</td><td>${num(l.id, 'trimEnd', (l.trim && l.trim.end) || 0)}</td><td>${num(l.id, 'speed', l.speed || 1)}</td><td>${num(l.id, 'gap', l.gap ?? 0.08)}</td></tr>`;
+  }).join('')).join('');
+  return `<div class="panel stack vedit" style="margin-top:28px"><h2 class="h2">Edit the video yourself</h2>
+    <p class="note" style="margin:0">Cut the start or end of a line, play it faster or slower, change the pause after it, or fix its subtitle. Press ▶ to hear a line. Nothing new is generated: the video is made again from the saved clips in a few minutes, with no Gemini cost.</p>
+    ${paceSummary(j.files && j.files.pace)}
+    ${captionLook(j)}
+    <div class="vetable"><table><thead><tr><th>#</th><th>Who</th><th>Subtitle</th><th title="Seconds cut off the start">Cut start (s)</th><th title="Seconds cut off the end">Cut end (s)</th><th title="1 = as made">Speed</th><th title="Pause after this line">Pause after (s)</th></tr></thead><tbody>${rows}</tbody></table></div>
+    <div class="acts"><button class="btn ok" onclick="applyEdits(this)">Apply and make the video again</button><span class="note">Takes a few minutes; the video comes back here.</span></div></div>`;
+}
+let lineStop = null;
+function playLine(at, secs) {
+  const v = $('.screen video'); if (!v) return; v.currentTime = Math.max(0, at - 0.15); v.play();
+  if (lineStop) v.removeEventListener('timeupdate', lineStop);
+  lineStop = () => { if (v.currentTime >= at + secs + 0.3) { v.pause(); v.removeEventListener('timeupdate', lineStop); lineStop = null; } }; v.addEventListener('timeupdate', lineStop);
+}
+async function applyEdits(btn) {
+  const lines = {}, byId = Object.fromEntries(openJob.script.chapters.flatMap(c => c.lines).map(l => [l.id, l]));
+  $$('[data-ed][data-dirty]').forEach(el => {
+    const id = el.dataset.ed, k = el.dataset.k, e = lines[id] = lines[id] || {}, l = byId[id];
+    if (k === 'caption') e.caption = el.value.trim() === l.say ? null : el.value;
+    else if (k === 'trimStart' || k === 'trimEnd') { const s = $(`[data-ed="${id}"][data-k="trimStart"]`), en = $(`[data-ed="${id}"][data-k="trimEnd"]`); e.trim = (+s.value || +en.value) ? { start: +s.value || 0, end: +en.value || 0 } : null; }
+    else e[k] = k === 'speed' && +el.value === 1 ? null : +el.value;
+  });
+  btn.disabled = true; btn.textContent = 'Sending';
+  try { await api(`/api/jobs/${openJob.id}/edit`, { lines, captions: openJob.script.captions || null, remake: true }); toast('Edits applied. The video is being made again from the saved clips.'); await reloadJob(); }
+  catch (e) { uiAlert(e.message); btn.disabled = false; btn.textContent = 'Apply and make the video again'; }
 }
 const SHOT = { headline: 'Headline', punch: 'Slam card', photo: 'Photo', text: 'Card', quote: 'Quote', stat: 'Counter', list: 'List', split: 'Side by side', black: 'Silent beat', map: 'Map', board: 'Evidence board', num: 'Number', countintro: 'Countdown', tease: 'Teaser', end: 'End card', spin: 'Newspaper spin', globe: 'World map', draw: 'Drawn scene', clip: 'Your clip' };
 function shotChip(s) {
@@ -555,16 +685,21 @@ function shotChip(s) {
   return `<span class="shot" title="${esc(t)}">${s.at ? `<em>"${esc(s.at)}"</em>` : ''}<b>${SHOT[s.type] || esc(s.type)}</b>${t ? `<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:24ch">${esc(String(t).toLowerCase())}</span>` : ''}${s.gfx && s.gfx.length ? `<em>+${esc(s.gfx.map(g => g.k).join(', '))}</em>` : ''}</span>`;
 }
 const LIBNAMES = { whiteboard: 'Whiteboard Explainer', 'cel-anime-80s': '80s Cel Anime', chalkboard: 'Chalkboard' };
+function themeOpts(cur) {
+  const L = (S.themeList || {})[openJob && openJob.script && openJob.script.domain === 'exam' ? 'exam' : 'history'] || [], has = L.some(t => t.slug === cur);
+  return (has ? '' : `<option value="${esc(cur)}" selected>${esc(LIBNAMES[cur] || cur)}</option>`) + L.map(t => `<option value="${esc(t.slug)}" ${t.slug === cur ? 'selected' : ''} title="${esc(t.use || '')}">${esc(t.name)}</option>`).join('');
+}
 function viewPlan(j, inside) {
   const sc = j.script, v = j.validation || {}, ST = S.v2styles || {}, MOODS = ['tense', 'curious', 'suspense', 'march', 'drama', 'rise', 'outro', 'bouncy'];
   let n = 0;
   const chapters = sc.chapters.map((ch, ci) => `<section class="chap"><div class="chap-h"><span class="no">${ch.title ? 'CH ' + String(ci).padStart(2, '0') : 'OPEN'}</span><h3 class="h3">${ch.title ? esc(ch.title.join(': ')) : 'Cold open'}</h3>
-      ${sc.look === 'lib' ? `<span class="note" style="margin:0" title="${esc(ch.why || '')}"><b>Theme: ${esc((LIBNAMES[ch.style] || ch.style))}</b> <small>(Lemo Opuscar library)</small>${ch.why ? ` · ${esc(ch.why)}` : ''}</span>` : `<select data-ci="${ci}" data-cf="style" aria-label="Look">${Object.entries(ST).map(([k, x]) => `<option value="${k}" ${k === ch.style ? 'selected' : ''}>${esc(x.name)}</option>`).join('')}</select>`}
+      ${sc.look === 'lib' ? `<label class="note" style="margin:0;display:flex;gap:8px;align-items:center;flex-wrap:wrap"><b>Theme</b><select data-ci="${ci}" data-cf="style" aria-label="Theme of this chapter" title="${esc(ch.why || '')}">${themeOpts(ch.style)}</select>${ch.why ? `<small>${esc(ch.why)}</small>` : ''}</label>` : `<select data-ci="${ci}" data-cf="style" aria-label="Look">${Object.entries(ST).map(([k, x]) => `<option value="${k}" ${k === ch.style ? 'selected' : ''}>${esc(x.name)}</option>`).join('')}</select>`}
       <select data-ci="${ci}" data-cf="mood" aria-label="Music">${MOODS.map(m => `<option value="${m}" ${m === ch.mood ? 'selected' : ''}>${m} music</option>`).join('')}</select>
       ${j.format === 'long' ? `<input data-ci="${ci}" data-cf="title" value="${esc((ch.title || []).join(' | '))}" placeholder="Chapter title, empty for none" aria-label="Chapter title">` : ''}</div>
     ${ch.lines.map((l, li) => `<div class="ln"><span class="k">${String(++n).padStart(2, '0')}</span><textarea data-ci="${ci}" data-li="${li}" rows="1" aria-label="Narration line ${n}">${esc(l.say)}</textarea><div class="shots">${(l.shots || []).map(shotChip).join('')}</div><button class="x" title="Remove this line" aria-label="Remove line ${n}" onclick="delLine(${ci},${li})">${ic('x')}</button></div>`).join('')}</section>`).join('');
   return `<div class="grid2" style="align-items:start;margin-top:${inside ? 20 : 8}px">
-    <div class="panel stack"><h2 class="h2">The plan</h2><p class="note" style="margin:0">About <b>${Math.max(1, Math.round((v.estSeconds || 0) / 60))} min</b>, ${v.lines || 0} lines, ${sc.chapters.length} chapters${sc.era ? `, set around ${esc(sc.era)}` : ''}. Each line is what the voice reads. The chips beside it are the shots Claude planned.</p>
+    ${castCard(j)}${j.pipeline === 'character' && j.script && j.script.cast ? `<div class="panel stack" style="grid-column:1/-1"><h2 class="h2">Subtitles</h2>${captionLook(j)}<p class="note" style="margin:0">Pick the look here and press <b>Save</b>. After the video is made you can still change it, and fix any subtitle's words, without making the clips again.</p></div>` + sceneBoard(j) : sbPanel(j)}
+    <div class="panel stack"><h2 class="h2">The plan</h2><p class="note" style="margin:0">About <b>${Math.max(1, Math.round((v.estSeconds || 0) / 60))} min</b>, ${v.lines || 0} lines, ${sc.chapters.length} chapters${sc.era ? `, set around ${esc(sc.era)}` : ''}. Each line is what the voice reads. The chips beside it are the shots Claude planned.${sc.look === 'lib' && j.status === 'script_review' ? ' To use another look, pick a new <b>Theme</b> on a chapter and press <b>Save</b>: Claude redraws that chapter in the new theme (about a minute) and the words stay the same.' : ''}</p>
       ${(v.errs || []).map(e => `<p class="err" style="margin:0">${esc(e)}</p>`).join('')}${(v.warns || []).slice(0, 6).map(e => `<p class="warnt" style="margin:0">${esc(e)}</p>`).join('')}
       <label class="f">YouTube title<input id="sTitle" value="${esc(sc.title)}" maxlength="100"></label>
       <label class="f">Description<textarea id="sDesc" rows="4">${esc(sc.description)}</textarea></label>
@@ -588,15 +723,150 @@ function collectPlan() {
   $$('[data-if]').forEach(e => { const im = sc.images[+e.dataset.ii]; if (e.dataset.if === 'queries') im.queries = e.value.split('|').map(x => x.trim()).filter(Boolean); else im.want = e.value; });
   return sc;
 }
-async function saveScript() { try { openJob = await api(`/api/jobs/${openJob.id}/script`, { script: collectPlan() }); toast('Saved'); render(true); } catch (e) { alert(e.message); } }
-async function apS(btn) { btn.disabled = true; try { await api(`/api/jobs/${openJob.id}/script`, { script: collectPlan() }); await api(`/api/jobs/${openJob.id}/approve-script`, {}); toast('Approved. The video is being made.'); openId = null; await refresh(true); } catch (e) { alert(e.message); btn.disabled = false; } }
+async function saveScript() { try { const sv = await api(`/api/jobs/${openJob.id}/script`, { script: collectPlan() }); toast(sv.status === 'writing' ? 'Saved. Claude is redrawing the chapters in their new themes (about a minute); the plan comes back as Plan ready.' : 'Saved'); await reloadJob(); } catch (e) { uiAlert(e.message); } }
+async function apS(btn) { btn.disabled = true; try { const sv = await api(`/api/jobs/${openJob.id}/script`, { script: collectPlan() }); if (sv.status === 'writing') { openJob = sv; toast('You changed a theme: Claude is redrawing that chapter first. Check the plan again when it says Plan ready, then approve.'); render(true); return; } await api(`/api/jobs/${openJob.id}/approve-script`, {}); toast('Approved. The video is being made.'); openId = null; await refresh(true); } catch (e) { uiAlert(e.message); btn.disabled = false; } }
 function delLine(ci, li) { collectPlan(); openJob.script.chapters[ci].lines.splice(li, 1); render(true); }
-async function applyRaw() { try { openJob = await api(`/api/jobs/${openJob.id}/script`, { script: JSON.parse($('#rawPlan').value) }); toast('Plan updated'); render(true); } catch (e) { alert('That JSON has a problem: ' + e.message); } }
-async function apV(now) { try { await api(`/api/jobs/${openJob.id}/approve-video`, { youtube: $('#toYT').checked, instagram: $('#toIG').checked, facebook: $('#toFB').checked, now }); toast(now ? 'Approved. Publishing now.' : 'Approved'); openId = null; await refresh(true); } catch (e) { alert(e.message); } }
-async function rej() { const r = prompt('Why are you rejecting it? (optional)'); if (r === null) return; await jact('reject', { reason: r }); }
-async function jact(a, b = {}, leave = false) { try { await api(`/api/jobs/${openJob.id}/${a}`, b); } catch (e) { alert(e.message); } if (leave) { openId = null; tab = 'log'; await refresh(true); return; } await reloadJob(); refresh(); }
-async function remakeThumb(btn) { btn.disabled = true; btn.textContent = 'Making it'; try { await api('/api/jobs/' + openJob.id + '/thumbnail', { text: $('#thText').value.trim() }); toast('Thumbnail updated'); await reloadJob(); } catch (e) { alert(e.message); btn.disabled = false; btn.textContent = 'Redo thumbnail'; } }
-async function voiceUpload(inp) { const f = inp.files[0]; if (!f) return; $('#vup').textContent = 'Uploading ' + (f.size / 1048576).toFixed(1) + ' MB'; try { const r = await fetch('/api/jobs/' + openJob.id + '/voice', { method: 'POST', headers: { 'x-filename': encodeURIComponent(f.name) }, body: f }); if (!r.ok) throw new Error((await r.json()).error); toast('Your recording will be used'); await reloadJob(); } catch (e) { alert('Upload failed: ' + e.message); $('#vup').textContent = ''; } }
+async function applyRaw() { try { openJob = await api(`/api/jobs/${openJob.id}/script`, { script: JSON.parse($('#rawPlan').value) }); toast('Plan updated'); render(true); } catch (e) { uiAlert('That JSON has a problem: ' + e.message); } }
+async function apV(now) { try { await api(`/api/jobs/${openJob.id}/approve-video`, { youtube: $('#toYT').checked, instagram: $('#toIG').checked, facebook: $('#toFB').checked, now }); toast(now ? 'Approved. Publishing now.' : 'Approved'); openId = null; await refresh(true); } catch (e) { uiAlert(e.message); } }
+async function fixVideo(btn) {
+  const notes = $('#vidNotes').value.trim(); if (!notes) return uiAlert('Write what to change in the video first.');
+  btn.disabled = true; btn.textContent = 'Sending';
+  try { await api(`/api/jobs/${openJob.id}/revise`, { notes }); toast('Claude is editing the video. It comes back here when it is made again.'); await reloadJob(); } catch (e) { uiAlert(e.message); btn.disabled = false; btn.textContent = 'Fix it with Claude'; }
+}
+async function rej() { const r = await uiPrompt('Reject this video?', '', 'Why are you rejecting it? (optional)', 'Reject'); if (r === null) return; await jact('reject', { reason: r }); }
+// ---------- character video (lib/character): the cast Claude designed for this script, each approved by photo, and the
+// scene board: every line with who says it, whether they are seen, the dialogue, emotion and pitch, all editable ----------
+const CH_EMOTIONS = ['neutral', 'friendly', 'happy', 'excited', 'confident', 'curious', 'surprised', 'worried', 'frustrated', 'angry', 'sad', 'relieved', 'serious'], CH_PITCHES = ['low', 'medium', 'high'];
+const castPhotoUrl = (j, id) => '/jobs/' + esc(j.id) + '/char/cast/' + esc(id) + '.png?v=' + (j.castAt || 0);
+const castOk = (j, m) => !!(j.castOk && j.castOk[m.id]);
+const promptFold = (title, parts) => { const p = parts.filter(([, t]) => t); return p.length ? '<details class="scprompt"><summary>' + title + '</summary>' + p.map(([h, t]) => '<b>' + esc(h) + '</b><pre>' + esc(t) + '</pre>').join('') + '</details>' : ''; };
+function castCard(j) {
+  const cast = (j.script && j.script.cast) || []; if (j.pipeline !== 'character' || !cast.length) return '';
+  const edit = ['script_review', 'failed', 'rejected'].includes(j.status), all = cast.every(m => castOk(j, m));
+  return '<div class="panel stack" style="grid-column:1/-1"><h2 class="h2">Cast</h2><p class="note" style="margin:0">' + (all ? 'Every character is approved: the storyboard frames use these faces and voices.' : 'Claude chose these characters for the script. Check each photo: the storyboard frames are made once all are approved.') + '</p><div class="castgrid">'
+    + cast.map(m => '<div class="castm"><img src="' + castPhotoUrl(j, m.id) + '" alt="Photo of ' + esc(m.name) + '" onerror="this.replaceWith(Object.assign(document.createElement(\'div\'),{className:\'castph\',textContent:\'Photo is being made…\'}))">'
+      + '<div class="stack" style="gap:4px;min-width:0"><h3 class="h3" style="margin:0">' + esc(m.name) + ' <span class="note">' + esc(m.role || '') + '</span>' + (castOk(j, m) ? ' <span class="chip ok"><i></i>Approved</span>' : '') + '</h3>'
+      + '<p style="margin:0"><b>Look</b> ' + esc(m.look) + '</p><p style="margin:0"><b>Voice</b> ' + esc(m.voice) + '</p><p style="margin:0"><b>Place</b> ' + esc(m.setting || '') + '</p>'
+      + promptFold('Exact photo prompt', [['Photo (Nano Banana)', j.prompts && j.prompts.cast[m.id]]])
+      + (edit ? '<div class="acts">' + (castOk(j, m) ? '' : '<button class="btn ok" onclick="castOkay(\'' + m.id + '\',this)">Looks right</button>') + '<input id="castNote_' + m.id + '" placeholder="Change, e.g. younger, a woman, softer voice" style="flex:1;min-width:180px"><button class="btn" onclick="castChange(\'' + m.id + '\',this)">Change</button></div>' : '')
+      + '</div></div>').join('') + '</div></div>';
+}
+async function castOkay(id, btn) { btn.disabled = true; try { await api(`/api/jobs/${openJob.id}/cast-ok`, { id }); toast('Approved'); await reloadJob(); } catch (e) { uiAlert(e.message); btn.disabled = false; } }
+async function castChange(id, btn) {
+  const note = $('#castNote_' + id).value.trim(); if (!note) return uiAlert('Write what to change about this character.');
+  btn.disabled = true; btn.textContent = 'Making a new photo';
+  try { await api(`/api/jobs/${openJob.id}/cast-change`, { id, note }); toast('New photo ready'); await reloadJob(); } catch (e) { uiAlert(e.message); btn.disabled = false; btn.textContent = 'Change'; }
+}
+function sceneBoard(j) {
+  const sc = j.script, cast = sc.cast || [], byId = Object.fromEntries(cast.map(m => [m.id, m])), media = Object.fromEntries((j.media || []).map(m => [m.id, m]));
+  const edit = ['script_review', 'failed', 'rejected'].includes(j.status), opt = (v, cur, label) => '<option value="' + esc(v) + '"' + (v === cur ? ' selected' : '') + '>' + esc(label) + '</option>';
+  const who = id => byId[id] ? byId[id].name : 'Narrator';
+  setTimeout(sbDraw, 30);
+  const scenes = sc.chapters.map((ch, c) => {
+    const people = [...new Set(ch.lines.flatMap(l => l.speaker && byId[l.speaker] ? [l.speaker, ...(l.camera === 'on' ? l.withWho || [] : [])] : []))].filter(id => byId[id]);
+    const rows = ch.lines.map((l, i) => {
+      const on = l.camera === 'on', shot = (l.shots || [])[0] || {}, m = shot.img && media[shot.img];
+      const pic = on ? '<canvas class="sbc" width="270" height="480" data-cover="1" data-src="/jobs/' + esc(j.id) + '/char/' + esc(l.id) + '.png?v=' + (j.castAt || 0) + '"></canvas><span class="sbz sbreal">' + esc([who(l.speaker), ...(l.withWho || []).map(who)].join(' + ')) + '</span>'
+        : m ? '<canvas class="sbc" width="270" height="480" data-src="/jobs/' + esc(j.id) + '/' + esc(m.file) + '"></canvas><span class="sbz">Voice only</span>'
+        : '<div class="sbscene" style="--h:' + SB_COL(ch.style || '') + '"><small>' + esc(ch.style || '') + '</small>' + (shot.text ? '<b>' + esc(shot.text) + '</b>' : '') + '<p>' + esc(shot.action || '') + '</p></div>';
+      const field = (k, html) => '<label class="f">' + k + html + '</label>', dis = edit ? '' : ' disabled', at = ' data-c="' + c + '" data-l="' + i + '"';
+      return '<div class="scrow"><div class="sbpic">' + pic + '</div><div class="stack" style="gap:8px;min-width:0">'
+        + '<div class="scgrid">' + field('Speaker', '<select' + at + ' data-k="speaker"' + dis + ' onchange="sceneSet(this)">' + cast.map(x => opt(x.id, l.speaker, x.name)).join('') + opt('narrator', l.speaker, 'Narrator (no character)') + '</select>')
+        + field('Camera', '<select' + at + ' data-k="camera"' + dis + ' onchange="sceneSet(this)">' + opt('on', l.camera, 'Speaker is seen') + opt('off', l.camera, 'Voice only (no one on screen)') + '</select>')
+        + field('Also seen', '<select' + at + ' data-k="withWho"' + dis + ' onchange="sceneSet(this)">' + opt('', (l.withWho || [])[0] || '', 'Nobody') + cast.filter(x => x.id !== l.speaker).map(x => opt(x.id, (l.withWho || [])[0], x.name)).join('') + '</select>')
+        + field('Emotion', '<select' + at + ' data-k="emotion"' + dis + ' onchange="sceneSet(this)">' + CH_EMOTIONS.map(e => opt(e, l.emotion, e)).join('') + '</select>')
+        + field('Pitch', '<select' + at + ' data-k="pitch"' + dis + ' onchange="sceneSet(this)">' + CH_PITCHES.map(e => opt(e, l.pitch, e)).join('') + '</select>') + '</div>'
+        + field('Dialogue', '<textarea rows="2"' + at + ' data-k="say"' + dis + ' oninput="sceneSet(this)">' + esc(l.say || '') + '</textarea>')
+        + (on ? '' : '<p class="note" style="margin:0">On screen: ' + esc(shot.action || shot.text || '') + '</p>')
+        + (() => { const p = (j.prompts && j.prompts.lines[l.id]) || {}; return promptFold('Exact prompt', [['First frame (Nano Banana)', p.frame], ['Clip with voice (Omni Flash, ' + (p.seconds || '') + ' s)' + (on ? '' : ': only the voice is used'), p.clip], ['Narrator voice reads', p.narrator]]); })() + '</div></div>';
+    }).join('');
+    return '<div class="scn"><div class="sbchh"><span class="sbdot" style="--h:' + SB_COL(ch.style || '') + '"></span><b>Scene ' + (c + 1) + '</b> · ' + esc(ch.style || '') + ' · ' + (people.length ? people.length + ' character' + (people.length > 1 ? 's' : '') : 'no characters, voice only') + '<span class="scfaces">' + people.map(id => '<img src="' + castPhotoUrl(j, id) + '" alt="' + esc(byId[id].name) + '" title="' + esc(byId[id].name) + '">').join('') + '</span></div>' + rows + '</div>';
+  }).join('');
+  const img = j.storyboardAt ? '<a class="btn" href="/jobs/' + esc(j.id) + '/storyboard.jpg?v=' + j.storyboardAt + '" download="storyboard-' + esc(j.id) + '.jpg">Download as image</a>' : '';
+  return '<div class="panel stack sb"><div class="sbhead"><div><h2 class="h2">Storyboard</h2><p class="note" style="margin:0">Scene by scene: who speaks, whether they are seen, the dialogue, its emotion and pitch. A seen speaker has no other voice over them; a voice-only line shows no people.' + (edit ? ' Change anything here, then press <b>Save changes</b>.' : '') + '</p></div>' + img + '</div>' + scenes
+    + (edit ? '<div class="sbfoot"><textarea id="sbnotes" rows="3" placeholder="Changes for the whole video (tone, hook, length, the ending…)"></textarea><div class="acts"><button class="btn" onclick="saveScript()">Save changes</button><button class="btn" onclick="sbApply(this)">Apply my notes</button><button class="btn ok" onclick="apS(this)">Looks good: approve and make the video</button></div></div>' : '') + '</div>';
+}
+// a scene board edit goes straight into the plan (and into the plan's own text box for the dialogue), saved with the plan
+function sceneSet(el) {
+  const l = openJob.script.chapters[+el.dataset.c].lines[+el.dataset.l], k = el.dataset.k;
+  if (k === 'withWho') l.withWho = el.value ? [el.value] : [];
+  else l[k] = el.value;
+  if (k === 'camera' && el.value === 'off') l.withWho = [];
+  if (k === 'say') { const t = $('textarea[data-ci="' + el.dataset.c + '"][data-li="' + el.dataset.l + '"]'); if (t) t.value = el.value; }
+}
+// ---------- storyboard review: every shot as a card (real screen / zoom / scene), a note box under each, "Apply my changes" ----------
+const SB_COL = s => { let h = 0; for (let i = 0; i < s.length; i++) h = (h + s.charCodeAt(i) * (i + 1)) % 360; return h; };
+const sbTime = t => Math.floor(t / 60) + ':' + String(Math.floor(t % 60)).padStart(2, '0');
+function sbPanel(j) {
+  const sc = j.script; if (j.engine !== 'v2' || !sc || !Array.isArray(sc.chapters)) return '';
+  const media = Object.fromEntries((j.media || []).map(m => [m.id, m])), edit = ['script_review', 'failed', 'rejected'].includes(j.status);
+  let n = 0, t = 0;
+  const chs = sc.chapters.map((ch, c) => {
+    const t0 = t;
+    const cards = ch.lines.map((ln, l) => {
+      const dur = Math.max(1.6, String(ln.say || '').split(/\s+/).length / 2.6) + .3, k = (ln.shots || []).length || 1;
+      const out = (ln.shots || []).map((sh, s) => {
+        n++; const m = sh.img && media[sh.img], reg = m && m.regions && sh.zoom && m.regions[sh.zoom], at = t + dur * s / k;
+        const pic = m
+          ? '<canvas class="sbc" width="270" height="480" data-src="/jobs/' + esc(j.id) + '/' + esc(m.file) + '"' + (reg ? ' data-r="' + reg.join(',') + '"' : '') + (/white/i.test(m.name || '') ? ' data-dark="1"' : '') + '></canvas>' + (reg ? '<span class="sbz">Zoom · ' + esc(sh.zoom.replace(/_/g, ' ')) + '</span>' : '<span class="sbz sbreal">Real screen</span>')
+          : '<div class="sbscene" style="--h:' + SB_COL(ch.style || '') + '"><small>' + esc(ch.style || '') + '</small>' + (sh.text ? '<b>' + esc(sh.text) + '</b>' : '') + '<p>' + esc(sh.action || '') + '</p></div>';
+        return '<div class="sbcard"><div class="sbtop"><span class="sbn">' + String(n).padStart(2, '0') + '</span><span>' + sbTime(at) + '</span></div><div class="sbpic">' + pic + '</div>'
+          + (s === 0 ? '<div class="sbsay">“' + esc(ln.say || '') + '”</div>' : '<div class="sbsay sbcont">… same line</div>')
+          + (m && sh.text ? '<div class="sbtxt">' + esc(sh.text) + '</div>' : '') + (m ? '<div class="sbact">' + esc(sh.action || '') + '</div>' : '')
+          + (edit ? '<textarea class="sbnote" data-k="' + c + '-' + l + '-' + s + '" rows="2" placeholder="Change this shot…"></textarea>' : '') + '</div>';
+      }).join('');
+      t += dur; return out;
+    }).join('');
+    return '<div class="sbch"><div class="sbchh"><span class="sbdot" style="--h:' + SB_COL(ch.style || '') + '"></span><b>Part ' + (c + 1) + '</b> · ' + esc(ch.style || '') + ' · ' + sbTime(t0) + (ch.why ? '<span class="sbwhy"> — ' + esc(ch.why) + '</span>' : '') + '</div><div class="sbgrid">' + cards + '</div></div>';
+  }).join('');
+  const img = j.storyboardAt ? '<a class="btn" href="/jobs/' + esc(j.id) + '/storyboard.jpg?v=' + j.storyboardAt + '" download="storyboard-' + esc(j.id) + '.jpg">Download as image</a>' : '';
+  setTimeout(sbDraw, 30);
+  return '<div class="panel stack sb"><div class="sbhead"><div><h2 class="h2">Storyboard</h2><p class="note" style="margin:0">' + n + ' shots · about ' + Math.round(t) + ' s. Real app screens are shown as they are (Zoom = the part the video zooms into); coloured cards are scenes animated for this video.' + (edit ? ' Write under any shot what to change, or for the whole video below, then press <b>Apply my changes</b>.' : '') + '</p></div>' + img + '</div><div class="sbwrap"><div class="sbmain">' + chs
+    + (edit ? '<div class="sbfoot"><textarea id="sbnotes" rows="3" placeholder="Changes for the whole video (tone, hook, length, a feature to add, the ending…)"></textarea><div class="acts"><button class="btn" onclick="sbApply(this)">Apply my changes</button><button class="btn ok" onclick="apS(this)">Looks good: approve and make the video</button></div></div>' : '') + '</div>' + sbScript(j) + '</div></div>';
+}
+// the whole narration, in order, for someone who wants to record it with their own voice
+function sbScript(j) {
+  const sc = j.script; let n = 0, t = 0;
+  const parts = sc.chapters.map((ch, c) => '<div class="sbsp"><div class="sbsph">Part ' + (c + 1) + ' · ' + sbTime(t) + '</div>' + ch.lines.map(ln => {
+    t += Math.max(1.6, String(ln.say || '').split(/\s+/).length / 2.6) + .3;
+    return '<p><span class="sbsn">' + String(++n).padStart(2, '0') + '</span>' + esc(ln.say || '') + '</p>';
+  }).join('') + '</div>').join('');
+  return '<aside class="sbscript"><div class="sbsh"><h3 class="h3" style="margin:0">Script for recording</h3><span class="note">' + n + ' lines · about ' + Math.round(t) + ' s</span></div>'
+    + '<p class="note" style="margin:0">Read the lines in order with a short pause between them. A stumble is fine: just say the sentence again. Then upload the recording here; the app finds every line by itself and uses your voice instead of the AI voice.</p>'
+    + (j.voiceFile ? '<p class="note" style="margin:0">Using your recording: <b>' + esc(j.voiceFile) + '</b></p>' : '')
+    + '<div class="acts"><button class="btn" onclick="sbCopy(this)">Copy script</button><a class="btn" href="/api/jobs/' + esc(j.id) + '/narration.txt">Download .txt</a><label class="btn cta" style="cursor:pointer">' + (j.voiceFile ? 'Replace my recording' : 'Upload my recording') + '<input type="file" accept="audio/*,video/*" hidden onchange="sbVoice(this)"></label>' + (j.voiceFile ? '<button class="btn danger" onclick="voiceRemove()">Use the AI voice</button>' : '') + '</div><span class="note sbvup"></span>'
+    + '<div class="sbstext">' + parts + '</div></aside>';
+}
+function sbCopy(btn) {
+  const txt = [...document.querySelectorAll('.sbstext .sbsp')].map(p => p.querySelector('.sbsph').textContent + '\n' + [...p.querySelectorAll('p')].map(x => x.lastChild.textContent).join('\n')).join('\n\n');
+  const done = () => { btn.textContent = 'Copied'; setTimeout(() => btn.textContent = 'Copy script', 1500); };
+  if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(txt).then(done, () => uiAlert('Could not copy. Use Download .txt instead.'));
+  else { const ta = document.createElement('textarea'); ta.value = txt; document.body.appendChild(ta); ta.select(); try { document.execCommand('copy'); done(); } catch { uiAlert('Could not copy. Use Download .txt instead.'); } ta.remove(); }
+}
+async function sbVoice(inp) {
+  const f = inp.files[0], st = document.querySelector('.sbvup'); if (!f) return; st.textContent = 'Uploading ' + (f.size / 1048576).toFixed(1) + ' MB…';
+  try { const r = await fetch('/api/jobs/' + openJob.id + '/voice', { method: 'POST', headers: { 'x-filename': encodeURIComponent(f.name) }, body: f }); if (!r.ok) throw new Error((await r.json()).error); toast('Your recording will be used'); await reloadJob(); }
+  catch (e) { uiAlert('Upload failed: ' + e.message); st.textContent = ''; }
+}
+function sbDraw() {
+  document.querySelectorAll('canvas.sbc:not([data-done])').forEach(cv => { cv.dataset.done = 1; const im = new Image(); im.onload = () => {
+    const g = cv.getContext('2d'), W = cv.width, H = cv.height; g.fillStyle = cv.dataset.dark ? '#22262c' : '#eef1f4'; g.fillRect(0, 0, W, H); g.imageSmoothingQuality = 'high';
+    let sx = 0, sy = 0, sw = im.naturalWidth, sh = im.naturalHeight;
+    if (cv.dataset.r) { const [x, y, w, h] = cv.dataset.r.split(',').map(Number); sx = x * sw; sy = y * sh; sw = w * sw; sh = h * sh; }
+    const r = cv.dataset.cover ? Math.max(W / sw, H / sh) : Math.min((W - 16) / sw, (H - 16) / sh), dw = sw * r, dh = sh * r, dx = (W - dw) / 2, dy = (H - dh) / 2;
+    g.drawImage(im, sx, sy, sw, sh, dx, dy, dw, dh);
+    if (cv.dataset.r) { g.strokeStyle = '#e5322d'; g.lineWidth = 4; g.strokeRect(dx - 3, dy - 3, dw + 6, dh + 6); } }; im.src = cv.dataset.src; });
+}
+async function sbApply(btn) {
+  const notes = ($('#sbnotes') || {}).value || '', shots = {};
+  document.querySelectorAll('textarea.sbnote').forEach(t => { if (t.value.trim()) shots[t.dataset.k] = t.value.trim(); });
+  if (!notes.trim() && !Object.keys(shots).length) return uiAlert('Write what to change first: under a shot, or for the whole video at the bottom.');
+  btn.disabled = true; btn.textContent = 'Sending…'; toast('Claude is applying your changes. The storyboard updates when it is done.');
+  await jact('revise', { notes: notes.trim(), shots });
+}
+async function jact(a, b = {}, leave = false) { try { await api(`/api/jobs/${openJob.id}/${a}`, b); } catch (e) { uiAlert(e.message); } if (leave) { openId = null; tab = 'log'; await refresh(true); return; } await reloadJob(); refresh(); }
+async function remakeThumb(btn) { btn.disabled = true; btn.textContent = 'Making it'; try { await api('/api/jobs/' + openJob.id + '/thumbnail', { text: $('#thText').value.trim() }); toast('Thumbnail updated'); await reloadJob(); } catch (e) { uiAlert(e.message); btn.disabled = false; btn.textContent = 'Redo thumbnail'; } }
+async function voiceUpload(inp) { const f = inp.files[0]; if (!f) return; $('#vup').textContent = 'Uploading ' + (f.size / 1048576).toFixed(1) + ' MB'; try { const r = await fetch('/api/jobs/' + openJob.id + '/voice', { method: 'POST', headers: { 'x-filename': encodeURIComponent(f.name) }, body: f }); if (!r.ok) throw new Error((await r.json()).error); toast('Your recording will be used'); await reloadJob(); } catch (e) { uiAlert('Upload failed: ' + e.message); $('#vup').textContent = ''; } }
 async function voiceRemove() { await api('/api/jobs/' + openJob.id + '/voice-remove', {}); await reloadJob(); }
 function viewDraft(j) {
   const M = j.media || [];
@@ -607,7 +877,7 @@ function viewDraft(j) {
    <div><button class="btn ok big" onclick="jact('start')">Plan the video from my material</button></div></div>`;
 }
 async function mediaUpload(inp) {
-  for (const f of inp.files) { const d = prompt(`What does "${f.name}" show? One line helps Claude place it.`, '') ?? ''; $('#vup').textContent = 'Uploading ' + f.name; const r = await fetch('/api/jobs/' + openJob.id + '/media', { method: 'POST', headers: { 'x-filename': encodeURIComponent(f.name), 'x-desc': encodeURIComponent(d || f.name) }, body: f }); if (!r.ok) { alert((await r.json().catch(() => ({}))).error || 'Upload failed'); break; } }
+  for (const f of inp.files) { const d = (await uiPrompt('Describe this file', '', `What does "${f.name}" show? One line helps Claude place it.`, 'Upload')) ?? ''; $('#vup').textContent = 'Uploading ' + f.name; const r = await fetch('/api/jobs/' + openJob.id + '/media', { method: 'POST', headers: { 'x-filename': encodeURIComponent(f.name), 'x-desc': encodeURIComponent(d || f.name) }, body: f }); if (!r.ok) { uiAlert((await r.json().catch(() => ({}))).error || 'Upload failed'); break; } }
   await reloadJob();
 }
 async function mediaRemove(id) { await api('/api/jobs/' + openJob.id + '/media-remove', { id }); await reloadJob(); }
@@ -634,7 +904,7 @@ function viewIdeas() {
     const acts = done ? `<button class="btn" onclick="openJ('${i.jobId}')">Open the video</button>`
       : rej ? `<button class="btn ghost" onclick="ideaAct('approve','${r.id}','${i.id}','${i.format}')">Make it anyway</button>`
       : `<button class="btn ok" onclick="ideaAct('approve','${r.id}','${i.id}','${i.format}')">Approve as ${i.format === 'long' ? 'long video' : 'Short'}</button><button class="btn" onclick="ideaAct('approve','${r.id}','${i.id}','${other}')">Make it ${other === 'short' ? 'a Short' : 'long'} instead</button><button class="btn ghost" onclick="ideaAct('reject','${r.id}','${i.id}')">Not now</button>`;
-    const src = i.sources.length ? `<p class="note" style="margin:0">Sources: ${i.sources.map(u => `<a href="${esc(u)}" target="_blank" rel="noopener">${esc((u.split('/')[2] || 'link').replace(/^www\./, ''))}</a>`).join(' · ')}</p>` : '';
+    const src = i.sources.length ? `<p class="note" style="margin:0">Sources: ${i.sources.map(u => /^KB:/.test(u) ? `<span title="from the company knowledge base">📘 ${esc(u)}</span>` : `<a href="${esc(u)}" target="_blank" rel="noopener">${esc((u.split('/')[2] || 'link').replace(/^www\./, ''))}</a>`).join(' · ')}</p>` : '';
     return `<div class="panel stack" style="padding:16px;${rej ? 'opacity:.45' : ''}">
       <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><span class="mono">${k + 1}</span><span class="chip ${i.format === 'long' ? 'work' : 'need'}">${i.format === 'long' ? 'Long video' : 'Short'}</span>${state}</div>
       <h3 class="h3" style="margin:0">${esc(i.title)}</h3>
@@ -646,29 +916,29 @@ function viewIdeas() {
       : r.status === 'failed' ? `<span class="chip bad"><i></i>Research failed</span><button class="btn" onclick="ideaAct('retry','${r.id}')">Try again</button>`
       : `<span class="chip done"><i></i>${r.ideas.length} titles</span>`;
     const head = `<div style="display:flex;gap:12px;align-items:flex-start;justify-content:space-between;flex-wrap:wrap"><div style="min-width:0"><b>${esc(r.prompt)}</b><div class="note" style="margin:4px 0 0">${esc(r.channel || '')} · ${r.format === 'any' ? 'Shorts and long' : r.format === 'short' ? 'Shorts' : 'Long videos'} · ${when(r.at)}</div></div>
-      <div class="acts">${status}<button class="btn ghost" onclick="if(confirm('Remove this list of ideas?'))ideaAct('delete','${r.id}')">Remove</button></div></div>`;
+      <div class="acts">${status}<button class="btn ghost" onclick="uiConfirm('Remove this list of ideas?', 'The titles in it are removed. Videos already made from them stay.', 'Remove', 'danger').then(y => y && ideaAct('delete','${r.id}'))">Remove</button></div></div>`;
     return `<div class="panel stack" style="max-width:900px">${head}${r.status === 'failed' ? `<p class="err">${esc(r.error || '')}</p>` : ''}${r.ideas.length ? `<div class="stack">${r.ideas.map((i, k) => card(r, i, k)).join('')}</div>` : ''}</div>`;
   };
-  return pagehead('Ideas', 'Give a prompt. Claude researches and suggests titles. Approve a title and Claude researches it and writes the plan; you approve the plan, then the finished video, then it is uploaded.') + form + (R.length ? `<div class="stack" style="--i:2;margin-top:18px">${R.map(run).join('')}</div>` : '');
+  return pagehead('Ideas', 'Give a prompt. Claude researches and suggests titles. Approve a title and Claude researches it and writes the plan; you approve the plan, then the finished video, then it is uploaded.') + form + (R.length ? `<div class="panel" style="--i:2;margin-top:18px;max-width:560px">${videoTypeSelect('iPipe', ideaVideoType).replace('<select ', '<select onchange="ideaVideoType=this.value" ')}<p class="note" style="margin:6px 0 0">Used for the titles you approve below.</p></div><div class="stack" style="--i:2;margin-top:18px">${R.map(run).join('')}</div>` : '');
 }
-async function delJob(j = openJob) { if (!confirm('Delete this video for good?' + (j.status === 'published' ? ' (The copy on YouTube stays there.)' : ''))) return;
-  const idea = j.fromIdea && confirm('Also delete the idea it was made from?\n\nOK = delete the idea too\nCancel = keep the idea, so you can make it again');
-  try { await api(`/api/jobs/${j.id}/delete`, { idea }); } catch (e) { return alert(e.message); }
+async function delJob(j = openJob) { if (!(await uiConfirm('Delete this video?', 'It is removed from the studio for good.' + (j.status === 'published' ? ' The copy on YouTube stays there.' : ''), 'Delete', 'danger'))) return;
+  const idea = j.fromIdea && (await ask({ title: 'Also delete its idea?', msg: 'Keep the idea if you may want to make this video again later.', ok: 'Delete the idea too', cancel: 'Keep the idea', tone: 'danger' }));
+  try { await api(`/api/jobs/${j.id}/delete`, { idea }); } catch (e) { return uiAlert(e.message); }
   openId = null; tab = 'log'; toast('Video deleted'); await refresh(true);
 }
 async function ideaRemove(run, id, hasVideo) {
-  if (!confirm('Delete this idea?')) return;
-  const video = hasVideo ? confirm('Also delete the video made from it?\n\nOK = delete the video too\nCancel = keep the video in Videos') : false;
-  try { await api('/api/ideas/remove', { run, id, video }); toast(video ? 'Idea and video deleted' : 'Idea deleted'); await refresh(true); } catch (e) { alert(e.message); }
+  if (!(await uiConfirm('Delete this idea?', '', 'Delete', 'danger'))) return;
+  const video = hasVideo ? (await ask({ title: 'Also delete its video?', msg: 'A video was already made from this idea.', ok: 'Delete the video too', cancel: 'Keep the video', tone: 'danger' })) : false;
+  try { await api('/api/ideas/remove', { run, id, video }); toast(video ? 'Idea and video deleted' : 'Idea deleted'); await refresh(true); } catch (e) { uiAlert(e.message); }
 }
 async function ideasGo(btn) {
   const b = { prompt: $('#iPrompt').value.trim(), flowId: $('#iFlow') ? $('#iFlow').value : null, format: $('#iFmt').value, n: +$('#iN').value };
-  if (!b.prompt) return alert('Write what kind of videos you want first.');
+  if (!b.prompt) return uiAlert('Write what kind of videos you want first.');
   ideaFmt = b.format; btn.disabled = true; btn.textContent = 'Starting';
-  try { await api('/api/ideas', b); toast('Claude is researching titles. They will show up here.'); $('#iPrompt').value = ''; if (document.activeElement) document.activeElement.blur(); await refresh(true); } catch (e) { alert(e.message); btn.disabled = false; btn.textContent = 'Research titles'; }
+  try { await api('/api/ideas', b); toast('Claude is researching titles. They will show up here.'); $('#iPrompt').value = ''; if (document.activeElement) document.activeElement.blur(); await refresh(true); } catch (e) { uiAlert(e.message); btn.disabled = false; btn.textContent = 'Research titles'; }
 }
 async function ideaAct(a, run, id, format) {
-  try { await api('/api/ideas/' + a, { run, id, format }); if (a === 'approve') toast('Approved. Claude is researching it and writing the plan. It will be in Needs you when ready.'); await refresh(true); } catch (e) { alert(e.message); }
+  try { await api('/api/ideas/' + a, { run, id, format, pipeline: ideaVideoType }); if (a === 'approve') toast('Approved. Claude is researching it and writing the plan. It will be in Needs you when ready.'); await refresh(true); } catch (e) { uiAlert(e.message); }
 }
 
 // ================= Make =================
@@ -682,14 +952,15 @@ function viewMake() {
   return pagehead('Make a video', 'One video outside the daily schedule.') + `<div class="modes" style="--i:1">${M.map(([k, n, t, d]) => `<button class="mode ${createMode === k ? 'on' : ''}" onclick="createMode='${k}';render(true)" aria-pressed="${createMode === k}"><div class="n">${n}</div><b>${t}</b><span>${d}</span></button>`).join('')}</div>
   <div class="panel stack" style="--i:2;margin-top:16px;max-width:900px">
     <div class="grid2" style="gap:14px">${F.length ? `<label class="f">Channel<select id="cFlow">${F.map(f => `<option value="${f.id}">${esc(f.name)}</option>`).join('')}</select></label>` : ''}<label class="f">Length<select id="cFmt"><option value="short">Short and Reel, about 45 seconds</option><option value="long">Long video</option></select></label></div>
+    ${videoTypeSelect('cPipe')}
     ${form}<div><button class="btn cta big" onclick="createOne(this)">${createMode === 'own' ? 'Continue to my material' : 'Write the plan'}</button></div></div>`;
 }
 async function createOne(btn) {
-  const b = { mode: createMode, flowId: $('#cFlow') ? $('#cFlow').value : null, format: $('#cFmt').value };
+  const b = { mode: createMode, flowId: $('#cFlow') ? $('#cFlow').value : null, format: $('#cFmt').value, pipeline: $('#cPipe').value };
   if (createMode === 'auto') b.topic = $('#cTopic').value.trim();
-  else { b.title = $('#cTitle').value.trim(); b.prompt = $('#cPrompt').value.trim(); b.topic = b.title; if (!b.title) return alert('Give the video a title first.'); if (createMode === 'own') b.voiceFirst = $('#cVF').checked; }
+  else { b.title = $('#cTitle').value.trim(); b.prompt = $('#cPrompt').value.trim(); b.topic = b.title; if (!b.title) return uiAlert('Give the video a title first.'); if (createMode === 'own') b.voiceFirst = $('#cVF').checked; }
   btn.disabled = true; btn.textContent = createMode === 'auto' && !b.topic ? 'Picking a topic' : 'Starting';
-  try { const j = await api('/api/jobs', b); if (createMode === 'own') { await openJ(j.id); toast('Draft made. Add your material.'); } else { toast('Claude is writing the plan'); go('log'); } } catch (e) { alert(e.message); btn.disabled = false; }
+  try { const j = await api('/api/jobs', b); if (createMode === 'own') { await openJ(j.id); toast('Draft made. Add your material.'); } else { toast('Claude is writing the plan'); go('log'); } } catch (e) { uiAlert(e.message); btn.disabled = false; }
 }
 
 // ================= Channels =================
@@ -707,8 +978,8 @@ function viewChannels() {
       <div class="week" aria-label="Runs on ${s.days.map(i => DAYS[i]).join(', ')}">${DAYS.map((d, i) => `<span class="${s.days.includes(i) ? 'on' : ''}" title="${d}">${d[0]}</span>`).join('')}</div>
       <div class="acts"><button class="btn" onclick="openCal('${f.id}')">Content calendar</button><button class="btn" onclick="flowRun('${f.id}',this)">Make today's videos now</button><button class="btn cta" onclick="flowEdit='${f.id}';render(true)">Edit</button></div></div></article>`; }).join('') || `<div class="empty-note">No channels yet. Add one for each YouTube and Instagram account.</div>`);
 }
-async function flowToggle(id, on) { try { await api('/api/flows', { id, enabled: on }); toast(on ? 'Channel running' : 'Channel paused'); } catch (e) { alert(e.message); } await refresh(true); }
-async function flowRun(id, btn) { btn.disabled = true; btn.textContent = 'Researching topics'; try { const r = await api(`/api/flows/${id}/run`, {}); toast(`${(r.jobs || []).length} videos started`); } catch (e) { alert(e.message); } await refresh(true); }
+async function flowToggle(id, on) { try { await api('/api/flows', { id, enabled: on }); toast(on ? 'Channel running' : 'Channel paused'); } catch (e) { uiAlert(e.message); } await refresh(true); }
+async function flowRun(id, btn) { btn.disabled = true; btn.textContent = 'Researching topics'; try { const r = await api(`/api/flows/${id}/run`, {}); toast(`${(r.jobs || []).length} videos started`); } catch (e) { uiAlert(e.message); } await refresh(true); }
 function viewChannelEdit() {
   const isNew = flowEdit === 'new', f = isNew ? { id: '', name: '', enabled: false, channel: { name: '', niche: '', audience: '', tone: 'warm, clear and friendly' }, domain: 'general', language: 'english', pack: 'auto', voice: S.settings.voice, longMinutes: 8, schedule: { days: [0, 1, 2, 3, 4, 5, 6], longs: 1, shorts: 2, readyBy: '09:00', leadHours: 8, publishLong: ['18:00'], publishShort: ['09:00', '15:00'] }, approvals: 'both', research: 'auto', topics: [], upload: { youtube: true, instagram: true, privacy: 'public' } } : (S.flows || []).find(x => x.id === flowEdit);
   if (!f) { flowEdit = null; return viewChannels(); }
@@ -749,7 +1020,7 @@ function viewChannelEdit() {
    </div>
   </div>
   <div class="actionbar"><label class="check" style="font-weight:600"><input type="checkbox" class="sw" id="fOn" ${f.enabled ? 'checked' : ''}> Run on schedule</label><span style="flex:1"></span>
-    ${isNew ? '' : `<button class="btn danger" onclick="if(confirm('Delete this channel? Videos already made stay in Videos.'))flowDelete('${f.id}')">Delete</button>`}
+    ${isNew ? '' : `<button class="btn danger" onclick="uiConfirm('Delete this channel?', 'Its schedule and settings are removed. Videos already made stay in Videos.', 'Delete channel', 'danger').then(y => y && flowDelete('${f.id}'))">Delete</button>`}
     <button class="btn cta big" onclick="flowSave('${f.id}')">Save channel</button></div>`;
 }
 const times = v => String(v).split(/[ ,]+/).map(x => x.trim()).filter(x => /^\d{1,2}:\d{2}$/.test(x));
@@ -759,12 +1030,16 @@ async function flowSave(id) {
     pack: $('#fPack').value, voice: $('#fVoice').value, domain: $('#fDomain').value, language: $('#fLang').value, look: $('#fLook') ? $('#fLook').value : undefined, longMinutes: +$('#fMin').value || 8, research: $('#fRes').value, topics: $('#fTopics').value.split('\n').map(x => x.trim()).filter(Boolean), ...($('#fShortTopics') ? { shortTopics: $('#fShortTopics').value.split('\n').map(x => x.trim()).filter(Boolean) } : {}),
     schedule: { days: $$('.fDay').filter(x => x.checked).map(x => +x.value), longs: +$('#fLongs').value || 0, shorts: +$('#fShorts').value || 0, readyBy: $('#fReady').value || '09:00', leadHours: +$('#fLead').value || 8, publishLong: times($('#fPubL').value), publishShort: times($('#fPubS').value) },
     approvals: ($('input[name=fAppr]:checked') || {}).value || 'both', upload: { youtube: $('#fYT').checked, instagram: $('#fIG').checked, facebook: $('#fFB').checked, privacy: $('#fPriv').value } };
-  if (!f.name) return alert('Give the channel a name.'); if (!f.channel.niche) return alert('Describe what the channel is about. Claude researches topics from it.');
+  if (!f.name) return uiAlert('Give the channel a name.'); if (!f.channel.niche) return uiAlert('Describe what the channel is about. Claude researches topics from it.');
   if (id) f.id = id;
-  try { await api('/api/flows', f); flowEdit = null; toast('Channel saved'); await refresh(true); } catch (e) { alert(e.message); }
+  try { await api('/api/flows', f); flowEdit = null; toast('Channel saved'); await refresh(true); } catch (e) { uiAlert(e.message); }
 }
 async function flowDelete(id) { await api(`/api/flows/${id}/delete`, {}); flowEdit = null; toast('Channel deleted'); await refresh(true); }
-async function flowResearch(id, btn) { btn.disabled = true; btn.textContent = 'Claude is researching'; try { const r = await api(`/api/flows/${id}/research`, {}); toast(`${(r.topics || []).length} topics added`); } catch (e) { alert(e.message); } S = await api('/api/state'); render(true); }
+// every video is either a normal one (narrator over themed scenes) or a character video (lib/character)
+const VIDEO_TYPES = { classic: 'Normal: narrator voice over animated scenes', character: 'Character: AI characters speak their own lines on camera (Gemini)' };
+const videoTypeSelect = (id, cur = 'classic') => `<label class="f">Video type<select id="${id}">${Object.entries(VIDEO_TYPES).map(([v, l]) => `<option value="${v}" ${v === cur ? 'selected' : ''}>${l}</option>`).join('')}</select></label>`;
+let ideaVideoType = 'classic';
+async function flowResearch(id, btn) { btn.disabled = true; btn.textContent = 'Claude is researching'; try { const r = await api(`/api/flows/${id}/research`, {}); toast(`${(r.topics || []).length} topics added`); } catch (e) { uiAlert(e.message); } S = await api('/api/state'); render(true); }
 async function flowConn(id) { $('#fConn').textContent = 'Checking'; try { const r = await api(`/api/flows/${id}/connections`, {}); $('#fConn').textContent = `YouTube ${r.youtube.connected ? 'connected' + (r.youtube.channel ? ' (' + r.youtube.channel + ')' : '') : 'not connected'}. Instagram ${r.instagram.connected ? 'connected' : 'not connected'}.`; } catch (e) { $('#fConn').textContent = e.message; } }
 
 // ================= accounts: connect YouTube / Instagram / Facebook from here =================
@@ -825,16 +1100,16 @@ function acctMeta(r, scope, back) {
   if ((ig && ig.connected) || (fb && fb.connected)) h += `<div class="arow">${ig && ig.connected ? `<button class="btn" onclick="accTest('${scope}','${back}','instagram')">Test Instagram Reel</button>` : ''}${fb && fb.connected ? `<button class="btn" onclick="accTest('${scope}','${back}','facebook')">Test Facebook (unpublished)</button>` : ''}<button class="btn ghost" onclick="accDisc('${scope}','${back}','meta','Disconnect Instagram and Facebook?')">Disconnect</button></div>`;
   return h + testLine(T.instagram) + testLine(T.facebook) + `</div>`;
 }
-async function accPost(scope, back, a, b, ok) { try { const r = await api('/api/connect/' + a, { scope, ...b }); if (ok) toast(typeof ok === 'function' ? ok(r) : ok); } catch (e) { alert(e.message); } loadConn(scope, back); }
+async function accPost(scope, back, a, b, ok) { try { const r = await api('/api/connect/' + a, { scope, ...b }); if (ok) toast(typeof ok === 'function' ? ok(r) : ok); } catch (e) { uiAlert(e.message); } loadConn(scope, back); }
 function gClientFile(scope, back, inp) { const f = inp.files[0]; if (!f) return; f.text().then(json => accPost(scope, back, 'google-client', { json }, 'Google key saved. Now press Connect YouTube.')); }
 function gClientSave(scope, back) { accPost(scope, back, 'google-client', { clientId: $('#gId-' + scope).value, clientSecret: $('#gSec-' + scope).value }, 'Google key saved. Now press Connect YouTube.'); }
 function metaAppSave(scope, back) { accPost(scope, back, 'meta-app', { appId: $('#mId-' + scope).value, appSecret: $('#mSec-' + scope).value }, 'Meta app saved. Now press Connect with Facebook.'); }
 function metaTok(scope, back) { accPost(scope, back, 'meta-token', { token: $('#mTok-' + scope).value }, r => r.picked ? 'Connected ' + r.picked.name : 'Token accepted. Pick a Page.'); }
 function metaPick(scope, back, pageId) { accPost(scope, back, 'meta-select', { pageId }, r => 'Posting to ' + r.page + (r.instagram ? ' and @' + r.instagram : '')); }
-function accDisc(scope, back, what, q) { if (confirm(q)) accPost(scope, back, 'disconnect', { what }, 'Disconnected'); }
-function accTest(scope, back, platform) {
+async function accDisc(scope, back, what, q) { if (await uiConfirm('Disconnect?', q, 'Disconnect', 'danger')) accPost(scope, back, 'disconnect', { what }, 'Disconnected'); }
+async function accTest(scope, back, platform) {
   const warn = { youtube: 'Upload your newest Short to YouTube as a PRIVATE test video? Only you can see it. Delete it in YouTube Studio afterwards.', instagram: 'Instagram has no private posts: this publishes your newest Short as a PUBLIC Reel on your account. Delete it afterwards in the Instagram app. Continue?', facebook: 'Upload your newest Short to your Facebook Page as an UNPUBLISHED video (only Page admins see it in Meta Business Suite)?' }[platform];
-  if (confirm(warn)) accPost(scope, back, 'test', { platform }, 'Test upload started');
+  if (await uiConfirm('Send a test upload?', warn, 'Upload test', 'warn')) accPost(scope, back, 'test', { platform }, 'Test upload started');
 }
 // ---- several YouTube channels: one row per AutoTube Studio channel ----
 function chanList() {
@@ -853,18 +1128,18 @@ async function loadChanStatus() {
   }
 }
 async function addYtChannel() {
-  const name = (prompt('Name of the new channel (as on YouTube):') || '').trim(); if (!name) return;
-  const niche = (prompt('What is this channel about? Claude researches topics from this.', 'History documentaries') || 'History documentaries').trim();
+  const name = ((await uiPrompt('Add a YouTube channel', '', 'Name of the channel, as on YouTube', 'Next')) || '').trim(); if (!name) return;
+  const niche = ((await uiPrompt('What is this channel about?', 'History documentaries', 'Claude researches topics from this.', 'Add channel')) || 'History documentaries').trim();
   try { const f = await api('/api/flows', { name, enabled: false, channel: { name, niche, audience: 'curious viewers worldwide', tone: 'warm, curious storyteller', language: 'English' } });
-    if (confirm(`"${name}" is added (schedule off for now). Connect its YouTube account now?`)) location.href = `/connect/google/start?scope=${f.id}&back=settings`; else await refresh(true);
-  } catch (e) { alert(e.message); }
+    if (await uiConfirm(`"${name}" is added`, 'Its schedule is off for now. Connect its YouTube account now?', 'Connect YouTube')) location.href = `/connect/google/start?scope=${f.id}&back=settings`; else await refresh(true);
+  } catch (e) { uiAlert(e.message); }
 }
 
 // ---- workers: who is making which video ----
 function workersPanel() {
   const W = S.workers || { workers: [] }, s = S.settings, jt = id => { const j = S.jobs.find(x => x.id === id); return j ? (j.title || j.topic) : id; };
   const ago = t => { const s2 = Math.round((Date.now() - t) / 1000); return s2 < 60 ? s2 + ' s ago' : Math.round(s2 / 60) + ' min ago'; };
-  const cmd = `node worker.mjs --server http://${(W.ips || [])[0] || '<this-PC-IP>'}:${W.port || 4747} --token ${W.token || ''} --name "Second PC" --slots 2`;
+  const cmd = `node worker.js --server http://${(W.ips || [])[0] || '<this-PC-IP>'}:${W.port || 4747} --token ${W.token || ''} --name "Second PC" --slots 2`;
   return `<div class="grid2" style="gap:12px;grid-template-columns:1fr 1fr">
      <label class="f">Videos at once on this PC <small>2 suits this laptop. Each extra video needs about 4 GB RAM and slows the others.</small><input data-k="renderSlots" type="number" min="1" max="6" value="${s.renderSlots || 2}" style="max-width:140px"></label>
      <label class="f">Plans written at once <small>Claude writes several plans in parallel.</small><input data-k="writeSlots" type="number" min="1" max="6" value="${s.writeSlots || 2}" style="max-width:140px"></label></div>
@@ -899,24 +1174,24 @@ async function loadVoice() {
      <label class="f">Likeness <small>How closely it copies your recording (0 to 1)</small><input id="elSim" type="number" step="0.05" min="0" max="1" value="${EV.similarity}" style="max-width:140px"></label>
      <button class="btn" onclick="elSave()">Save sound settings</button></div></div>`;
 }
-async function elPost(a, b, ok) { try { const r = await api('/api/eleven/' + a, b); if (ok) toast(typeof ok === 'function' ? ok(r) : ok); S = await api('/api/state'); return r; } catch (e) { alert(e.message); } finally { loadVoice(); } }
+async function elPost(a, b, ok) { try { const r = await api('/api/eleven/' + a, b); if (ok) toast(typeof ok === 'function' ? ok(r) : ok); S = await api('/api/state'); return r; } catch (e) { uiAlert(e.message); } finally { loadVoice(); } }
 function elKey() { const k = $('#elKey').value.trim(); if (k) elPost('key', { apiKey: k }, 'Key saved').then(() => elPost('check', {}, r => r.tts ? 'Key works' : 'Key saved, but it cannot make speech yet')); }
 function elCheck(btn) { btn.disabled = true; btn.textContent = 'Testing'; elPost('check', {}, r => r.tts ? 'The key works' : 'The key cannot make speech'); }
 async function elCloneExtracted(btn) { btn.disabled = true; btn.textContent = 'Making your voice (about 30 s)'; await elPost('clone-extracted', { name: 'My narrator voice' }, 'Your voice is ready. Press Play sample.'); }
 async function elCloneUpload(inp) {
-  const f = inp.files[0]; if (!f) return; const name = (prompt('Name for this voice:', 'My narrator voice') || 'My narrator voice').trim(); toast('Uploading ' + (f.size / 1048576).toFixed(1) + ' MB');
-  try { const r = await fetch('/api/eleven/clone-upload', { method: 'POST', headers: { 'x-filename': encodeURIComponent(f.name), 'x-name': encodeURIComponent(name) }, body: f }); const j = await r.json(); if (!r.ok || j.error) throw new Error(j.error || 'failed'); toast('Your voice is ready'); S = await api('/api/state'); } catch (e) { alert(e.message); } loadVoice();
+  const f = inp.files[0]; if (!f) return; const name = ((await uiPrompt('Name this voice', 'My narrator voice', '', 'Upload')) || 'My narrator voice').trim(); toast('Uploading ' + (f.size / 1048576).toFixed(1) + ' MB');
+  try { const r = await fetch('/api/eleven/clone-upload', { method: 'POST', headers: { 'x-filename': encodeURIComponent(f.name), 'x-name': encodeURIComponent(name) }, body: f }); const j = await r.json(); if (!r.ok || j.error) throw new Error(j.error || 'failed'); toast('Your voice is ready'); S = await api('/api/state'); } catch (e) { uiAlert(e.message); } loadVoice();
 }
-async function elSample(id, btn) { btn.disabled = true; btn.textContent = 'Making sample'; try { const r = await api('/api/eleven/sample', { voiceId: id }); const a = $('#elAudio'); a.style.display = 'block'; a.src = r.url; a.play(); } catch (e) { alert(e.message); } btn.disabled = false; btn.textContent = 'Play sample'; }
-async function elUse(id) { try { await api('/api/settings', { voice: 'eleven:' + id }); await api('/api/eleven/settings', { defaultVoice: id }); toast('New videos will be narrated in your voice'); S = await api('/api/state'); } catch (e) { alert(e.message); } loadVoice(); }
-function elRemove(id) { if (confirm('Remove this voice from AutoTube Studio? (It stays in your ElevenLabs account.)')) elPost('remove', { voiceId: id }, 'Removed'); }
+async function elSample(id, btn) { btn.disabled = true; btn.textContent = 'Making sample'; try { const r = await api('/api/eleven/sample', { voiceId: id }); const a = $('#elAudio'); a.style.display = 'block'; a.src = r.url; a.play(); } catch (e) { uiAlert(e.message); } btn.disabled = false; btn.textContent = 'Play sample'; }
+async function elUse(id) { try { await api('/api/settings', { voice: 'eleven:' + id }); await api('/api/eleven/settings', { defaultVoice: id }); toast('New videos will be narrated in your voice'); S = await api('/api/state'); } catch (e) { uiAlert(e.message); } loadVoice(); }
+async function elRemove(id) { if (await uiConfirm('Remove this voice?', 'It is removed from AutoTube Studio. It stays in your ElevenLabs account.', 'Remove', 'danger')) elPost('remove', { voiceId: id }, 'Removed'); }
 function elAddId() { elPost('add-id', { voiceId: $('#elVid').value.trim(), name: 'My ElevenLabs voice' }, 'Voice added'); }
 function elSave() { elPost('settings', { speed: $('#elSpeed').value, stability: $('#elStab').value, similarity: $('#elSim').value }, 'Saved'); }
 
 // came back from Google / Facebook sign-in
 (() => { const q = new URLSearchParams(location.search); if (!q.has('cmsg')) return; const back = q.get('back') || 'settings';
   if (back === 'settings') tab = 'settings'; else { tab = 'channels'; flowEdit = back; }
-  history.replaceState(null, '', '/'); const m = q.get('cmsg'); setTimeout(() => q.get('cok') === '1' ? toast(m) : alert(m), 600); })();
+  history.replaceState(null, '', '/'); const m = q.get('cmsg'); setTimeout(() => q.get('cok') === '1' ? toast(m) : uiAlert(m), 600); })();
 
 // ================= content calendar (per channel) =================
 let calFlow = null, CAL = null;
@@ -988,8 +1263,8 @@ function viewCalendarAll() {
 // ---- month plan: change a planned title, its day and time, or its themes ----
 let MONTH = {};   // flowId -> { month, themes }
 async function openMonthItem(fid, date, mid) {
-  try { MONTH[fid] = await api('/api/flows/' + fid + '/month'); } catch (e) { return alert(e.message); }
-  const it = (MONTH[fid].month[date] || []).find(x => x.id === mid); if (!it) return alert('That planned title is not in the month plan any more.');
+  try { MONTH[fid] = await api('/api/flows/' + fid + '/month'); } catch (e) { return uiAlert(e.message); }
+  const it = (MONTH[fid].month[date] || []).find(x => x.id === mid); if (!it) return uiAlert('That planned title is not in the month plan any more.');
   const on = new Set(it.themes || []);
   $('#overlay').innerHTML = `<div class="modal" onclick="if(event.target===this)closeOv()"><div class="box" style="width:min(760px,100%)"><div style="padding:20px 22px;display:grid;gap:14px">
     <div style="display:flex;justify-content:space-between;gap:12px;align-items:center"><h2 class="h2" style="margin:0">Planned Short</h2><button class="x" onclick="closeOv()" aria-label="Close">${ic('x')}</button></div>
@@ -1004,7 +1279,7 @@ async function openMonthItem(fid, date, mid) {
   </div></div></div>`;
 }
 async function saveMonthItem(fid, date, mid, remove) {
-  if (remove && !confirm('Remove this planned title from the month plan?')) return;
+  if (remove && !(await uiConfirm('Remove this title?', 'It is taken off the month plan.', 'Remove', 'danger'))) return;
   const themes = [...document.querySelectorAll('#miThemes input:checked')].map(x => x.value);
   if (themes.length > 3) { $('#miErr').textContent = 'Pick at most 3 themes (or none for Auto).'; return; }
   try { await api('/api/flows/' + fid + '/month', remove ? { date, id: mid, remove: true } : { date, id: mid, title: $('#miTitle').value, themes, publishAt: $('#miTime').value, ...($('#miDate').value && $('#miDate').value !== date ? { date, newDate: $('#miDate').value } : {}) }); closeOv(); loadAllCal(true); }
@@ -1018,6 +1293,33 @@ function viewLooks() {
     `<div class="gal" style="--i:1">${STY.map(x => `<button onclick="openLook('${x.slug}')" onmouseenter="hoverPlay(this,1)" onmouseleave="hoverPlay(this,0)"><div class="m"><img loading="lazy" src="${x.posterUrl || (x.presetImg && x.presetImg.h) || ''}" alt="">${x.previewUrl ? `<video muted loop playsinline preload="none" data-src="${x.previewUrl}"></video>` : ''}</div><div class="t"><b>${esc(x.name)}</b><span>${esc(x.category)}</span></div></button>`).join('')}</div>`;
 }
 function openLook(slug) { const x = STY.find(y => y.slug === slug); if (!x) return; gal = slug; $('#overlay').innerHTML = `<div class="modal" onclick="if(event.target===this)closeOv()"><div class="box"><div style="display:flex;justify-content:space-between;align-items:center;padding:18px 22px;gap:12px"><div><h2 class="h2">${esc(x.name)}</h2><p class="note" style="margin:4px 0 0">${esc(x.line)}</p></div><button class="x" onclick="closeOv()" aria-label="Close">${ic('x')}</button></div>${x.previewUrl ? `<video controls autoplay src="${x.previewUrl}" style="width:100%;display:block;background:#000"></video>` : `<img src="${x.posterUrl}" style="width:100%;display:block" alt="">`}</div></div>`; }
+// Studio dialogs in place of the browser's alert / confirm / prompt boxes.
+// ask({ title, msg, ok, cancel (false = no cancel button), tone: 'danger'|'warn'|'info', input: default text }) -> Promise
+let dlgDone = null;
+function ask(o) {
+  if (dlgDone) dlgDone(o.input !== undefined ? null : false);
+  return new Promise(res => {
+    const tone = o.tone || 'info', icon = tone === 'danger' ? 'M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14M10 11v6M14 11v6' : tone === 'warn' ? 'M12 3l10 18H2zM12 10v5M12 18v.5' : 'M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20zM12 11v6M12 7v.5';
+    const prev = document.activeElement, hasIn = o.input !== undefined;
+    const okVal = () => hasIn ? $('#dlgIn').value : true, noVal = hasIn ? null : false;
+    const done = v => { dlgDone = null; $('#dlg').innerHTML = ''; document.removeEventListener('keydown', key, true); try { prev && prev.focus && prev.focus(); } catch {} res(v); };
+    const key = e => {
+      if (e.key === 'Escape') { e.preventDefault(); done(o.cancel === false ? okVal() : noVal); }
+      else if (e.key === 'Enter' && !(e.target && e.target.dataset && e.target.dataset.v)) { e.preventDefault(); done(okVal()); }
+      else if (e.key === 'Tab') { const f = [...$('#dlg').querySelectorAll('button,input')], i = f.indexOf(document.activeElement); if (e.shiftKey && i <= 0) { e.preventDefault(); f[f.length - 1].focus(); } else if (!e.shiftKey && i === f.length - 1) { e.preventDefault(); f[0].focus(); } }
+    };
+    dlgDone = done;
+    $('#dlg').innerHTML = `<div class="modal"><div class="dlg ${tone}" role="${o.cancel === false ? 'alertdialog' : 'dialog'}" aria-modal="true" aria-labelledby="dlgT"><div class="dh"><span class="di"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="${icon}"/></svg></span><div><h2 id="dlgT">${esc(o.title || '')}</h2>${o.msg ? `<p>${esc(o.msg)}</p>` : ''}</div></div>${hasIn ? `<input id="dlgIn" value="${esc(o.input || '')}" placeholder="${esc(o.placeholder || '')}" aria-label="${esc(o.title || '')}">` : ''}<div class="acts">${o.cancel === false ? '' : `<button class="btn" data-v="no">${esc(o.cancel || 'Cancel')}</button>`}<button class="btn ${tone === 'danger' ? 'danger' : 'cta'}" data-v="ok">${esc(o.ok || 'OK')}</button></div></div></div>`;
+    $('#dlg .modal').onclick = e => { if (e.target.classList.contains('modal') && o.cancel !== false) done(noVal); };
+    $('#dlg').querySelectorAll('[data-v]').forEach(b => b.onclick = () => done(b.dataset.v === 'ok' ? okVal() : noVal));
+    document.addEventListener('keydown', key, true);
+    setTimeout(() => { const f = $('#dlgIn') || $('#dlg [data-v="ok"]'); if (f) f.focus(); if ($('#dlgIn')) $('#dlgIn').select(); }, 30);
+  });
+}
+const BADMSG = /fail|error|could not|cannot|can't|not found|blocked|problem|wrong|invalid/i;
+const uiAlert = (msg, title) => ask({ title: title || (BADMSG.test(String(msg)) ? 'Something went wrong' : 'Note'), msg: String(msg), cancel: false, tone: BADMSG.test(String(msg)) ? 'warn' : 'info' });
+const uiConfirm = (title, msg, ok = 'OK', tone = 'info') => ask({ title, msg, ok, tone });
+const uiPrompt = (title, def = '', msg = '', ok = 'OK') => ask({ title, msg, input: def, ok });
 function closeOv() { $('#overlay').innerHTML = ''; gal = null; }
 
 // ================= Settings =================
@@ -1048,11 +1350,11 @@ async function claudeAct(a, btn) {
       clearInterval(claudeWait); let n = 0;
       claudeWait = setInterval(async () => { const c = await api('/api/claude/status', { fresh: true }).catch(() => null); if ((c && c.loggedIn) || ++n > 60 || !$('#claudePanel')) { clearInterval(claudeWait); if (c && c.loggedIn) { loadClaude(false, 'Signed in.'); refresh(); } } }, 5000);
     }
-    if (a === 'logout') { if (!confirm('Sign this computer out of the Claude account? Videos cannot be planned until you sign in again or add an API key.')) return; await api('/api/claude/logout', {}); loadClaude(true, 'Signed out.'); }
-    if (a === 'key') { const k = $('#claudeKey').value.trim(); if (!k) return alert('Paste the API key first.'); await api('/api/claude/key', { key: k }); $('#claudeKey').value = ''; loadClaude(true, 'API key saved. Press "Test the connection" to check it.'); }
-    if (a === 'nokey') { if (!confirm('Remove the API key? Claude then uses the signed-in account.')) return; await api('/api/claude/key', { key: '' }); loadClaude(true, 'API key removed.'); }
+    if (a === 'logout') { if (!(await uiConfirm('Sign out of Claude?', 'Videos cannot be planned until you sign in again or add an API key.', 'Sign out', 'danger'))) return; await api('/api/claude/logout', {}); loadClaude(true, 'Signed out.'); }
+    if (a === 'key') { const k = $('#claudeKey').value.trim(); if (!k) return uiAlert('Paste the API key first.'); await api('/api/claude/key', { key: k }); $('#claudeKey').value = ''; loadClaude(true, 'API key saved. Press "Test the connection" to check it.'); }
+    if (a === 'nokey') { if (!(await uiConfirm('Remove the API key?', 'Claude then uses the signed-in account.', 'Remove key', 'danger'))) return; await api('/api/claude/key', { key: '' }); loadClaude(true, 'API key removed.'); }
     if (a === 'test') { btn.disabled = true; btn.textContent = 'Testing...'; const r = await api('/api/claude/test', {}); loadClaude(true, r.ok ? `Working: Claude answered in ${r.seconds} s.` : 'Not working: ' + esc(r.error || 'no answer')); }
-  } catch (e) { alert(e.message); if (btn) { btn.disabled = false; btn.textContent = 'Test the connection'; } }
+  } catch (e) { uiAlert(e.message); if (btn) { btn.disabled = false; btn.textContent = 'Test the connection'; } }
 }
 function viewSettings() {
   const s = S.settings;
@@ -1077,7 +1379,7 @@ function viewSettings() {
    <div class="panel stack" style="--i:6;margin-top:20px"><h2 class="h2">Your voice</h2><p class="note" style="margin:0">Narrate videos in your own voice with ElevenLabs. Your recording becomes a voice clone, and every video can be read in it, with exact word timing for the captions.</p><div id="voicePanel"><p class="note">Loading</p></div></div>
    <div class="actionbar" style="justify-content:flex-end"><button class="btn cta big" onclick="saveSettings()">Save settings</button></div>`;
 }
-async function saveSettings() { const p = {}; $$('[data-k]').forEach(e => { p[e.dataset.k] = e.type === 'checkbox' ? e.checked : e.type === 'number' ? +e.value : e.value; }); try { await api('/api/settings', p); toast('Settings saved'); await refresh(true); } catch (e) { alert(e.message); } }
+async function saveSettings() { const p = {}; $$('[data-k]').forEach(e => { p[e.dataset.k] = e.type === 'checkbox' ? e.checked : e.type === 'number' ? +e.value : e.value; }); try { await api('/api/settings', p); toast('Settings saved'); await refresh(true); } catch (e) { uiAlert(e.message); } }
 
 // ================= command palette =================
 let palItems = [], palSel = 0;

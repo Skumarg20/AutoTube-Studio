@@ -6,7 +6,7 @@
 $ErrorActionPreference = 'Stop'
 $app = Split-Path -Parent $PSScriptRoot
 $home2 = Split-Path -Parent $app
-$lib = (& node -e "import('file:///$($app.Replace('\','/'))/lib/store.mjs').then(m=>console.log(m.settings().libraryPath))").Trim()
+$lib = (& node -e "import('file:///$($app.Replace('\','/'))/lib/store.js').then(m=>console.log(m.settings().libraryPath))").Trim()
 if (-not (Test-Path "$lib\core\render\video.mjs")) { throw "Library not found at $lib" }
 $out = Join-Path ([Environment]::GetFolderPath('Desktop')) 'AutoTube-deploy'
 New-Item -ItemType Directory -Force $out | Out-Null

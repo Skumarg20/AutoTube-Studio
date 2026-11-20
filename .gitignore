@@ -4,6 +4,7 @@ config/elevenlabs.json
 config/settings.json
 config/youtube_client.json
 config/instagram.json
+config/google-service-account.json
 **/youtube_token.json
 **/youtube_client.json
 !config/youtube_client.example.json

@@ -293,8 +293,8 @@ Connect YouTube once in **Settings → Connections** (a free Google key, about 1
 
 ```
 autotube-studio/
-├── server.mjs          # The studio: dashboard, scheduler, video queue
-├── worker.mjs          # Render helper for a second PC
+├── server.js          # The studio: dashboard, scheduler, video queue
+├── worker.js          # Render helper for a second PC
 ├── dashboard/          # The web dashboard (Channels, Ideas, Calendar, Videos, Settings)
 ├── lib/                # Research, ideas, planning, voice, scheduling, YouTube stats
 │   └── v2/             # Themes, director, timeline and build pipeline
@@ -312,9 +312,9 @@ autotube-studio/
 
 | Task | Command |
 |---|---|
-| Start the studio | `start.cmd` or `node server.mjs` |
-| Check the computer is ready | `node tools\doctor.mjs` |
-| Set a dashboard password | `node tools\set-password.mjs` |
+| Start the studio | `start.cmd` or `node server.js` |
+| Check the computer is ready | `node tools\doctor.js` |
+| Set a dashboard password | `node tools\set-password.js` |
 | Is it running? | open `http://localhost:4747/healthz` |
 | Stop it | `deploy\stop-studio.ps1` |
 | Build an installer for another PC | `deploy\make-release.ps1` |

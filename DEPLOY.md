@@ -78,7 +78,7 @@ If the Windows username or the folder is different on the VM, set the library pa
 
 ## 5. Check everything
 ```
-node tools\doctor.mjs
+node tools\doctor.js
 ```
 Fix every **FAIL**. Read each WARN.
 
@@ -107,7 +107,7 @@ Pick one way:
 - **Remote Desktop**: no change needed. The dashboard opens only on the VM itself (the safest choice).
 - **Tailscale (recommended for the phone)**:
   1. Install Tailscale on the VM and on your phone and laptop.
-  2. On the VM, run `node tools\set-password.mjs` and restart the studio.
+  2. On the VM, run `node tools\set-password.js` and restart the studio.
   3. Open `http://<vm-tailscale-name>:4747` and sign in.
 - **Public internet**: only behind HTTPS, for example a Cloudflare Tunnel or a reverse proxy with a certificate, and with the password set. Never open port 4747 itself to the internet: plain http sends the password unencrypted.
 
@@ -115,7 +115,7 @@ How the password works:
 - Only a scrypt hash of it is stored.
 - 5 wrong tries lock that address for 15 minutes.
 - A sign-in lasts 30 days.
-- `node tools\set-password.mjs` changes it and signs every device out. Add `--off` to remove it.
+- `node tools\set-password.js` changes it and signs every device out. Add `--off` to remove it.
 
 ## 9. The laptop
 - Stop the studio on the laptop. If it started with Windows there, run `deploy\uninstall-autostart.ps1` on the laptop too.
@@ -133,7 +133,7 @@ How the password works:
 Set Active hours on the VM (Settings → Windows Update → Advanced). After an update restarts the VM, the studio starts again by itself, and videos that were being made start over.
 
 ## Before going live: checklist
-- [ ] `node tools\doctor.mjs` shows 0 FAIL
+- [ ] `node tools\doctor.js` shows 0 FAIL
 - [ ] the Test button is green for every channel and platform (on the VM)
 - [ ] the Google OAuth app is "In production"
 - [ ] one Short made end to end on the VM: check its frames, then approve and upload it

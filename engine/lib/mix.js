@@ -8,10 +8,10 @@ const TL = window.TL, VERT = (TL.meta && TL.meta.format) === 'short', W = VERT ?
 const used = new Set((TL.chapters || []).map(c => c.style));
 const WB = used.has('whiteboard') ? await import('./whiteboard.js') : null;
 const AN = TL.shots.some(x => x.type === 'anime') ? await import('./anime.js') : null;
-// this video's directed scenes (lib/v2/director.mjs): written for this video with each theme's own tools
+// this video's directed scenes (lib/v2/director.js): written for this video with each theme's own tools
 let SCN = { default: {}, subtitles: {} }; try { SCN = await import('./scenes.js'); } catch (err) { console.error('scenes.js: ' + err); }
 const SCENES = SCN.default || {}, SUBS = SCN.subtitles || {}, sceneShots = TL.shots.filter(x => x.type === 'scene');
-const IMGS = {}; await Promise.all([...new Set(sceneShots.map(x => x.img).filter(Boolean))].map(id => new Promise(res => { const im = new Image(); im.onload = () => { IMGS[id] = im; res(); }; im.onerror = () => res(); im.src = 'img/' + id + '.jpg'; })));
+const IMGS = {}; await Promise.all([...new Set(sceneShots.map(x => x.img).filter(Boolean))].map(id => new Promise(res => { const im = new Image(); im.onload = () => { IMGS[id] = im; res(); }; im.onerror = () => { if (im.src.endsWith('.jpg')) im.src = 'img/' + id + '.png'; else res(); }; im.src = 'img/' + id + '.jpg'; })));
 const mouthAt = t => { const m = (TL.mouth || []).find(x => t >= x[0] && t < x[1]); return m ? ({ A: 'closed', B: 'talk', C: 'talk', D: 'smileopen', E: 'oh', F: 'oh', G: 'talk', H: 'talk' })[m[2]] || null : null; };
 const wb = WB ? await WB.build({ vertical: VERT, only: 'whiteboard' }) : null;
 const an = AN ? await AN.build({ vertical: VERT }) : null;
@@ -22,7 +22,7 @@ const buf = new OffscreenCanvas(1920, 1080), bctx = buf.getContext('2d');
 const styleAt = t => { const C = TL.chapters || []; const c = C.find(c => t >= c.t0 && t < c.t1) || C[C.length - 1]; return c ? c.style : 'whiteboard'; };
 const subs = (TL.phrases || []).map(p => ({ t0: p.s - .05, t1: p.e + .25, text: p.w.map(w => w.w).join(' ') }));
 for (let i = 0; i < subs.length - 1; i++) subs[i].t1 = Math.min(Math.max(subs[i].t1, subs[i].t0 + 1), subs[i + 1].t0 - .04);
-const noSubs = new URLSearchParams(location.search).has('nosubs');
+const noSubs = new URLSearchParams(location.search).has('nosubs') || (TL.captionLook || {}).style === 'off';   // the editor can turn subtitles off
 
 function wrap2(text, maxW) {
   if (ctx.measureText(text).width <= maxW) return [text];
@@ -51,16 +51,54 @@ function tapeSub(t) {
   ctx.restore();
 }
 function sceneAt(t) { let i = -1; for (let k = 0; k < sceneShots.length; k++) if (sceneShots[k].t <= t) i = k; if (i < 0) return null; const s = sceneShots[i], nx = TL.shots.find(x => x.t > s.t); return { s, i, end: nx ? nx.t : TL.dur }; }
-function render(t) {
-  const st = styleAt(t);
+// a character video's on-camera lines (lib/character/clips.js): each clip as frames, full screen; nothing else plays over it
+const CLIPS = TL.characters || [], FRAMES = new Map();
+async function characterAt(t) {
+  const clip = CLIPS.find(c => t >= c.t0 && t < c.t1); if (!clip) return null;
+  const n = Math.max(1, Math.min(clip.frames, 1 + Math.floor((t - clip.t0) * clip.fps))), src = `${clip.dir}/f${String(n).padStart(5, '0')}.jpg`;
+  let frame = FRAMES.get(src);
+  if (!frame) { frame = new Image(); frame.src = src; try { await frame.decode(); } catch { } FRAMES.set(src, frame); if (FRAMES.size > 60) FRAMES.delete(FRAMES.keys().next().value); }
+  return { clip, frame };
+}
+function drawCover(im) { const r = Math.max(W / im.naturalWidth, H / im.naturalHeight), w = im.naturalWidth * r, h = im.naturalHeight * r; ctx.drawImage(im, (W - w) / 2, (H - h) / 2, w, h); }
+// character videos (TL.characters): word-by-word captions on every shot. 2-3 big words at a time; the word being said is
+// yellow and pops a little larger. Timing comes from the caption words (TL.phrases).
+// The editor's caption look (TL.captionLook): style word | phrase (no highlight) | off, position low | middle | high, size m | l | xl
+const CHARACTER_VIDEO = !!TL.characters;
+const LOOK = TL.captionLook || {};
+const CAPTION_Y = { low: .78, middle: .6, high: .22 }, CAPTION_SIZE = { m: 1, l: 1.2, xl: 1.4 };
+function wordCaption(t) {
+  const P = TL.phrases || [], i = P.findIndex((p, k) => t >= p.s - .05 && t < (P[k + 1] ? Math.min(P[k + 1].s - .02, p.e + .4) : p.e + .4)); if (i < 0) return;
+  const words = P[i].w.map(w => ({ ...w, text: String(w.w).toUpperCase() })), fs = (VERT ? 84 : 62) * (CAPTION_SIZE[LOOK.size] || 1), gap = fs * .3;
+  const base = LOOK.position && CAPTION_Y[LOOK.position] ? H * CAPTION_Y[LOOK.position] : (VERT ? 1500 : H - 130), highlight = LOOK.style !== 'phrase';
+  ctx.save(); ctx.font = `800 ${fs}px "Barlow SC", Inter, sans-serif`; ctx.textBaseline = 'alphabetic'; ctx.lineJoin = 'round';
+  const widths = words.map(w => ctx.measureText(w.text).width), total = widths.reduce((x, y) => x + y, 0) + gap * (words.length - 1);
+  let x = W / 2 - total / 2;
+  words.forEach((w, k) => {
+    const on = highlight && t >= w.s - .03 && t < w.e + .05, pop = on ? 1 + .14 * Math.min(1, (t - w.s + .03) / .08) : 1, cx = x + widths[k] / 2;
+    ctx.save(); ctx.translate(cx, base); ctx.scale(pop, pop); ctx.textAlign = 'center';
+    ctx.shadowColor = 'rgba(0,0,0,.45)'; ctx.shadowBlur = 14; ctx.strokeStyle = '#000'; ctx.lineWidth = fs * .2; ctx.strokeText(w.text, 0, 0);
+    ctx.shadowColor = 'transparent'; ctx.fillStyle = on ? '#FFD400' : '#fff'; ctx.fillText(w.text, 0, 0); ctx.restore();
+    x += widths[k] + gap;
+  });
+  ctx.restore();
+}
+// a character's clip, cover-filled; a quick punch-in on the line's key word (held to the end of the line)
+function drawClip(c, im, t) {
+  const z = c.punch == null || t < c.punch ? 1 : 1 + .1 * Math.min(1, (t - c.punch) / .12);
+  ctx.save(); ctx.translate(W / 2, H * .42); ctx.scale(z, z); ctx.translate(-W / 2, -H * .42); drawCover(im); ctx.restore();
+}
+function subtitle(t, st) { const sub = SUBS[st], cue = subs.find(c => t >= c.t0 && t < c.t1); if (sub && cue && !noSubs) { ctx.save(); sub(ctx, cue, { t, W, H, VERT }); ctx.restore(); } }
+async function render(t) {
+  const st = styleAt(t), live = await characterAt(t);
   ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalAlpha = 1;
+  if (live) { drawClip(live.clip, live.frame, t); if (!noSubs) wordCaption(t); return; }
   const cur = TL.shots.filter(x => x.t <= t).pop();
   if (cur && cur.type === 'scene') {
     const a = sceneAt(t), fn = a && SCENES['s' + a.i];
     ctx.fillStyle = '#000'; ctx.fillRect(0, 0, W, H);
     if (fn) { ctx.save(); fn({ t, lt: t - a.s.t, d: a.end - a.s.t, u: (t - a.s.t) / Math.max(.01, a.end - a.s.t), g: ctx, W, H, VERT, shot: a.s, img: id => IMGS[id] || null, mouthAt }); ctx.restore(); ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalAlpha = 1; ctx.globalCompositeOperation = 'source-over'; ctx.filter = 'none'; }
-    const sub = SUBS[st], cue = subs.find(c => t >= c.t0 && t < c.t1);
-    if (sub && cue && !noSubs) { ctx.save(); sub(ctx, cue, { t, W, H, VERT }); ctx.restore(); }
+    if (CHARACTER_VIDEO) { if (!noSubs) wordCaption(t); } else subtitle(t, st);
   }
   else if (st === 'cel-anime-80s' && an) { ctx.drawImage(an.render(t), 0, 0); if (!noSubs) tapeSub(t); }
   else if (wb) {

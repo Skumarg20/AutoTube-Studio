@@ -428,7 +428,7 @@ function viewFlowEdit() {
       <label style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="fYT" ${f.upload.youtube ? 'checked' : ''}> Upload to this channel's YouTube</label>
       <label style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="fIG" ${f.upload.instagram ? 'checked' : ''}> Post Shorts as Instagram Reels</label>
       <label class="f">YouTube privacy<select id="fPriv">${['public', 'unlisted', 'private'].map(v => `<option ${v === f.upload.privacy ? 'selected' : ''}>${v}</option>`).join('')}</select></label>
-      <div class="muted">This channel's accounts live in <code>${esc(root)}</code>: put <code>config\\youtube_client.json</code> and <code>config\\instagram.json</code> there (see uploaders\\SETUP.md), then connect YouTube once with:<br><code>set HS_UPLOADER_ROOT=${esc(root)} &amp;&amp; node uploaders\\youtube.mjs auth</code></div>
+      <div class="muted">This channel's accounts live in <code>${esc(root)}</code>: put <code>config\\youtube_client.json</code> and <code>config\\instagram.json</code> there (see uploaders\\SETUP.md), then connect YouTube once with:<br><code>set HS_UPLOADER_ROOT=${esc(root)} &amp;&amp; node uploaders\\youtube.js auth</code></div>
       ${isNew ? '' : `<div class="row" style="margin:0"><button class="b" onclick="flowConn('${f.id}')">Check connections</button><span class="muted" id="fConn"></span></div>`}
     </div></div>
    </div>

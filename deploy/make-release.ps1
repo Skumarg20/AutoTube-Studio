@@ -5,7 +5,7 @@
 # (deploy\make-package.ps1 is different: it moves YOUR studio with all its data to your own server.)
 $ErrorActionPreference = 'Stop'
 $app = Split-Path -Parent $PSScriptRoot
-$lib = (& node -e "import('file:///$($app.Replace('\','/'))/lib/store.mjs').then(m=>console.log(m.settings().libraryPath))").Trim()
+$lib = (& node -e "import('file:///$($app.Replace('\','/'))/lib/store.js').then(m=>console.log(m.settings().libraryPath))").Trim()
 if (-not (Test-Path "$lib\core\render\video.mjs")) { throw "Library not found at $lib" }
 $out = Join-Path ([Environment]::GetFolderPath('Desktop')) 'AutoTube-Studio-Setup'
 if (Test-Path $out) { Remove-Item $out -Recurse -Force }
@@ -13,7 +13,7 @@ New-Item -ItemType Directory -Force $out | Out-Null
 $tmp = Join-Path $env:TEMP 'autotube-release'; if (Test-Path $tmp) { Remove-Item $tmp -Recurse -Force }; New-Item -ItemType Directory -Force $tmp | Out-Null
 
 # ---- the studio: an allow-list of program files ----
-$files = @('server.mjs', 'worker.mjs', 'package.json', 'package-lock.json', 'start.cmd', 'README.md', 'THEMES.md', 'DEPLOY.md', 'CLAUDE.md', 'dashboard\index.html',
+$files = @('server.js', 'worker.js', 'package.json', 'package-lock.json', 'start.cmd', 'README.md', 'THEMES.md', 'DEPLOY.md', 'CLAUDE.md', 'dashboard\index.html',
            'config\.env.example', 'config\youtube_client.example.json', 'config\instagram.example.json')
 $dirs = @('lib', 'engine', 'uploaders', 'template', 'deploy', 'dashboard\previews', 'tools')
 $skip = '^(tools\\(rhubarb_dl|bin)\\|tools\\test_|tools\\ai_test|deploy\\make-package|deploy\\setup-server)|\.(bak|log)$|\.before'
